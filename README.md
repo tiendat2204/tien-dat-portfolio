@@ -1,45 +1,61 @@
 
+# Tien Dat Portfolio [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftiendat2204%2Ftien-dat-portfolio)
 
-# Portfolio [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdillionverma%2Fportfolio)
+🚀 A personal portfolio built with Next.js, TypeScript, Shadcn/UI, TailwindCSS, Framer Motion, and Magic UI — fully responsive and deployed on [Vercel](https://vercel.com).
 
-Built with next.js, [shadcn/ui](https://ui.shadcn.com/), and [magic ui](https://magicui.design/), deployed on Vercel.
+## ✨ Features
 
-# Features
+- **Easy Configuration**: Customize your portfolio by editing a single config file [`resume.tsx`](./src/data/resume.tsx)
+- **Modern Stack**: Built with Next.js 14, React, TypeScript, TailwindCSS, Shadcn/UI, Framer Motion, and Magic UI
+- **Blog Included**: Easily publish blog posts and updates
+- **Fully Responsive**: Works great on all devices
+- **Optimized for Vercel**: Fast and efficient deployment
 
-- Setup only takes a few minutes by editing the [single config file](./src/data/resume.tsx)
-- Built using Next.js 14, React, Typescript, Shadcn/UI, TailwindCSS, Framer Motion, Magic UI
-- Includes a blog
-- Responsive for different devices
-- Optimized for Next.js and Vercel
+## 🚀 Getting Started Locally
 
-# Getting Started Locally
+Follow these steps to run the project locally:
 
-1. Clone this repository to your local machine:
-
-   ```bash
-   git clone https://github.com/dillionverma/portfolio
-   ```
-
-2. Move to the cloned directory
+1. **Clone the repository:**
 
    ```bash
-   cd portfolio
+   git clone git@github.com:tiendat2204/tien-dat-portfolio.git
    ```
 
-3. Install dependencies:
+2. **Navigate into the project directory:**
+
+   ```bash
+   cd tien-dat-portfolio
+   ```
+
+3. **Install dependencies:**
+
+   Using `pnpm`:
 
    ```bash
    pnpm install
    ```
 
-4. Start the local Server:
+   > You can also use `npm install` or `yarn install` if you prefer.
+
+4. **Run the development server:**
 
    ```bash
    pnpm dev
    ```
 
-5. Open the [Config file](./src/data/resume.tsx) and make changes
+   Open your browser and go to `http://localhost:3000`
 
-# License
+5. **Customize your personal information**:
 
-Licensed under the [MIT license](https://github.com/dillionverma/portfolio/blob/main/LICENSE.md).
+   Open the file [`src/data/resume.tsx`](./src/data/resume.tsx) and update your name, skills, projects, social links, etc.
+
+## 📦 Deployment
+
+This project is optimized for deployment on Vercel. You can deploy it instantly by clicking the button below:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftiendat2204%2Ftien-dat-portfolio)
+
+## 📄 License
+
+This project is licensed under the [MIT License](./LICENSE.md).
+
