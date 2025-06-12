@@ -79,10 +79,10 @@ export default function BlogPage() {
         id="background"
         className="relative screen-line-before border-x"
       >
-        <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 text-white" />
-        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
-        <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 text-white" />
-        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
+        <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black" />
+        <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black" />
         <div className="flex w-full h-[200px] justify-center items-center">
           <FlickeringGrid
             className={`absolute inset-0 z-0 [mask-image:radial-gradient(1000px_circle_at_center,white,transparent)] motion-safe:animate-pulse`}
@@ -102,13 +102,13 @@ export default function BlogPage() {
 
       <section
         id="blog-header"
-        className="relative screen-line-before screen-line-after pt-1"
+        className="relative screen-line-before screen-line-after "
       >
         <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
         <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
         <div className="mx-auto w-full space-y-8 border-x">
-          <div className="flex items-stretch justify-center min-h-[120px]">
-            <div className="flex flex-col justify-between h-full min-h-[140px] md:min-h-[170px]">
+          <div className="flex items-stretch justify-center w-full min-h-[120px] ">
+            <div className="flex flex-col justify-between h-full min-h-[140px] md:min-h-[170px] w-full">
               <div className="flex items-center justify-between border-y w-full">
                 <BlurFadeText
                   delay={BLUR_FADE_DELAY}

@@ -6,15 +6,14 @@ import { ProjectCard } from "@/components/project-card";
 import { ResumeCard } from "@/components/resume-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DATA, LOGO_BASE64 } from "@/data/resume";
-import Link from "next/link";
 import Markdown from "react-markdown";
 import { FlickeringGrid } from "@/components/ui/flickering-grid-hero";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import SkillsSection from "./section/skills-section";
 import React  from "react";
 import WorkSection from "@/app/section/work-section";
+import BlogSection from "@/app/section/blog-section";
 import {Icon} from "@/components/Icon";
-import {Footer} from "@/components/footer";
 import AnimatedSocialLinks from "@/components/ui/social-links";
 import {TextLoop} from "@/components/ui/text-loop";
 import {Icons} from "@/components/icons";
@@ -58,10 +57,10 @@ export default function Page() {
         id="background"
         className="relative screen-line-before  border-x"
       >
-        <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 text-white" />
-        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
-        <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 text-white" />
-        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
+        <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black" />
+        <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black" />
         <div className="flex w-full h-[200px]  justify-center items-center">
           <FlickeringGrid
             className={`absolute inset-0 z-0 [mask-image:radial-gradient(1000px_circle_at_center,white,transparent)] motion-safe:animate-pulse`}
@@ -82,8 +81,8 @@ export default function Page() {
         id="information"
         className="relative screen-line-before screen-line-after pt-1 "
       >
-        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
-        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black" />
         <div className="mx-auto w-full space-y-8 border-x">
           <div className="flex items-stretch justify-center min-h-[120px]">
             <div className="">
@@ -102,7 +101,7 @@ export default function Page() {
                   <div className="flex items-center gap-2 px-4">
                       <BlurFade delay={BLUR_FADE_DELAY}>
                           <AnimatedSocialLinks
-                              socials={Object.entries(DATA.contact.social).map(([name, social]) => ({
+                              socials={Object.entries(DATA.contact.social).map(([, social]) => ({
                                   icon: social.icon,
                                   image: social.image || '',
                                   url: social.url
@@ -121,7 +120,6 @@ export default function Page() {
                 />
                   <div className="size-6 mr-4">
                       <Icons.logo/>
-
                   </div>
               </div>
                 <BlurFade delay={BLUR_FADE_DELAY}>
@@ -133,9 +131,9 @@ export default function Page() {
                         DATA.contact.email,
                         DATA.contact.tel,
                     ].map((text) => (
-                        <span key={text} className="block px-4 font-normal font-ibm text-left text-muted">
-              {text}
-            </span>
+                        <span key={text} className="block px-4 font-normal font-ibm text-left dark:text-muted text-gray-400">
+                           {text}
+                         </span>
                     ))}
                 </TextLoop>
                 </BlurFade>
@@ -160,10 +158,10 @@ export default function Page() {
         </div>
       </section>
       <section id="skills" className="relative screen-line-after border-x">
-        <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 text-white" />
-        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
-        <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 text-white" />
-        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
+        <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black" />
+        <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black" />
         <div className="border-b">
           <BlurFade delay={BLUR_FADE_DELAY * 3} offset={0}>
             <h2 className="text-2xl font-extrabold px-4 font-doto">Skills</h2>
@@ -173,10 +171,10 @@ export default function Page() {
         <SkillsSection />
       </section>
       <section id="work" className="relative screen-line-after border-x font-ibm">
-        <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 text-white" />
-        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
-        <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 text-white" />
-        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
+        <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black" />
+        <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black" />
         <div className="flex min-h-0 flex-col">
           <div className="border-b">
             <BlurFade delay={BLUR_FADE_DELAY * 5} offset={0}>
@@ -187,10 +185,10 @@ export default function Page() {
         </div>
       </section>
       <section id="education" className="relative screen-line-after border-x font-ibm">
-          <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 text-white" />
-          <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
-          <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 text-white" />
-          <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
+          <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black" />
+          <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black" />
+          <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black" />
+          <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black" />
           <div className="border-b">
           <BlurFade delay={BLUR_FADE_DELAY * 7}>
             <h2 className="text-2xl font-extrabold px-4 font-doto">Education</h2>
@@ -224,10 +222,10 @@ export default function Page() {
       </section>
 
       <section id="projects" className="relative screen-line-after border-x font-ibm">
-          <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 text-white" />
-          <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
-          <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 text-white" />
-          <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
+          <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black" />
+          <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black" />
+          <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black" />
+          <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black" />
           <div className="border-b">
           <BlurFade delay={BLUR_FADE_DELAY * 11}>
             <h2 className="text-2xl font-extrabold px-4 font-doto">Project</h2>
@@ -253,10 +251,10 @@ export default function Page() {
           </div>
       </section>
         <section id="awards" className="relative screen-line-after border-x font-ibm">
-            <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 text-white" />
-            <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
-            <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 text-white" />
-            <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
+            <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black" />
+            <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black" />
+            <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black" />
+            <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black" />
             <div className="border-b">
                 <BlurFade delay={BLUR_FADE_DELAY * 13}>
                     <h2 className="text-2xl font-extrabold px-4 font-doto">Awards</h2>
@@ -282,6 +280,9 @@ export default function Page() {
             </BlurFade>
         </section>
 
+        <BlogSection />
+
     </main>
   );
 }
+

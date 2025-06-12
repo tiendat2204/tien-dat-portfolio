@@ -1,512 +1,108 @@
 ---
-title: "Creating Facebook-like Sticker Animations with React"
+title: "StickerCop - React Sprite Sheet Animation Component"
 publishedAt: "2025-06-12"
-summary: "Learn how to build interactive sprite sheet animations for stickers similar to Facebook's implementation."
+summary: "A reusable React component for creating Facebook-style interactive sticker animations using sprite sheets"
 image: "/stickers/hero-image.png"
 author: "Tien Dat"
 tags: ["react", "animation", "ui", "frontend", "sprite-sheets"]
 ---
 
 <Image
-  src="/projects/stickers-demo.gif"
-  alt="Facebook-style sticker animations in action"
+  src="/stickers/sprite-sheet-example.png"
+  alt="Example of a sprite sheet with multiple animation frames"
   width={800}
   height={400}
   className="rounded-lg shadow-md"
 />
 
-# Creating Facebook-like Sticker Animations with React
+# StickerCop
 
-> *Add a touch of personality to your messaging app with interactive animated stickers that respond to user interactions.*
+A lightweight React component for creating interactive sprite sheet animations similar to Facebook stickers.
 
-Interactive stickers have become a staple feature of modern social platforms. Facebook's expressive stickers add a fun layer to communication, making conversations more engaging. In this tutorial, I'll walk you through building a reusable React component that mimics Facebook's sticker animations using sprite sheets.
+---
 
-## Interactive Demo 🎮
+## 🖼️ Sticker Demo
 
-<div className="my-8 p-6 bg-gray-50 dark:bg-gray-800/30 rounded-xl">
-  <h3 className="text-xl font-bold mb-4 text-center">Try It Out!</h3>
-  <p className="text-center mb-6">Hover over these stickers to see the animations in action:</p>
+Hover over a sticker to see it animate, and click to select it!
 
-  <div className="flex flex-wrap justify-center gap-6">
-    {/* This is our demo component that uses StickerCop */}
-    <StickerDemo />
-  </div>
+👉 [See Demo](https://sticker-animation-umber.vercel.app/)
 
-  <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-    Hover over a sticker to see it animate, and click to select it!
-  </div>
-</div>
+---
 
-## What are Sprite Sheet Animations? 🎬
 
-<div className="flex flex-col md:flex-row gap-6 items-center">
-  <div className="flex-1">
-    <p>Sprite sheets are single images that contain multiple frames of an animation arranged in a grid. Instead of loading multiple image files, we load one image and show different portions of it to create the animation effect.</p>
-
-    <p className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-      <span className="font-bold">💡 Pro Tip:</span> Using sprite sheets can dramatically improve loading times and animation performance in your web applications!
-    </p>
-  </div>
-
-  <div className="flex-1">
-    <Image
-      src="/stickers/sprite-sheet-example.png"
-      alt="Example of a sprite sheet with multiple animation frames"
-      width={400}
-      height={300}
-      className="rounded-lg border-2 border-gray-200 dark:border-gray-800"
-    />
-  </div>
-</div>
-
-### Benefits of Sprite Sheets
-
-- ⚡ **Reduced HTTP Requests** - Load one image instead of many
-- 🧠 **Better Memory Management** - Lower memory footprint
-- 🎯 **Smoother Animations** - Faster frame transitions
-- 🚀 **Improved Loading Performance** - Faster initial load time
-
-## The StickerCop Component ✨
-
-I've built a reusable React component called `StickerCop` that handles sprite sheet animations. Here's what it can do:
-
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
-  <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-    <h3 className="text-green-700 dark:text-green-400 font-bold">Features</h3>
-    <ul className="list-disc pl-5 mt-2">
-      <li>Play animations on hover</li>
-      <li>Support various sprite sheet layouts</li>
-      <li>Configurable frame rates</li>
-      <li>Customizable sizes</li>
-      <li>Support for click events</li>
-    </ul>
-  </div>
-
-  <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
-    <h3 className="text-purple-700 dark:text-purple-400 font-bold">Use Cases</h3>
-    <ul className="list-disc pl-5 mt-2">
-      <li>Chat applications</li>
-      <li>Interactive feedback</li>
-      <li>Game interfaces</li>
-      <li>Reaction systems</li>
-      <li>Animated icons</li>
-    </ul>
-  </div>
-</div>
-
-Let's dive into the implementation:
+## Usage
 
 ```tsx
-'use client'
-import React, { useEffect, useState, useMemo, useCallback } from 'react'
-import Image from 'next/image'
+import StickerCop from '@/components/ui/sticker-cop'
 
-interface StickerProps {
-  id: string;
-  frameCount: number;
-  frameRate: number;
-  framesPerCol: number;
-  framesPerRow: number;
-  spriteImg: string;
-  className?: string;
-  frameSize?: number;
-  onStickerClick?: (id: string) => void;
-}
-
-const StickerCop: React.FC<StickerProps> = ({
-  id,
-  frameCount,
-  frameRate,
-  framesPerCol,
-  framesPerRow,
-  spriteImg,
-  className = '',
-  frameSize = 64,
-  onStickerClick,
-}) => {
-  const [currentFrame, setCurrentFrame] = useState(0)
-  const [isHovered, setIsHovered] = useState(false)
-
-  // Calculate frame position
-  const framePosition = useMemo(() => {
-    const currentCol = currentFrame % framesPerRow
-    const currentRow = Math.floor(currentFrame / framesPerRow)
-    return { col: currentCol, row: currentRow }
-  }, [currentFrame, framesPerRow])
-
-  // Handle hover to start/stop animation
-  const handleMouseEnter = useCallback(() => {
-    setIsHovered(true)
-  }, [])
-
-  const handleMouseLeave = useCallback(() => {
-    setIsHovered(false)
-    setCurrentFrame(0) // Reset to first frame when not hovering
-  }, [])
-
-  // Handle click
-  const handleClick = useCallback(() => {
-    if (onStickerClick) {
-      onStickerClick(id)
-    } else {
-      console.log(`Sticker clicked: ${id}`)
-    }
-  }, [id, onStickerClick])
-
-  // Calculate sizes and transformations
-  const containerStyle = useMemo(
-    () => ({
-      width: `${frameSize}px`,
-      height: `${frameSize}px`,
-    }),
-    [frameSize]
-  )
-
-  const spriteStyle = useMemo(
-    () => ({
-      width: `${framesPerRow * frameSize}px`,
-      height: `${framesPerCol * frameSize}px`,
-      transform: `translate(-${framePosition.col * frameSize}px, -${framePosition.row * frameSize}px)`,
-      transition: 'transform 0s',
-    }),
-    [framePosition, framesPerRow, framesPerCol, frameSize]
-  )
-
-  // Only update frame when hovering
-  useEffect(() => {
-    if (!isHovered) return
-
-    const frameInterval = setInterval(() => {
-      setCurrentFrame((prevFrame) => {
-        const nextFrame = (prevFrame + 1) % frameCount
-        return nextFrame
-      })
-    }, 1000 / frameRate)
-
-    return () => clearInterval(frameInterval)
-  }, [frameCount, frameRate, isHovered])
+export default function Example() {
+  const handleStickerClick = (id: string) => {
+    console.log(`Sticker ${id} was clicked!`)
+    // Add your logic here
+  }
 
   return (
-    <div className='hover:bg-gray-100/90 dark:hover:bg-sidebar px-1 cursor-pointer rounded-lg'>
-      <div
-        className='relative overflow-hidden'
-        style={containerStyle}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onClick={handleClick}
-        data-testid={`sticker-${id}`}
-      >
-        <div className={`absolute ${className}`} style={spriteStyle}>
-          <Image
-            id={id}
-            src={spriteImg}
-            alt={`Sprite Animation ${id}`}
-            width={framesPerRow * frameSize}
-            height={framesPerCol * frameSize}
-            priority
-            unoptimized
-          />
-        </div>
-      </div>
+    <div className="flex gap-4">
+      <StickerCop
+        id="cute-cat"
+        frameCount={16}
+        frameRate={12}
+        framesPerRow={4}
+        framesPerCol={4}
+        spriteImg="/stickers/cat-sprite.png"
+        frameSize={80}
+        onStickerClick={handleStickerClick}
+      />
+
+      <StickerCop
+        id="thumbs-up"
+        frameCount={24}
+        frameRate={15}
+        framesPerRow={6}
+        framesPerCol={4}
+        spriteImg="/stickers/sprite-2.png"
+        frameSize={80}
+        onStickerClick={handleStickerClick}
+      />
     </div>
   )
 }
 ```
 
-## How It Works 🛠️
+## Props
 
-<div className="p-5 bg-amber-50 dark:bg-amber-900/20 rounded-xl mb-8">
-  <h3 className="text-xl font-bold text-amber-700 dark:text-amber-400">Technical Overview</h3>
-  <p className="mt-2">
-    The StickerCop component works by displaying a portion of a larger image (sprite sheet) and changing which portion is visible based on user interaction and timing.
-  </p>
-</div>
+| Prop | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Unique identifier for the sticker |
+| `frameCount` | `number` | Total number of animation frames |
+| `frameRate` | `number` | Speed of animation in frames per second |
+| `framesPerCol` | `number` | Number of frames vertically in the sprite sheet |
+| `framesPerRow` | `number` | Number of frames horizontally in the sprite sheet |
+| `spriteImg` | `string` | URL to the sprite sheet image |
+| `className` | `string?` | Optional additional CSS classes |
+| `frameSize` | `number?` | Size of each individual frame (default: 64px) |
+| `onStickerClick` | `(id: string) => void` | Callback when sticker is clicked |
 
-### 1. Component Props
+## Features
 
-The component accepts several important props:
+- ✅ Play animations on hover
+- ✅ Support for various sprite sheet layouts
+- ✅ Configurable frame rates
+- ✅ Customizable sizes
+- ✅ React/Next.js friendly
+- ✅ Performance optimized with useMemo/useCallback
+- ✅ TypeScript support
 
-<div className="overflow-x-auto">
-  <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md my-6">
-    <thead className="bg-gray-100 dark:bg-gray-700">
-      <tr>
-        <th className="py-3 px-4 text-left">Prop</th>
-        <th className="py-3 px-4 text-left">Type</th>
-        <th className="py-3 px-4 text-left">Description</th>
-      </tr>
-    </thead>
-    <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
-      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-        <td className="py-3 px-4 font-medium">id</td>
-        <td className="py-3 px-4 text-gray-600 dark:text-gray-300">string</td>
-        <td className="py-3 px-4">Unique identifier for the sticker</td>
-      </tr>
-      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-        <td className="py-3 px-4 font-medium">frameCount</td>
-        <td className="py-3 px-4 text-gray-600 dark:text-gray-300">number</td>
-        <td className="py-3 px-4">Total number of animation frames</td>
-      </tr>
-      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-        <td className="py-3 px-4 font-medium">frameRate</td>
-        <td className="py-3 px-4 text-gray-600 dark:text-gray-300">number</td>
-        <td className="py-3 px-4">Speed of animation in frames per second</td>
-      </tr>
-      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-        <td className="py-3 px-4 font-medium">framesPerCol</td>
-        <td className="py-3 px-4 text-gray-600 dark:text-gray-300">number</td>
-        <td className="py-3 px-4">Number of frames vertically in the sprite sheet</td>
-      </tr>
-      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-        <td className="py-3 px-4 font-medium">framesPerRow</td>
-        <td className="py-3 px-4 text-gray-600 dark:text-gray-300">number</td>
-        <td className="py-3 px-4">Number of frames horizontally in the sprite sheet</td>
-      </tr>
-      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-        <td className="py-3 px-4 font-medium">spriteImg</td>
-        <td className="py-3 px-4 text-gray-600 dark:text-gray-300">string</td>
-        <td className="py-3 px-4">URL to the sprite sheet image</td>
-      </tr>
-      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-        <td className="py-3 px-4 font-medium">frameSize</td>
-        <td className="py-3 px-4 text-gray-600 dark:text-gray-300">number?</td>
-        <td className="py-3 px-4">Size of each individual frame (optional)</td>
-      </tr>
-      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-        <td className="py-3 px-4 font-medium">onStickerClick</td>
-        <td className="py-3 px-4 text-gray-600 dark:text-gray-300">(id: string) => void</td>
-        <td className="py-3 px-4">Callback when sticker is clicked (optional)</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+## Example: Sticker Picker
 
-### 2. State Management
-
-<div className="flex flex-col md:flex-row gap-6 my-6">
-  <div className="flex-1 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-    <h4 className="font-bold text-lg mb-2">currentFrame</h4>
-    <p>Tracks which frame of animation we're on</p>
-    <div className="mt-3 p-2 bg-gray-100 dark:bg-gray-800 rounded">
-      <code>const [currentFrame, setCurrentFrame] = useState(0)</code>
-    </div>
-  </div>
-
-  <div className="flex-1 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-    <h4 className="font-bold text-lg mb-2">isHovered</h4>
-    <p>Determines if animation should play</p>
-    <div className="mt-3 p-2 bg-gray-100 dark:bg-gray-800 rounded">
-      <code>const [isHovered, setIsHovered] = useState(false)</code>
-    </div>
-  </div>
-</div>
-
-### 3. Frame Position Calculation
-
-The component calculates the position of each frame in the sprite sheet:
-
-<div className="relative">
-  <div className="absolute top-0 right-0 bg-gradient-to-l from-blue-500 to-purple-500 text-white px-3 py-1 rounded-bl-lg rounded-tr-lg text-xs">CORE LOGIC</div>
-  <div className="border rounded-lg p-4 mt-6 bg-gray-50 dark:bg-gray-800/50">
-    ```jsx
-    const framePosition = useMemo(() => {
-      const currentCol = currentFrame % framesPerRow
-      const currentRow = Math.floor(currentFrame / framesPerRow)
-      return { col: currentCol, row: currentRow }
-    }, [currentFrame, framesPerRow])
-    ```
-  </div>
-</div>
-
-### 4. Animation Logic
-
-<div className="my-6">
-  <div className="mb-4">
-    <Image
-      src="/stickers/animation-diagram.png"
-      alt="Diagram showing how the animation cycle works"
-      width={600}
-      height={300}
-      className="rounded-lg mx-auto border border-gray-200 dark:border-gray-700"
-    />
-  </div>
-
-  <p>The animation starts when a user hovers over the sticker and stops when they move away:</p>
-
-  ```jsx
-  useEffect(() => {
-    if (!isHovered) return
-
-    const frameInterval = setInterval(() => {
-      setCurrentFrame((prevFrame) => {
-        const nextFrame = (prevFrame + 1) % frameCount
-        return nextFrame
-      })
-    }, 1000 / frameRate)
-
-    return () => clearInterval(frameInterval)
-  }, [frameCount, frameRate, isHovered])
-  ```
-</div>
-
-### 5. CSS Transformations
-
-<div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg my-6">
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-    <div>
-      <h4 className="font-bold mb-2">The Magic Behind the Animations</h4>
-      <p>We use the <code className="px-1 bg-gray-200 dark:bg-gray-700 rounded">transform</code> CSS property to display different parts of the sprite sheet:</p>
-    </div>
-    <div>
-      ```jsx
-      const spriteStyle = useMemo(
-        () => ({
-          width: `${framesPerRow * frameSize}px`,
-          height: `${framesPerCol * frameSize}px`,
-          transform: `translate(-${framePosition.col * frameSize}px, -${framePosition.row * frameSize}px)`,
-          transition: 'transform 0s',
-        }),
-        [framePosition, framesPerRow, framesPerCol, frameSize]
-      )
-      ```
-    </div>
-  </div>
-</div>
-
-## Example Usage 📱
-
-Here's how you can use the StickerCop component in your React application:
-
-<div className="my-8 p-6 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
-  ```jsx
-  import StickerCop from '@/components/StickerCop'
-
-  export default function StickerDemo() {
-    const handleStickerClick = (id: string) => {
-      console.log(`Sticker ${id} was clicked!`)
-      // Add your logic here, like adding the sticker to a message
-    }
-
-    return (
-      <div className="flex gap-4 p-4 bg-white dark:bg-gray-900 rounded-lg shadow-md">
-        <StickerCop
-          id="cute-cat"
-          frameCount={16}
-          frameRate={12}
-          framesPerRow={4}
-          framesPerCol={4}
-          spriteImg="/stickers/cat-sprite.png"
-          frameSize={80}
-          onStickerClick={handleStickerClick}
-        />
-
-        <StickerCop
-          id="thumbs-up"
-          frameCount={24}
-          frameRate={15}
-          framesPerRow={6}
-          framesPerCol={4}
-          spriteImg="/stickers/thumbs-up-sprite.png"
-          frameSize={80}
-          onStickerClick={handleStickerClick}
-        />
-      </div>
-    )
-  }
-  ```
-</div>
-
-## Performance Optimizations ⚡
-
-Notice several performance optimizations in the component:
-
-<div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
-  <div className="p-4 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 shadow-sm">
-    <h4 className="font-bold text-green-700 dark:text-green-400 flex items-center">
-      <span className="mr-2">⚡</span> useMemo
-    </h4>
-    <p className="mt-2 text-gray-700 dark:text-gray-300">For expensive calculations like frame positions and styles</p>
-    <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">Prevents recalculation on every render</div>
-  </div>
-
-  <div className="p-4 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 shadow-sm">
-    <h4 className="font-bold text-blue-700 dark:text-blue-400 flex items-center">
-      <span className="mr-2">🔄</span> useCallback
-    </h4>
-    <p className="mt-2 text-gray-700 dark:text-gray-300">For event handlers to prevent unnecessary re-renders</p>
-    <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">Maintains reference consistency between renders</div>
-  </div>
-
-  <div className="p-4 rounded-lg bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 shadow-sm">
-    <h4 className="font-bold text-amber-700 dark:text-amber-400 flex items-center">
-      <span className="mr-2">🖼️</span> unoptimized
-    </h4>
-    <p className="mt-2 text-gray-700 dark:text-gray-300">Used with Next.js Image to prevent automatic optimizations</p>
-    <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">Ensures sprite sheet displays correctly</div>
-  </div>
-
-  <div className="p-4 rounded-lg bg-gradient-to-br from-purple-50 to-fuchsia-50 dark:from-purple-900/20 dark:to-fuchsia-900/20 shadow-sm">
-    <h4 className="font-bold text-purple-700 dark:text-purple-400 flex items-center">
-      <span className="mr-2">🔁</span> Frame reset
-    </h4>
-    <p className="mt-2 text-gray-700 dark:text-gray-300">Animation resets when hovering stops</p>
-    <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">Saves resources when not in use</div>
-  </div>
-</div>
-
-## Creating Your Own Sprite Sheets 🎨
-
-<div className="flex flex-col md:flex-row gap-6 items-center my-8">
-  <div className="flex-1">
-    <Image
-      src="/stickers/sprite-creation.png"
-      alt="Process of creating a sprite sheet in design software"
-      width={350}
-      height={250}
-      className="rounded-lg shadow-md"
-    />
-  </div>
-
-  <div className="flex-1">
-    <ol className="list-decimal pl-5 space-y-3">
-      <li className="pb-2 border-b border-gray-200 dark:border-gray-700">
-        <span className="font-bold">Create or acquire an animation sequence</span>
-        <p className="text-sm text-gray-600 dark:text-gray-400">Design your animation frames or find existing ones</p>
-      </li>
-      <li className="pb-2 border-b border-gray-200 dark:border-gray-700">
-        <span className="font-bold">Arrange frames in a grid</span>
-        <p className="text-sm text-gray-600 dark:text-gray-400">Use design software like Photoshop, GIMP, or Figma</p>
-      </li>
-      <li className="pb-2 border-b border-gray-200 dark:border-gray-700">
-        <span className="font-bold">Make sure each frame is equally sized</span>
-        <p className="text-sm text-gray-600 dark:text-gray-400">Consistent dimensions are crucial for proper animation</p>
-      </li>
-      <li className="pb-2 border-b border-gray-200 dark:border-gray-700">
-        <span className="font-bold">Export as a single image</span>
-        <p className="text-sm text-gray-600 dark:text-gray-400">PNG or WebP formats work best for animation</p>
-      </li>
-      <li>
-        <span className="font-bold">Note the frames, rows, and columns</span>
-        <p className="text-sm text-gray-600 dark:text-gray-400">You'll need these values for the component props</p>
-      </li>
-    </ol>
-  </div>
-</div>
-
-<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-500 my-8">
-  <h4 className="font-bold text-lg text-blue-700 dark:text-blue-400 mb-2">💡 Pro Tip</h4>
-  <p>You can use tools like <a href="https://www.leshylabs.com/apps/sstool/" className="text-blue-600 dark:text-blue-400 underline hover:no-underline">Leshy SpriteSheet Tool</a> to automatically generate sprite sheets from individual image files!</p>
-</div>
-
-## Building a Sticker Picker Component 🌟
-
-Now let's build a practical example - a sticker picker component that showcases multiple stickers:
+Here's an example of how to implement a sticker picker component:
 
 ```tsx
 'use client'
 import React, { useState } from 'react'
-import StickerCop from '@/components/StickerCop'
+import StickerCop from '@/components/ui/sticker-cop'
 
-// Sample sticker data - in a real app, this would come from your API
+// Sample sticker data
 const STICKERS = [
   {
     id: 'thumbs-up',
@@ -526,24 +122,7 @@ const STICKERS = [
     spriteImg: '/stickers/heart-sprite.png',
     label: 'Heart'
   },
-  {
-    id: 'laugh',
-    frameCount: 16,
-    frameRate: 12,
-    framesPerRow: 4,
-    framesPerCol: 4,
-    spriteImg: '/stickers/laugh-sprite.png',
-    label: 'Laugh'
-  },
-  {
-    id: 'surprised',
-    frameCount: 16,
-    frameRate: 12,
-    framesPerRow: 4,
-    framesPerCol: 4,
-    spriteImg: '/stickers/surprised-sprite.png',
-    label: 'Surprised'
-  }
+  // Add more stickers as needed
 ]
 
 const StickerDemo = () => {
@@ -551,7 +130,7 @@ const StickerDemo = () => {
 
   const handleStickerClick = (id: string) => {
     setSelectedSticker(id)
-    // In a real app, you might send this sticker to a chat or add it to a message
+    // In a real app, you might send this sticker to a chat
     console.log(`Selected sticker: ${id}`)
   }
 
@@ -596,115 +175,3 @@ const StickerDemo = () => {
 export default StickerDemo
 ```
 
-## Advanced Usage: Animation Controls 🎛️
-
-If you want to give users more control over animations, you can extend the component to include animation controls:
-
-<div className="my-8 p-6 bg-gray-100 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
-  <h3 className="text-lg font-bold mb-4">Animation Control Ideas</h3>
-  <ul className="space-y-3">
-    <li className="flex items-start">
-      <span className="inline-flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 w-6 h-6 mr-3 flex-shrink-0">✓</span>
-      <span><strong>Play/Pause Button:</strong> Allow users to manually control animation playback</span>
-    </li>
-    <li className="flex items-start">
-      <span className="inline-flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 w-6 h-6 mr-3 flex-shrink-0">✓</span>
-      <span><strong>Speed Slider:</strong> Let users adjust the frameRate on the fly</span>
-    </li>
-    <li className="flex items-start">
-      <span className="inline-flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 w-6 h-6 mr-3 flex-shrink-0">✓</span>
-      <span><strong>Frame Scrubber:</strong> Allow users to manually navigate between animation frames</span>
-    </li>
-    <li className="flex items-start">
-      <span className="inline-flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 w-6 h-6 mr-3 flex-shrink-0">✓</span>
-      <span><strong>Loop Controls:</strong> Options for playing once, looping, or ping-pong animations</span>
-    </li>
-  </ul>
-
-  <div className="mt-5 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-sm">
-    <strong>Implementation Note:</strong> These features would require expanding the StickerCop component API with additional props and state management.
-  </div>
-</div>
-
-## Integration with Chat Applications 💬
-
-Here's how you might integrate the stickers into a chat interface:
-
-```tsx
-<div className="flex flex-col h-screen">
-  {/* Chat messages area */}
-  <div className="flex-1 p-4 overflow-y-auto">
-    {messages.map((message) => (
-      <div key={message.id} className={`flex ${message.isMe ? 'justify-end' : 'justify-start'} mb-4`}>
-        {message.type === 'sticker' ? (
-          <div className="max-w-xs">
-            <StickerCop
-              id={message.stickerId}
-              frameCount={message.frameCount}
-              frameRate={message.frameRate}
-              framesPerRow={message.framesPerRow}
-              framesPerCol={message.framesPerCol}
-              spriteImg={message.spriteImg}
-              frameSize={120}
-            />
-          </div>
-        ) : (
-          <div className={`p-3 rounded-lg ${message.isMe ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700'}`}>
-            {message.text}
-          </div>
-        )}
-      </div>
-    ))}
-  </div>
-
-  {/* Sticker picker toggle and message input */}
-  <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-    <div className="flex items-center gap-2">
-      <button
-        onClick={() => setShowStickerPicker(!showStickerPicker)}
-        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
-      >
-        😀
-      </button>
-      <input
-        type="text"
-        className="flex-1 border border-gray-300 dark:border-gray-600 rounded-full px-4 py-2 bg-transparent"
-        placeholder="Type a message..."
-      />
-      <button className="bg-blue-500 text-white rounded-full p-2">
-        Send
-      </button>
-    </div>
-
-    {showStickerPicker && (
-      <div className="mt-2 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
-        <StickerDemo />
-      </div>
-    )}
-  </div>
-</div>
-```
-
-## Conclusion
-
-With this reusable sticker animation component, you can add Facebook-like sticker interactions to your web applications. The component is flexible enough to work with various sprite sheet layouts and can be extended to support additional features like favorites, categories, or custom behaviors.
-
-<div className="p-6 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl my-8 text-center">
-  <h3 className="text-xl font-bold text-indigo-700 dark:text-indigo-400 mb-3">Ready to enhance your user interactions?</h3>
-  <p className="mb-4">Try implementing this in your next project and let me know what creative uses you find for sprite animations!</p>
-  <a href="https://github.com/tiendat2204" className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-    <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd"></path>
-    </svg>
-    Check out more code samples
-  </a>
-</div>
-
-<div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm">
-  <div>
-    <span className="font-medium">Author:</span> Tien Dat
-  </div>
-  <div>
-    <span className="text-gray-500">Last Updated: June 12, 2025</span>
-  </div>
-</div>
