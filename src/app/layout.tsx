@@ -1,17 +1,12 @@
-import Navbar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DATA } from "@/data/resume";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
-import { IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { ReactLenis } from 'lenis/react'
-const fontMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  weight: ["400", "500", "600", "700"]
-});
+import { Footer } from "@/components/footer";
+import Navbar from "@/components/navbar";
 
 
 export const metadata: Metadata = {
@@ -21,6 +16,11 @@ export const metadata: Metadata = {
     template: `%s | ${DATA.name}`,
   },
   description: DATA.description,
+  icons: {
+    icon: '/logo.svg',
+    shortcut: '/logo.svg',
+    apple: '/logo.svg',
+  },
   openGraph: {
     title: `${DATA.name}`,
     description: DATA.description,
@@ -59,16 +59,35 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          "min-h-screen bg-background antialiased max-w-3xl mx-auto py-12 overflow-x-hidden sm:py-24 px-6",
-          fontMono.variable
+          "min-h-screen bg-background antialiased max-w-3xl mx-auto py-12  md:pb-0 mt-8 md:mt-0 overflow-x-hidden px-4",
         )}
         suppressHydrationWarning
       >
          <ReactLenis root />
-        <ThemeProvider attribute="class" defaultTheme="light">
+        <ThemeProvider attribute="class" defaultTheme="dark">
           <TooltipProvider delayDuration={0}>
             {children}
             <Navbar />
+            <Footer
+                logo={DATA.footer.logo}
+                brandName={DATA.footer.brandName}
+                socialLinks={DATA.footer.socialLinks.map(link => ({
+                  icon: link.icon,
+                  href: link.url,
+                  label: link.name
+                }))}
+                mainLinks={DATA.footer.mainLinks.map(link => ({
+                  href: link.href,
+                  label: link.name
+                }))}
+                legalLinks={DATA.footer.legalLinks.map(link => ({
+                  href: link.href,
+                  label: link.name
+                }))}
+                copyright={{
+                  text: DATA.footer.copyright,
+                }}
+            />
           </TooltipProvider>
         </ThemeProvider>
       </body>

@@ -13,7 +13,7 @@ interface SkillBadgeProps {
   icon?: string;
 }
 
-function SkillBadge({ name, icon }: SkillBadgeProps) {
+export function SkillBadge({ name, icon }: SkillBadgeProps) {
   return (
     <Badge
       variant="outline"
@@ -80,14 +80,14 @@ export default function SkillsSection() {
       <div className="max-w-4xl mx-auto">
         <BlurFadeText
           delay={BLUR_FADE_DELAY}
-          className="text-gray-400 text-sm mb-2"
+          className="dark:text-gray-400 text-muted-foreground text-sm mb-2"
           text="Which I use? See below."
         />
 
         <BlurFade delay={BLUR_FADE_DELAY * 2}>
           <div className="mb-4  screen-line-after pb-4">
             {" "}
-            <div className="text-gray-300 text-sm leading-8 ">
+            <div className="dark:text-gray-300 text-muted-foreground text-sm leading-8 ">
               My main Tech stack is{" "}
               <BlurFade delay={BLUR_FADE_DELAY * 3} className="inline-block">
                 <SkillBadge
@@ -132,7 +132,7 @@ export default function SkillsSection() {
               </BlurFade>
             </div>
             <br />
-            <div className="text-gray-300 text-sm">
+            <div className="dark:text-gray-300 text-muted-foreground text-sm">
               At last, but not least, I use{" "}
               <BlurFade delay={BLUR_FADE_DELAY * 9} className="inline-block">
                 <SkillBadge

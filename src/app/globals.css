@@ -1,8 +1,20 @@
-@import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Doto:wght@100..900&display=swap');
+@import "tailwindcss";
 @custom-variant dark (&:is(.dark *));
 
-@theme {
+@utility container {
+    margin-inline: auto;
+    padding-inline: 2rem;
+    @media (width >= --theme(--breakpoint-sm)) {
+    max-width: none;
+}
+    @media (width >= 1400px) {
+        max-width: 1400px;
+    }
+}
+
+@theme  {
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
@@ -39,7 +51,6 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
-
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-blur-fade: blur-fade 0.5s ease-out forwards;
@@ -85,25 +96,7 @@
   }
 }
 
-@utility container {
-  margin-inline: auto;
-  padding-inline: 2rem;
-  @media (width >= --theme(--breakpoint-sm)) {
-    max-width: none;
-  }
-  @media (width >= 1400px) {
-    max-width: 1400px;
-  }
-}
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
 @layer base {
   *,
   ::after,
@@ -112,8 +105,13 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
   }
+  :root {
+    --font-doto: "Doto", "Doto Fallback", sans-serif;
+  }
 }
-
+.font-doto {
+  font-family: var(--font-doto);
+}
 @utility prose {
   /* Enhanced typography styles for better readability */
   @apply max-w-none;
@@ -228,75 +226,7 @@
   }
 }
 
-@layer components {
-  .font-ibm {
-    font-family: "IBM Plex Mono", monospace;
-  }
-  /* Code and syntax highlighting styles */
-  h3 code {
-    @apply text-lg! md:text-xl!;
-  }
 
-  pre {
-    @apply px-0! rounded-lg overflow-x-auto py-4 bg-muted/50;
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--border)) transparent;
-  }
-
-  pre [data-line] {
-    @apply px-4;
-  }
-
-  pre > code {
-    counter-reset: line;
-    display: block;
-  }
-
-  /* Enhanced Shiki theme support with better contrast */
-  code[data-theme*=" "],
-  code[data-theme*=" "] span {
-    color: var(--shiki-light);
-    background-color: var(--shiki-light-bg);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    code[data-theme*=" "],
-    code[data-theme*=" "] span {
-      color: var(--shiki-dark);
-      background-color: var(--shiki-dark-bg);
-    }
-  }
-
-  /* Improved code block line numbers styling */
-  code[data-line-numbers] {
-    counter-reset: line;
-  }
-
-  code[data-line-numbers] > [data-line]::before {
-    counter-increment: line;
-    content: counter(line);
-    @apply inline-block w-4 mr-4 text-right text-muted-foreground select-none;
-    font-variant-numeric: tabular-nums;
-  }
-
-  code[data-line-numbers-max-digits="2"] > [data-line]::before {
-    @apply w-8;
-  }
-
-  code[data-line-numbers-max-digits="3"] > [data-line]::before {
-    @apply w-12;
-  }
-
-  /* Enhanced code highlighting for specific lines */
-  [data-highlighted-line] {
-    @apply bg-muted/30 border-l-2 border-primary/50;
-  }
-
-  /* Inline code styling */
-  :not(pre) > code {
-    @apply bg-muted/50 text-foreground px-1.5 py-0.5 rounded-md text-sm;
-  }
-}
 @layer utilities {
   .screen-line-before:before {
     content: "";
@@ -318,6 +248,9 @@
     height: 1px;
     position: absolute;
     left: -100vw;
+  }
+  .font-ibm {
+    font-family: "IBM Plex Mono", monospace;
   }
 
   /* Work Experience Timeline Styles */

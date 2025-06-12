@@ -1,20 +1,23 @@
 "use client";
 
-import { AppleHelloEnglishEffect } from "@/components/apple-hello-effect";
-import { HackathonCard } from "@/components/hackathon-card";
+import { AwardCard } from "@/components/AwardCard";
 import BlurFadeText from "@/components/magicui/blur-fade-text";
 import { ProjectCard } from "@/components/project-card";
 import { ResumeCard } from "@/components/resume-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { DATA, LOGO_BASE64 } from "@/data/resume";
 import Link from "next/link";
 import Markdown from "react-markdown";
 import { FlickeringGrid } from "@/components/ui/flickering-grid-hero";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import SkillsSection from "./section/skills-section";
-import { AnimatedBeam } from "@/components/magicui/animated-beam";
-import { useRef } from "react";
+import React  from "react";
+import WorkSection from "@/app/section/work-section";
+import {Icon} from "@/components/Icon";
+import {Footer} from "@/components/footer";
+import AnimatedSocialLinks from "@/components/ui/social-links";
+import {TextLoop} from "@/components/ui/text-loop";
+import {Icons} from "@/components/icons";
 
 const BLUR_FADE_DELAY = 0.04;
 
@@ -46,10 +49,9 @@ const GRID_CONFIG = {
   },
 } as const;
 
-export default function Page() {
-  const containerRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-  const positionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
+
+export default function Page() {
   return (
     <main className="flex flex-col min-h-dvh ">
       <section
@@ -66,7 +68,7 @@ export default function Page() {
             {...GRID_CONFIG.background}
           />
           <div
-            className="absolute inset-0 z-0  motion-safe:animate-fade-in"
+            className="absolute  inset-0 z-0  motion-safe:animate-fade-in"
             style={{
               ...maskStyle,
               animation: "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
@@ -85,7 +87,7 @@ export default function Page() {
         <div className="mx-auto w-full space-y-8 border-x">
           <div className="flex items-stretch justify-center min-h-[120px]">
             <div className="">
-              <Avatar className="size-32 rounded-full m-1 ring-1 ring-border ring-offset-2 ring-offset-background select-none sm:size-40">
+              <Avatar className="size-32 text rounded-full m-1 ring-1 ring-border ring-offset-2 ring-offset-background select-none sm:size-40">
                 <AvatarImage
                   alt={DATA.name}
                   src={DATA.avatarUrl}
@@ -95,32 +97,48 @@ export default function Page() {
               </Avatar>
             </div>
 
-            <div className="flex flex-1 flex-col justify-between h-full min-h-[160px] border-l">
+            <div className="flex flex-1 flex-col justify-between h-full min-h-[140px] md:min-h-[170px] border-l">
               <div className="flex-1 flex items-end pb-1">
-                <div className="flex items-center gap-2 px-4">
-                  {Object.entries(DATA.contact.social).map(
-                    ([name, social], id) => (
-                      <BlurFade key={name} delay={BLUR_FADE_DELAY + id * 0.1}>
-                        <Link
-                          href={social.url}
-                          className="flex items-center justify-center w-8 h-8 rounded-full bg-muted hover:bg-muted-foreground/20 transition-colors "
-                        >
-                          <social.icon className="w-4 h-4" />
-                        </Link>
+                  <div className="flex items-center gap-2 px-4">
+                      <BlurFade delay={BLUR_FADE_DELAY}>
+                          <AnimatedSocialLinks
+                              socials={Object.entries(DATA.contact.social).map(([name, social]) => ({
+                                  icon: social.icon,
+                                  image: social.image || '',
+                                  url: social.url
+                              }))}
+                          />
                       </BlurFade>
-                    )
-                  )}
-                </div>
+                  </div>
               </div>
 
-              <div className="flex items-start border-t">
+              <div className="flex items-center justify-between border-y">
                 <BlurFadeText
                   delay={BLUR_FADE_DELAY}
-                  className="text-2xl font-bold tracking-tight sm:text-3xl font-ibm px-4"
+                  className="text-3xl  font-extrabold  tracking-tight sm:text-3xl font-doto px-4"
                   yOffset={0}
                   text={DATA.name}
                 />
+                  <div className="size-6 mr-4">
+                      <Icons.logo/>
+
+                  </div>
               </div>
+                <BlurFade delay={BLUR_FADE_DELAY}>
+                <TextLoop
+                    transition={{ duration: 0.8 }}
+                    interval={4}
+                >
+                    {[
+                        DATA.contact.email,
+                        DATA.contact.tel,
+                    ].map((text) => (
+                        <span key={text} className="block px-4 font-normal font-ibm text-left text-muted">
+              {text}
+            </span>
+                    ))}
+                </TextLoop>
+                </BlurFade>
             </div>
           </div>
         </div>
@@ -129,7 +147,7 @@ export default function Page() {
       <section id="about" className="relative  screen-line-after  border-x">
         <div className="border-b">
           <BlurFade delay={BLUR_FADE_DELAY * 3} offset={0}>
-            <h2 className="text-xl font-bold px-4">About</h2>
+            <h2 className="text-2xl font-extrabold px-4 font-doto">About</h2>
           </BlurFade>
         </div>
 
@@ -142,146 +160,48 @@ export default function Page() {
         </div>
       </section>
       <section id="skills" className="relative screen-line-after border-x">
+        <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 text-white" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
+        <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 text-white" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
         <div className="border-b">
           <BlurFade delay={BLUR_FADE_DELAY * 3} offset={0}>
-            <h2 className="text-xl font-bold px-4">Skills</h2>
+            <h2 className="text-2xl font-extrabold px-4 font-doto">Skills</h2>
           </BlurFade>
         </div>
 
         <SkillsSection />
       </section>
-      <section id="work" className="relative screen-line-after border-x">
-        <div className="flex min-h-0 flex-col ">
+      <section id="work" className="relative screen-line-after border-x font-ibm">
+        <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 text-white" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
+        <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 text-white" />
+        <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
+        <div className="flex min-h-0 flex-col">
           <div className="border-b">
             <BlurFade delay={BLUR_FADE_DELAY * 5} offset={0}>
-              <h2 className="text-xl font-bold px-4">Work Experience</h2>
+              <h2 className="text-2xl font-extrabold px-4 font-doto">Experience</h2>
             </BlurFade>
           </div>
-          {DATA.work.map((company, companyIndex) => (
-            <div
-              key={company.company}
-              className="company-group relative"
-              ref={(el) => {
-                containerRefs.current[company.company] = el;
-              }}
-            >
-              {/* Company Header */}
-              <BlurFade delay={BLUR_FADE_DELAY * 6 + companyIndex * 0.1}>
-                <div className="company-header py-4 border-b border-muted ">
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2">
-                    <div className="relative">
-                      <div className="w-3 h-3 bg-primary rounded-full relative z-10"></div>
-                      <div className="absolute inset-0 w-3 h-3 bg-primary/30 rounded-full animate-ping"></div>
-                      <div className="absolute inset-0 w-3 h-3 bg-primary/20 rounded-full animate-pulse scale-150"></div>
-                      <div className="absolute inset-0 w-3 h-3 bg-primary/10 rounded-full animate-ping animation-delay-75 scale-200"></div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 pl-6">
-                    <div className="flex-none">
-                      <Avatar className="border size-12 m-auto bg-muted-background dark:bg-foreground">
-                        <AvatarImage
-                          src={company.logoUrl}
-                          alt={company.company}
-                          className="object-contain"
-                        />
-                        <AvatarFallback>{company.company}</AvatarFallback>
-                      </Avatar>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg text-foreground">
-                        {company.company}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {company.location}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </BlurFade>
-
-              {/* Positions */}
-              <div className="relative p-4 space-y-8">
-                {company.positions.map((position, positionIndex) => (
-                  <div
-                    key={`${company.company}-${position.title}`}
-                    ref={(el) => {
-                      positionRefs.current[
-                        `${company.company}-${positionIndex}`
-                      ] = el;
-                    }}
-                  >
-                    <BlurFade
-                      delay={
-                        BLUR_FADE_DELAY * 6 +
-                        companyIndex * 0.1 +
-                        (positionIndex + 1) * 0.05
-                      }
-                    >
-                      <ResumeCard
-                        logoUrl={company.logoUrl}
-                        altText={company.company}
-                        title={position.title}
-                        subtitle=""
-                        href={company.href}
-                        badges={position.badges}
-                        period={`${position.start} - ${
-                          position.end ?? "Present"
-                        }`}
-                        description={position.description}
-                      />
-                    </BlurFade>
-                  </div>
-                ))}
-
-                {/* AnimatedBeams for connecting positions */}
-                {company.positions.length > 1 &&
-                  company.positions.map((_, positionIndex) => {
-                    if (positionIndex === company.positions.length - 1)
-                      return null;
-
-                    const fromKey = `${company.company}-${positionIndex}`;
-                    const toKey = `${company.company}-${positionIndex + 1}`;
-
-                    return (
-                      <AnimatedBeam
-                        key={`beam-${fromKey}-${toKey}`}
-                        containerRef={{
-                          current: containerRefs.current[company.company],
-                        }}
-                        fromRef={{
-                          current: positionRefs.current[fromKey],
-                        }}
-                        toRef={{
-                          current: positionRefs.current[toKey],
-                        }}
-                        curvature={20}
-                        pathColor="hsl(var(--muted-foreground))"
-                        pathOpacity={0.3}
-                        pathWidth={2}
-                        gradientStartColor="hsl(var(--primary))"
-                        gradientStopColor="hsl(var(--primary)/0.5)"
-                        delay={
-                          BLUR_FADE_DELAY * 6 +
-                          companyIndex * 0.1 +
-                          (positionIndex + 1) * 0.1
-                        }
-                        duration={3}
-                      />
-                    );
-                  })}
-              </div>
-            </div>
-          ))}
+          <WorkSection />
         </div>
       </section>
-      <section id="education">
-        <div className="flex min-h-0 flex-col gap-y-3">
+      <section id="education" className="relative screen-line-after border-x font-ibm">
+          <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 text-white" />
+          <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
+          <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 text-white" />
+          <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
+          <div className="border-b">
           <BlurFade delay={BLUR_FADE_DELAY * 7}>
-            <h2 className="text-xl font-bold">Education</h2>
+            <h2 className="text-2xl font-extrabold px-4 font-doto">Education</h2>
           </BlurFade>
+          </div>
+        <div className="relative p-4 space-y-4">
           {DATA.education.map((education, id) => (
+              <div
+                  key={`${education.school}-${education.degree}`}
+              >
             <BlurFade
-              key={education.school}
               delay={BLUR_FADE_DELAY * 8 + id * 0.05}
             >
               <ResumeCard
@@ -290,138 +210,78 @@ export default function Page() {
                 logoUrl={education.logoUrl}
                 altText={education.school}
                 title={education.school}
+                description={education.description}
+                technologies={'technologies' in education ? education.technologies : []}
                 subtitle={education.degree}
+                isExpanded={false}
                 period={`${education.start} - ${education.end}`}
               />
             </BlurFade>
+              </div>
           ))}
         </div>
+
       </section>
 
-      <section id="projects">
-        <div className="space-y-12 w-full py-12">
+      <section id="projects" className="relative screen-line-after border-x font-ibm">
+          <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 text-white" />
+          <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
+          <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 text-white" />
+          <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
+          <div className="border-b">
           <BlurFade delay={BLUR_FADE_DELAY * 11}>
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-foreground text-background px-3 py-1 text-sm">
-                  My Projects
-                </div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  Check out my latest work
-                </h2>
-                <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  I&apos;ve worked on a variety of projects, from simple
-                  websites to complex web applications. Here are a few of my
-                  favorites.
-                </p>
-              </div>
-            </div>
+            <h2 className="text-2xl font-extrabold px-4 font-doto">Project</h2>
           </BlurFade>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 max-w-[800px] mx-auto">
-            {DATA.projects.map((project, id) => (
-              <BlurFade
-                key={project.title}
-                delay={BLUR_FADE_DELAY * 12 + id * 0.05}
-              >
-                <ProjectCard
-                  href={project.href}
-                  key={project.title}
-                  title={project.title}
-                  description={project.description}
-                  dates={project.dates}
-                  tags={project.technologies}
-                  image={project.image}
-                  video={project.video}
-                  links={project.links}
-                />
-              </BlurFade>
-            ))}
           </div>
-        </div>
-      </section>
-      <section id="hackathons">
-        <div className="space-y-12 w-full py-12">
-          <BlurFade delay={BLUR_FADE_DELAY * 13}>
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-foreground text-background px-3 py-1 text-sm">
-                  Hackathons
-                </div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                  I like building things
-                </h2>
-                <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  During my time in university, I attended{" "}
-                  {DATA.hackathons.length}+ hackathons. People from around the
-                  country would come together and build incredible things in 2-3
-                  days. It was eye-opening to see the endless possibilities
-                  brought to life by a group of motivated and passionate
-                  individuals.
-                </p>
-              </div>
-            </div>
-          </BlurFade>
-          <BlurFade delay={BLUR_FADE_DELAY * 14}>
-            <ul className="mb-4 ml-4 divide-y divide-dashed border-l">
-              {DATA.hackathons.map((project, id) => (
+          <div className="grid grid-cols-1  ">
+            {DATA.projects.map((project, id) => (
                 <BlurFade
-                  key={project.title + project.dates}
-                  delay={BLUR_FADE_DELAY * 15 + id * 0.05}
+                    key={project.title}
+                    delay={BLUR_FADE_DELAY * 12 + id * 0.05}
                 >
-                  <HackathonCard
-                    title={project.title}
-                    description={project.description}
-                    location={project.location}
-                    dates={project.dates}
-                    image={project.image}
-                    links={project.links}
+                  <ProjectCard
+                      href={project.href}
+                      key={project.title}
+                      title={project.title}
+                      logoUrl={project.logoUrl}
+                      positions={project.positions}
+                      image={project.image}
+                      links={project.links}
                   />
                 </BlurFade>
-              ))}
-            </ul>
-          </BlurFade>
-        </div>
+            ))}
+          </div>
       </section>
-      <section id="contact">
-        <div className="grid items-center justify-center gap-4 px-4 text-center md:px-6 w-full py-12">
-          <BlurFade delay={BLUR_FADE_DELAY * 16}>
-            <div className="space-y-3">
-              <div className="inline-block rounded-lg bg-foreground text-background px-3 py-1 text-sm">
-                Contact
-              </div>
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                Get in Touch
-              </h2>
-              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Want to chat? Just shoot me a dm{" "}
-                <Link
-                  href={DATA.contact.social.X.url}
-                  className="text-blue-500 hover:underline"
-                >
-                  with a direct question on twitter
-                </Link>{" "}
-                and I&apos;ll respond whenever I can. I will ignore all
-                soliciting.
-              </p>
+        <section id="awards" className="relative screen-line-after border-x font-ibm">
+            <Icon className="absolute z-20 h-6 w-6 -top-3 -left-3 text-white" />
+            <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
+            <Icon className="absolute z-20 h-6 w-6 -top-3 -right-3 text-white" />
+            <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
+            <div className="border-b">
+                <BlurFade delay={BLUR_FADE_DELAY * 13}>
+                    <h2 className="text-2xl font-extrabold px-4 font-doto">Awards</h2>
+                </BlurFade>
             </div>
-          </BlurFade>
-        </div>
-      </section>
+            <BlurFade delay={BLUR_FADE_DELAY * 14}>
+                <ul className=" ml-5 divide-y divide-dashed border-l">
+                    {DATA.awards.map((award, id) => (
+                        <BlurFade
+                            key={award.title + award.dates}
+                            delay={BLUR_FADE_DELAY * 15 + id * 0.05}
+                        >
+                            <AwardCard
+                                title={award.title}
+                                description={award.description}
+                                location={award.location}
+                                dates={award.dates}
+                                links={award.links}
+                            />
+                        </BlurFade>
+                    ))}
+                </ul>
+            </BlurFade>
+        </section>
+
     </main>
   );
 }
-const Icon = ({ className, ...rest }: any) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth="1.5"
-      stroke="currentColor"
-      className={className}
-      {...rest}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
-    </svg>
-  );
-};
