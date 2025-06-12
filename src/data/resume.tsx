@@ -5,7 +5,7 @@ import { HomeIcon, NotebookIcon } from "lucide-react";
 export const DATA = {
   name: "Tien Dat",
   initials: "DV",
-  url: 'https://github.com/tiendat2204',
+  url: 'https://www.tiendatdev.me/',
   location:
     "256 Duong Quang Ham Street, Go Vap District, Ho Chi Minh City, Vietnam",
   locationLink:
@@ -95,7 +95,7 @@ export const DATA = {
       GitHub: {
         name: "GitHub",
         icon: "github-icon.svg",
-        url: "https://github.com/tiendat2204",
+        url: "https://www.tiendatdev.me/",
         image: "https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg",
         navbar: true,
       },
@@ -283,7 +283,7 @@ export const DATA = {
   projects: [
     {
       title: "Tien Dat Portfolio",
-      href: "https://tien-dat.vercel.app",
+      href: "https://www.tiendatdev.me/",
       logoUrl: "/project-logo.png",
       positions: [
         {
@@ -323,7 +323,7 @@ export const DATA = {
       links: [
         {
           type: "Website",
-          href: "https://tien-dat.vercel.app",
+          href: "https://www.tiendatdev.me/",
           icon: <Icons.globe className="size-3" />
         },
         {
@@ -612,14 +612,9 @@ export const DATA = {
       },
       {
         name: "LinkedIn",
-        url: "https://linkedin.com/in/yourprofile",
+        url: "https://www.linkedin.com/in/ttd-7796b5341/",
         icon: <Icons.linkedin className="h-5 w-5" />
       },
-      {
-        name: "X",
-        url: "https://x.com/yourprofile",
-        icon: <Icons.x className="h-5 w-5" />
-      }
     ],
     mainLinks: [
       { name: "Home", href: "/" },
