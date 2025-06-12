@@ -139,7 +139,7 @@ export default function BlogDetailPage() {
 
       <section
         id="blog-header"
-        className="relative screen-line-before screen-line-after pt-1"
+        className="relative screen-line-before screen-line-after "
       >
         <Icon className="absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white" />
         <Icon className="absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white" />
@@ -186,7 +186,7 @@ export default function BlogDetailPage() {
         <div className="px-4 py-6">
           <BlurFade delay={BLUR_FADE_DELAY * 4} offset={0}>
             <article
-              className="prose prose-zinc dark:prose-invert max-w-none font-ibm"
+              className="prose prose-zinc dark:prose-invert max-w-none font-ibm wiki-styled"
               dangerouslySetInnerHTML={{ __html: post.source }}
             />
           </BlurFade>
