@@ -1,5 +1,3 @@
-'use client'
-
 import { AwardCard } from '@/components/AwardCard'
 import BlurFadeText from '@/components/magicui/blur-fade-text'
 import { ProjectCard } from '@/components/project-card'
@@ -21,7 +19,7 @@ import { BLUR_FADE_DELAY, GRID_CONFIG, maskStyle } from '@/data/config'
 
 export default function Page () {
   return (
-    <main className='flex flex-col min-h-dvh '>
+    <main className='flex flex-col min-h-dvh  '>
       <section
         id='background'
         className='relative screen-line-before  border-x'
