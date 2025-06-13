@@ -33,7 +33,7 @@ export function Footer ({
   copyright,
 }: FooterProps) {
   return (
-    <footer className='md:py-18 py-8 border-x font-ibm'>
+    <footer className='md:py-18 py-8 border-x font-ibm relative screen-line-before'>
       <div className='px-4 lg:px-8'>
         <div className='md:flex md:items-start md:justify-between'>
           <Link
@@ -42,9 +42,7 @@ export function Footer ({
             aria-label={brandName}
           >
             <div className='size-10'>
-
               <Icons.Logo />
-
             </div>
             <span className='font-bold text-2xl font-doto whitespace-nowrap '>{brandName}</span>
           </Link>

@@ -1,65 +1,70 @@
-'use server'
-
 import fs from 'fs'
 import matter from 'gray-matter'
 import path from 'path'
-import rehypePrettyCode from 'rehype-pretty-code'
-import rehypeStringify from 'rehype-stringify'
-import remarkGfm from 'remark-gfm'
-import remarkParse from 'remark-parse'
-import remarkRehype from 'remark-rehype'
-import { unified } from 'unified'
+
+import type { Post, PostMetadata } from '@/types/blog'
+
+function parseFrontmatter (fileContent: string) {
+  const file = matter(fileContent)
+
+  return {
+    metadata: file.data as PostMetadata,
+    content: file.content,
+  }
+}
 
 function getMDXFiles (dir: string) {
   return fs.readdirSync(dir).filter((file) => path.extname(file) === '.mdx')
 }
 
-export async function markdownToHTML (markdown: string) {
-  const p = await unified()
-    .use(remarkParse)
-    .use(remarkGfm)
-    .use(remarkRehype)
-    .use(rehypePrettyCode, {
-      // https://rehype-pretty.pages.dev/#usage
-      theme: {
-        light: 'min-light',
-        dark: 'min-dark',
-      },
-      keepBackground: false,
-    })
-    .use(rehypeStringify)
-    .process(markdown)
-
-  return p.toString()
+function readMDXFile (filePath: string) {
+  const rawContent = fs.readFileSync(filePath, 'utf-8')
+  return parseFrontmatter(rawContent)
 }
 
-export async function getPost (slug: string) {
-  const filePath = path.join('content', `${slug}.mdx`)
-  const source = fs.readFileSync(filePath, 'utf-8')
-  const { content: rawContent, data: metadata } = matter(source)
-  const content = await markdownToHTML(rawContent)
-  return {
-    source: content,
-    metadata,
-    slug,
-  }
-}
-
-async function getAllPosts (dir: string) {
+function getMDXData (dir: string) {
   const mdxFiles = getMDXFiles(dir)
-  return Promise.all(
-    mdxFiles.map(async (file) => {
-      const slug = path.basename(file, path.extname(file))
-      const { metadata, source } = await getPost(slug)
-      return {
-        metadata,
-        slug,
-        source,
-      }
-    })
+
+  return mdxFiles.map<Post>((file) => {
+    const { metadata, content } = readMDXFile(path.join(dir, file))
+
+    const slug = path.basename(file, path.extname(file))
+
+    return {
+      metadata,
+      slug,
+      content,
+    }
+  })
+}
+
+export function getAllPosts () {
+  return getMDXData(path.join(process.cwd(), 'src', 'content', 'blog')).sort(
+    (a, b) =>
+      new Date(b.metadata.createdAt).getTime() -
+            new Date(a.metadata.createdAt).getTime()
   )
 }
 
-export async function getBlogPosts () {
-  return getAllPosts(path.join(process.cwd(), 'content'))
+export function getPostBySlug (slug: string) {
+  return getAllPosts().find((post) => post.slug === slug)
+}
+
+export function getPostsByCategory (category: string) {
+  return getAllPosts().filter((post) => post.metadata?.category === category)
+}
+
+export function findNeighbour (posts: Post[], slug: string) {
+  const len = posts.length
+
+  for (let i = 0; i < len; ++i) {
+    if (posts[i].slug === slug) {
+      return {
+        previous: i > 0 ? posts[i - 1] : null,
+        next: i < len - 1 ? posts[i + 1] : null,
+      }
+    }
+  }
+
+  return { previous: null, next: null }
 }

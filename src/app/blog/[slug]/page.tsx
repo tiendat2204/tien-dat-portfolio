@@ -1,175 +1,138 @@
-'use client'
+import dayjs from 'dayjs'
+import { getTableOfContents } from 'fumadocs-core/server'
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
+import type { BlogPosting as PageSchema, WithContext } from 'schema-dts'
 
-import { Icon } from '@/components/Icon'
-import BlurFadeText from '@/components/magicui/blur-fade-text'
-import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
-import { FlickeringGrid } from '@/components/ui/flickering-grid-hero'
-import { BlurFade } from '@/components/magicui/blur-fade'
-import { Icons } from '@/components/icons'
-import { useParams } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
-import { GRID_CONFIG, maskStyle } from '@/data/config'
+import { InlineTOC } from '@/components/inline-toc'
+import { MDX } from '@/components/mdx'
+import { Prose } from '@/components/ui/typography'
+import { getAllPosts, getPostBySlug } from '@/data/blog'
+import { USER } from '@/data/user'
+import type { Post } from '@/types/blog'
 
-type BlogPost = {
-  slug: string;
-  title: string;
-  publishedAt: string;
-  summary: string;
-  image?: string;
-  source: string;
+import { Back } from './back'
+import { SITE_INFO } from '@/data/config'
+
+export async function generateStaticParams () {
+  const posts = getAllPosts()
+  return posts.map((post) => ({
+    slug: post.slug,
+  }))
 }
 
-const BLUR_FADE_DELAY = 0.04
-
-export default function BlogDetailPage () {
-  const params = useParams()
-  const slug = typeof params.slug === 'string' ? params.slug : ''
-
-  const [post, setPost] = useState<BlogPost | null>(null)
-  const [loading, setLoading] = useState(true)
-  console.log('BlogDetailPage slug:', post)
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const response = await fetch('/api/blogs')
-        if (response.ok) {
-          const posts = await response.json()
-          const currentPost = posts.find((p: BlogPost) => p.slug === slug)
-          if (currentPost) {
-            setPost(currentPost)
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching blog post:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    if (slug) {
-      fetchPost()
-    }
-  }, [slug])
-
-  if (loading) {
-    return (
-      <main className='flex flex-col '>
-        <section className='relative screen-line-before border-x'>
-          <div className='flex w-full h-[200px] justify-center items-center'>
-            <div className='animate-pulse w-full h-full' />
-          </div>
-        </section>
-      </main>
-    )
-  }
+export async function generateMetadata ({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const slug = (await params).slug
+  const post = getPostBySlug(slug)
 
   if (!post) {
-    return (
-      <main className='flex flex-col '>
-        <section className='relative screen-line-before border-x p-4'>
-          <h1 className='text-2xl font-bold'>Post not found</h1>
-          <p className='mt-4'>
-            <Link href='/blog' className='text-blue-500 hover:underline'>
-              ← Back to blog
-            </Link>
-          </p>
-        </section>
-      </main>
-    )
+    return notFound()
   }
 
+  const { title, description, image, createdAt, updatedAt } = post.metadata
+
+  const ogImage = image || `/og/simple?title=${encodeURIComponent(title)}`
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `/blog/${post.slug}`,
+    },
+    openGraph: {
+      url: `/blog/${post.slug}`,
+      type: 'article',
+      publishedTime: dayjs(createdAt).toISOString(),
+      modifiedTime: dayjs(updatedAt).toISOString(),
+      images: {
+        url: ogImage,
+        width: 1200,
+        height: 630,
+        alt: title,
+      },
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: [ogImage],
+    },
+  }
+}
+
+function getPageJsonLd (post: Post): WithContext<PageSchema> {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.metadata.title,
+    description: post.metadata.description,
+    image:
+        post.metadata.image ||
+        `/og/simple?title=${encodeURIComponent(post.metadata.title)}`,
+    url: `${SITE_INFO.url}/blog/${post.slug}`,
+    datePublished: dayjs(post.metadata.createdAt).toISOString(),
+    dateModified: dayjs(post.metadata.updatedAt).toISOString(),
+    author: {
+      '@type': 'Person',
+      name: USER.displayName,
+      identifier: USER.username,
+      image: USER.avatar,
+    },
+  }
+}
+
+export default async function Page ({
+  params,
+}: {
+  params: Promise<{
+    slug: string;
+  }>;
+}) {
+  const slug = (await params).slug
+  const post = getPostBySlug(slug)
+
+  if (!post) {
+    notFound()
+  }
+
+  const toc = getTableOfContents(post.content)
+  // const tocDepth2Count = toc.reduce(
+  //   (count, item) => (item.depth === 2 ? count + 1 : count),
+  //   0
+  // );
   return (
-    <main className='flex flex-col '>
-      <section
-        id='background'
-        className='relative screen-line-before border-x'
-      >
-        <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 text-white' />
-        <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white' />
-        <Icon className='absolute z-20 h-6 w-6 -top-3 -right-3 text-white' />
-        <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white' />
-        <div className='flex w-full h-[200px] justify-center items-center'>
-          <FlickeringGrid
-            className='absolute inset-0 z-0 [mask-image:radial-gradient(1000px_circle_at_center,white,transparent)] motion-safe:animate-pulse'
-            {...GRID_CONFIG.background}
-          />
-          <div
-            className='absolute inset-0 z-0 motion-safe:animate-fade-in'
-            style={{
-              ...maskStyle,
-              animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            }}
-          >
-            <FlickeringGrid {...GRID_CONFIG.logo} />
-          </div>
-        </div>
-      </section>
+    <>
+      <script
+        type='application/ld+json'
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(getPageJsonLd(post)).replace(/</g, '\\u003c'),
+        }}
+      />
 
-      <section
-        id='blog-header'
-        className='relative screen-line-before screen-line-after '
-      >
-        <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white' />
-        <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white' />
-        <div className='mx-auto w-full space-y-8 border-x'>
-          <div className='flex items-stretch justify-center min-h-[120px]'>
-            <div className='flex flex-col justify-between h-full min-h-[140px] md:min-h-[170px] w-full'>
-              <div className='flex items-center justify-between border-y w-full'>
-                <BlurFadeText
-                  delay={BLUR_FADE_DELAY}
-                  className='text-3xl font-extrabold tracking-tight sm:text-3xl font-doto px-4'
-                  yOffset={0}
-                  text={post.title || 'Blog'}
-                />
-                <div className='size-6 mr-4'>
-                  <Icons.Logo />
-                </div>
-              </div>
-              <BlurFade delay={BLUR_FADE_DELAY}>
-                <p className='px-4 font-normal font-ibm text-left text-muted'>
-                  {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </p>
-              </BlurFade>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div className='flex items-center justify-between p-2 pl-4'>
+        <Suspense>
+          <Back />
+        </Suspense>
+      </div>
 
-      <section id='blog-content' className='relative screen-line-after border-x'>
-        <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 text-white' />
-        <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 text-white' />
-        <Icon className='absolute z-20 h-6 w-6 -top-3 -right-3 text-white' />
-        <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 text-white' />
+      <Prose className='px-4'>
+        <h1 className='  mb-6 font-heading font-semibold'>
+          {post.metadata.title}
+        </h1>
 
-        <div className='border-b'>
-          <BlurFade delay={BLUR_FADE_DELAY * 3} offset={0}>
-            <p className='text-xl px-4 py-2 font-ibm text-muted-foreground'>{post.summary}</p>
-          </BlurFade>
-        </div>
+        <p className='lead mt-6 mb-6'>{post.metadata.description}</p>
 
-        <div className='px-4 py-6'>
-          <BlurFade delay={BLUR_FADE_DELAY * 4} offset={0}>
-            <article
-              className='prose prose-zinc dark:prose-invert max-w-none font-ibm wiki-styled'
-              dangerouslySetInnerHTML={{ __html: post.source }}
-            />
-          </BlurFade>
-        </div>
+        <InlineTOC items={toc} />
 
-        <div className='border-t p-4'>
-          <BlurFade delay={BLUR_FADE_DELAY * 5} offset={0}>
-            <Link href='/blog' className='flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors'>
-              <ArrowLeft className='mr-2 h-4 w-4' />
-              Back to all posts
-            </Link>
-          </BlurFade>
+        <div>
+          {/* eslint-disable-next-line @stylistic/jsx-pascal-case */}
+          <MDX code={post.content} />
         </div>
-      </section>
-    </main>
+      </Prose>
+
+    </>
   )
 }

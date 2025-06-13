@@ -91,7 +91,7 @@ export default function Page () {
                   <Icons.Logo />
                 </div>
               </div>
-              <BlurFade delay={BLUR_FADE_DELAY}>
+              <BlurFade delay={BLUR_FADE_DELAY} className='bg-lines-pattern-light dark:bg-lines-pattern size-full'>
                 <TextLoop
                   transition={{ duration: 0.8 }}
                   interval={4}
@@ -100,7 +100,7 @@ export default function Page () {
                     DATA.contact.email,
                     DATA.contact.tel,
                   ].map((text) => (
-                    <span key={text} className='block px-4 font-normal font-ibm text-left dark:text-muted text-gray-400'>
+                    <span key={text} className='block  px-4 font-normal font-ibm text-left dark:text-muted text-gray-400'>
                       {text}
                     </span>
                   ))}

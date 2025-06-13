@@ -36,3 +36,8 @@ export const SITE_INFO = {
   description: DATA.summary,
   keywords: DATA.initials,
 }
+export const UTM_PARAMS = {
+  utm_source: 'tiendatdev.me',
+  utm_medium: 'portfolio_website',
+  utm_campaign: 'referral',
+}
