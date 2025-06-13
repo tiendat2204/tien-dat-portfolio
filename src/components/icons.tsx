@@ -16,6 +16,18 @@ export const Icons = {
       <path d='M12.5 7h-1a1.5 1.5 0 00-1.5 1.5v4a1.5 1.5 0 001.5 1.5h1a1.5 1.5 0 001.5-1.5v-4A1.5 1.5 0 0012.5 7zm-.5 6h-1v-4h1z' />
     </svg>
   ),
+  ShadcnUI: (props: IconProps) => (
+    <svg
+      viewBox='0 0 24 24'
+      xmlns='http://www.w3.org/2000/svg'
+      fill='currentColor'
+      {...props}
+    >
+      <title>Shadcn UI</title>
+      <path d='M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm0 18a8 8 0 118-8 8.009 8.009 0 01-8 8z' />
+      <path d='M16.5 7h-1a1.5 1.5 0 00-1.5 1.5v4a1.5 1.5 0 001.5 1.5h1a1.5 1.5 0 001.5-1.5v-4A1.5 1.5 0 0016.5 7zm-.5 6h-1v-4h1z' />
+    </svg>
+  ),
   Bookmark: (props: IconProps) => (
     <svg
       viewBox='0 0 24 24'

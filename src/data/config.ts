@@ -1,4 +1,4 @@
-import { LOGO_BASE64 } from '@/data/resume'
+import { DATA, LOGO_BASE64 } from '@/data/resume'
 
 export const BLUR_FADE_DELAY = 0.04
 
@@ -29,3 +29,10 @@ export const GRID_CONFIG = {
     gridGap: 8,
   },
 } as const
+export const SITE_INFO = {
+  name: DATA.name,
+  url: process.env.APP_URL || 'https://tiendatdev.me/',
+  ogImage: DATA.avatarUrl,
+  description: DATA.summary,
+  keywords: DATA.initials,
+}

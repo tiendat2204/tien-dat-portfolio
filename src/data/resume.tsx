@@ -4,8 +4,8 @@ import { HomeIcon, NotebookIcon } from 'lucide-react'
 
 export const DATA = {
   name: 'Tien Dat',
-  initials: 'DV',
-  url: 'https://www.tiendatdev.me/',
+  initials: 'TD',
+  url: 'https://tiendatdev.me/',
   location:
     '256 Duong Quang Ham Street, Go Vap District, Ho Chi Minh City, Vietnam',
   locationLink:
@@ -95,7 +95,7 @@ export const DATA = {
       GitHub: {
         name: 'GitHub',
         icon: 'github-icon.svg',
-        url: 'https://www.tiendatdev.me/',
+        url: 'https://tiendatdev.me/',
         image: 'https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg',
         navbar: true,
       },
@@ -285,7 +285,7 @@ export const DATA = {
   projects: [
     {
       title: 'Tien Dat Portfolio',
-      href: 'https://www.tiendatdev.me/',
+      href: 'https://tiendatdev.me/',
       logoUrl: '/project-logo.png',
       positions: [
         {
@@ -324,7 +324,7 @@ export const DATA = {
       links: [
         {
           type: 'Website',
-          href: 'https://www.tiendatdev.me/',
+          href: 'https://tiendatdev.me/',
           icon: <Icons.Globe className='size-3' />
         },
         {
