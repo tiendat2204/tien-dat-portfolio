@@ -1,18 +1,18 @@
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
+import Image from 'next/image'
+import Link from 'next/link'
+import React from 'react'
 
-function Table({ data }: { data: { headers: string[]; rows: string[][] } }) {
-  let headers = data.headers.map((header, index) => (
+function Table ({ data }: { data: { headers: string[]; rows: string[][] } }) {
+  const headers = data.headers.map((header, index) => (
     <th key={index}>{header}</th>
-  ));
-  let rows = data.rows.map((row, index) => (
+  ))
+  const rows = data.rows.map((row, index) => (
     <tr key={index}>
       {row.map((cell, cellIndex) => (
         <td key={cellIndex}>{cell}</td>
       ))}
     </tr>
-  ));
+  ))
 
   return (
     <table>
@@ -21,61 +21,61 @@ function Table({ data }: { data: { headers: string[]; rows: string[][] } }) {
       </thead>
       <tbody>{rows}</tbody>
     </table>
-  );
+  )
 }
 
-function CustomLink(props: any) {
-  let href = props.href;
+function CustomLink (props: any) {
+  const href = props.href
 
-  if (href.startsWith("/")) {
+  if (href.startsWith('/')) {
     return (
       <Link href={href} {...props}>
         {props.children}
       </Link>
-    );
+    )
   }
 
-  if (href.startsWith("#")) {
-    return <a {...props} />;
+  if (href.startsWith('#')) {
+    return <a {...props} />
   }
 
-  return <a target="_blank" rel="noopener noreferrer" {...props} />;
+  return <a target='_blank' rel='noopener noreferrer' {...props} />
 }
 
-function RoundedImage(props: any) {
-  return <Image alt={props.alt} className="rounded-lg" {...props} />;
+function RoundedImage (props: any) {
+  return <Image alt={props.alt} className='rounded-lg' {...props} />
 }
 
 // This replaces rehype-slug
-function slugify(str: string) {
+function slugify (str: string) {
   return str
     .toString()
     .toLowerCase()
     .trim() // Remove whitespace from both ends of a string
-    .replace(/\s+/g, "-") // Replace spaces with -
-    .replace(/&/g, "-and-") // Replace & with 'and'
-    .replace(/[^\w\-]+/g, "") // Remove all non-word characters except for -
-    .replace(/\-\-+/g, "-"); // Replace multiple - with single -
+    .replace(/\s+/g, '-') // Replace spaces with -
+    .replace(/&/g, '-and-') // Replace & with 'and'
+    .replace(/[^\w-]+/g, '') // Remove all non-word characters except for -
+    .replace(/--+/g, '-') // Replace multiple - with single -
 }
 
-function createHeading(level: number) {
+function createHeading (level: number) {
   const Heading = ({ children }: { children: React.ReactNode }) => {
-    let slug = slugify(children as string);
+    const slug = slugify(children as string)
     return React.createElement(
       `h${level}`,
       { id: slug },
       [
-        React.createElement("a", {
+        React.createElement('a', {
           href: `#${slug}`,
           key: `link-${slug}`,
-          className: "anchor",
+          className: 'anchor',
         }),
       ],
-      children,
-    );
-  };
-  Heading.displayName = `Heading${level}`;
-  return Heading;
+      children
+    )
+  }
+  Heading.displayName = `Heading${level}`
+  return Heading
 }
 
 export const globalComponents = {
@@ -88,4 +88,4 @@ export const globalComponents = {
   Image: RoundedImage,
   a: CustomLink,
   Table,
-};
+}

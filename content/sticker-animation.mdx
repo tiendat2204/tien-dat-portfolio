@@ -7,6 +7,10 @@ author: "Tien Dat"
 tags: ["react", "animation", "ui", "frontend", "sprite-sheets"]
 ---
 
+import { Preview } from '@/components/docs/preview'
+import { CodeBlock } from '@/components/docs/codeblock'
+import { InstallTabs } from '@/components/docs/install-tabs'
+
 <Image
   src="/stickers/sprite-sheet-example.png"
   alt="Example of a sprite sheet with multiple animation frames"
@@ -25,19 +29,54 @@ A lightweight React component for creating interactive sprite sheet animations s
 
 Hover over a sticker to see it animate, and click to select it!
 
-👉 [See Demo](https://sticker-animation-umber.vercel.app/)
+<Preview background="grid" className="mb-4">
+  <div className="flex gap-4 flex-wrap justify-center">
+    <StickerCop
+      id="cute-cat"
+      frameCount={16}
+      frameRate={12}
+      framesPerRow={4}
+      framesPerCol={4}
+      spriteImg="/stickers/cat-sprite.png"
+      frameSize={80}
+      onStickerClick={(id) => alert(`You clicked the ${id} sticker!`)}
+    />
+    <StickerCop
+      id="thumbs-up"
+      frameCount={24}
+      frameRate={15}
+      framesPerRow={6}
+      framesPerCol={4}
+      spriteImg="/stickers/sprite-2.png"
+      frameSize={80}
+      onStickerClick={(id) => alert(`You clicked the ${id} sticker!`)}
+    />
+  </div>
+</Preview>
+
+👉 [See Full Demo](https://sticker-animation-umber.vercel.app/)
 
 ---
 
+## Installation
+
+<InstallTabs
+  npm="npm install @tiendat/sticker-cop"
+  yarn="yarn add @tiendat/sticker-cop"
+  pnpm="pnpm add @tiendat/sticker-cop"
+  bun="bun add @tiendat/sticker-cop"
+/>
 
 ## Usage
 
-```tsx
-import StickerCop from '@/components/ui/sticker-cop'
+<CodeBlock
+  language="tsx"
+  fileName="components/example.tsx"
+  code={`import StickerCop from '@/components/ui/sticker-cop'
 
 export default function Example() {
   const handleStickerClick = (id: string) => {
-    console.log(`Sticker ${id} was clicked!`)
+    console.log(\`Sticker \${id} was clicked!\`)
     // Add your logic here
   }
 
@@ -66,8 +105,8 @@ export default function Example() {
       />
     </div>
   )
-}
-```
+}`}
+/>
 
 ## Props
 
@@ -97,8 +136,14 @@ export default function Example() {
 
 Here's an example of how to implement a sticker picker component:
 
-```tsx
-'use client'
+<Preview background="gray">
+  <StickerDemo />
+</Preview>
+
+<CodeBlock
+  language="tsx"
+  fileName="components/sticker-demo.tsx"
+  code={`'use client'
 import React, { useState } from 'react'
 import StickerCop from '@/components/ui/sticker-cop'
 
@@ -131,7 +176,7 @@ const StickerDemo = () => {
   const handleStickerClick = (id: string) => {
     setSelectedSticker(id)
     // In a real app, you might send this sticker to a chat
-    console.log(`Selected sticker: ${id}`)
+    console.log(\`Selected sticker: \${id}\`)
   }
 
   return (
@@ -148,11 +193,11 @@ const StickerDemo = () => {
         {STICKERS.map((sticker) => (
           <div
             key={sticker.id}
-            className={`p-4 flex flex-col items-center ${
+            className={\`p-4 flex flex-col items-center \${
               selectedSticker === sticker.id
                 ? 'bg-blue-100 dark:bg-blue-900/40 ring-2 ring-blue-400 dark:ring-blue-500'
                 : 'bg-white dark:bg-gray-800'
-            } rounded-lg transition-all`}
+            } rounded-lg transition-all\`}
           >
             <StickerCop
               id={sticker.id}
@@ -172,6 +217,5 @@ const StickerDemo = () => {
   )
 }
 
-export default StickerDemo
-```
-
+export default StickerDemo`}
+/>
