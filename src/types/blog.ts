@@ -6,6 +6,7 @@ export type PostMetadata = {
   category?: string;
   new?: boolean;
   publishedAt: string;
+  tags: string[];
 }
 
 export type Post = {

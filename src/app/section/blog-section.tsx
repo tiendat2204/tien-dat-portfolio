@@ -44,9 +44,16 @@ export default function BlogSection () {
                       <div className='absolute inset-0 bg-gradient-to-b from-transparent to-background/80 z-10' />
                       <div className='relative z-20 md:p-4 p-3 flex flex-col h-full'>
                         <div className='flex justify-between items-center mb-2'>
-                          <p className='text-sm text-muted-foreground'>
-                            {post.metadata.publishedAt && formatDate(post.metadata.publishedAt)}
-                          </p>
+                          <div className='flex items-center gap-2'>
+                            <p className='text-sm text-muted-foreground'>
+                              {post.metadata.publishedAt && formatDate(post.metadata.publishedAt)}
+                            </p>
+                            {post.metadata.new && (
+                              <Badge variant='default' className='bg-primary text-primary-foreground text-xs h-4.5 font-medium px-2 py-0.5'>
+                                NEW
+                              </Badge>
+                            )}
+                          </div>
                           {post.metadata.category && (
                             <Badge variant='outline' className='bg-primary/10'>
                               {post.metadata.category}
@@ -64,14 +71,38 @@ export default function BlogSection () {
                           {post.metadata.description}
                         </p>
 
-                        <div className='mt-auto pt-2 flex items-center'>
-                          <Link
-                            href={`/blog/${post.slug}`}
-                            className='text-sm font-medium text-primary flex items-center'
-                          >
-                            Read more
-                            <ArrowRightIcon className='ml-1 h-3 w-3 transition-transform group-hover:translate-x-1' />
-                          </Link>
+                        <div className='mt-auto'>
+                          {post.metadata.tags && post.metadata.tags.length > 0 && (
+                            <div className='flex flex-wrap gap-1.5 mb-3'>
+                              {post.metadata.tags.slice(0, 2).map((tag: string) => (
+                                <Badge
+                                  key={tag}
+                                  variant='outline'
+                                  className='text-xs hover:bg-primary/10 hover:border-primary/20 transition-colors'
+                                >
+                                  # {tag}
+                                </Badge>
+                              ))}
+                              {post.metadata.tags.length > 2 && (
+                                <Badge
+                                  variant='outline'
+                                  className='text-xs hover:bg-primary/10 hover:border-primary/20 transition-colors'
+                                >
+                                  +{post.metadata.tags.length - 2} more
+                                </Badge>
+                              )}
+                            </div>
+                          )}
+
+                          <div className='pt-2 flex items-center'>
+                            <Link
+                              href={`/blog/${post.slug}`}
+                              className='text-sm font-medium text-primary flex items-center'
+                            >
+                              Read more
+                              <ArrowRightIcon className='ml-1 h-3 w-3 transition-transform group-hover:translate-x-1' />
+                            </Link>
+                          </div>
                         </div>
                       </div>
                     </div>

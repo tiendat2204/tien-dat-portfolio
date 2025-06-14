@@ -16,7 +16,7 @@ const StickerAnimationDemo = () => {
 
   return (
     <div className='flex flex-col items-center justify-center   '>
-      <div className='grid grid-cols-1 w-fit mx-auto bg-background dark:bg-zinc-800 p-4 rounded-xl  dark:shadow-zinc-900/20 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 transition-colors duration-300'>
+      <div className='grid grid-cols-1 w-fit mx-auto bg-background dark:bg-zinc-800  rounded-xl  dark:shadow-zinc-900/20  gap-4 mb-6 transition-colors duration-300'>
         {stickers.map((sticker) => (
           <StickerCop
             key={sticker.id}

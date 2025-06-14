@@ -4,8 +4,8 @@ import path from 'node:path'
 import { u } from 'unist-builder'
 import { visit } from 'unist-util-visit'
 
-import { Index } from '@/__registry__/index'
 import type { UnistNode, UnistTree } from '@/types/unist'
+import { Index } from '@/__registry__'
 
 export function rehypeComponent () {
   // Thanks @shadcn/ui
@@ -13,17 +13,17 @@ export function rehypeComponent () {
     visit(tree, (node: UnistNode) => {
       // src prop overrides both name and fileName.
       const { value: srcPath } =
-            (getNodeAttributeByName(node, 'src') as {
-              name: string;
-              value?: string;
-              type?: string;
-            }) || {}
+      (getNodeAttributeByName(node, 'src') as {
+        name: string;
+        value?: string;
+        type?: string;
+      }) || {}
 
       if (node.name === 'ComponentSource') {
         const name = getNodeAttributeByName(node, 'name')?.value as string
         const fileName = getNodeAttributeByName(node, 'fileName')?.value as
-                    | string
-                    | undefined
+            | string
+            | undefined
 
         if (!name && !srcPath) {
           return null
@@ -41,7 +41,7 @@ export function rehypeComponent () {
                 if (typeof file === 'string') {
                   return (
                     file.endsWith(`${fileName}.tsx`) ||
-                                    file.endsWith(`${fileName}.ts`)
+                    file.endsWith(`${fileName}.ts`)
                   )
                 }
                 return false

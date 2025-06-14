@@ -1,4 +1,3 @@
-import { ThemeProvider } from '@/components/theme-provider'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { DATA } from '@/data/resume'
 import { cn } from '@/lib/utils'
@@ -7,6 +6,7 @@ import './globals.css'
 import { ReactLenis } from 'lenis/react'
 import { Footer } from '@/components/footer'
 import Navbar from '@/components/navbar'
+import { Providers } from '@/components/Providers'
 
 export const metadata: Metadata = {
   metadataBase: new URL(DATA.url),
@@ -63,8 +63,9 @@ export default function RootLayout ({
         suppressHydrationWarning
       >
         <ReactLenis root />
-        <ThemeProvider attribute='class' defaultTheme='dark'>
-          <TooltipProvider delayDuration={0}>
+        <TooltipProvider delayDuration={0}>
+
+          <Providers>
             {children}
             <Navbar />
             <Footer
@@ -87,8 +88,9 @@ export default function RootLayout ({
                 text: DATA.footer.copyright,
               }}
             />
-          </TooltipProvider>
-        </ThemeProvider>
+          </Providers>
+        </TooltipProvider>
+
       </body>
     </html>
   )

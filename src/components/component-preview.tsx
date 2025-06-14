@@ -3,7 +3,6 @@
 import { RepeatIcon } from 'lucide-react'
 import React, { useMemo, useState } from 'react'
 
-import { Index } from '@/__registry__/index'
 import { cn } from '@/lib/utils'
 
 import { OpenInV0Button } from './open-in-v0'
@@ -11,6 +10,7 @@ import { Button } from './ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { SimpleTooltip } from './ui/tooltip'
 import { Code as CodeInline } from './ui/typography'
+import { Index } from '@/__registry__'
 
 export function ComponentPreview ({
   className,
@@ -31,7 +31,6 @@ export function ComponentPreview ({
 
   const Preview = useMemo(() => {
     const Component = Index[name]?.component
-
     if (!Component) {
       return (
         <p className='text-sm text-muted-foreground'>
@@ -52,7 +51,7 @@ export function ComponentPreview ({
         </TabsList>
 
         <TabsContent value='preview'>
-          <div className='rounded-lg border border-edge bg-zinc-950/0.75 bg-[radial-gradient(var(--pattern-foreground)_1px,transparent_0)] bg-size-[10px_10px] bg-center p-4 [--pattern-foreground:var(--color-zinc-950)]/5 dark:bg-white/0.75 dark:[--pattern-foreground:var(--color-white)]/5'>
+          <div className='rounded-lg border p-4  bg-radial-[125%_125%_at_50%_10%] from-[rgba(34,34,34,0.6)] from-40% to-[rgba(0,0,0,1)] to-100%'>
             {(canReplay || openInV0Url) && (
               <div className='flex justify-end gap-2'>
                 {canReplay && (

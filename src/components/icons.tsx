@@ -17,28 +17,13 @@ export const Icons = {
     </svg>
   ),
   V0: (props: IconProps) => (
-    <svg
-      viewBox='0 0 24 24'
-      xmlns='http://www.w3.org/2000/svg'
-      fill='currentColor'
-      {...props}
-    >
-      <title>v0</title>
-      <path d='M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm0 18a8 8 0 118-8 8.009 8.009 0 01-8 8z' />
-      <path d='M16.5 7h-1a1.5 1.5 0 00-1.5 1.5v4a1.5 1.5 0 001.5 1.5h1a1.5 1.5 0 001.5-1.5v-4A1.5 1.5 0 0016.5 7zm-.5 6h-1v-4h1z' />
-    </svg>
+    <svg height='16' xmlns='http://www.w3.org/2000/svg' strokeLinejoin='round' viewBox='0 0 16 16' width='16'><path clipRule='evenodd' d='M9.50321 5.5H13.2532C13.3123 5.5 13.3704 5.5041 13.4273 5.51203L9.51242 9.42692C9.50424 9.36912 9.5 9.31006 9.5 9.25L9.5 5.5L8 5.5L8 9.25C8 10.7688 9.23122 12 10.75 12H14.5V10.5L10.75 10.5C10.6899 10.5 10.6309 10.4958 10.5731 10.4876L14.4904 6.57028C14.4988 6.62897 14.5032 6.68897 14.5032 6.75V10.5H16.0032V6.75C16.0032 5.23122 14.772 4 13.2532 4H9.50321V5.5ZM0 5V5.00405L5.12525 11.5307C5.74119 12.3151 7.00106 11.8795 7.00106 10.8822V5H5.50106V9.58056L1.90404 5H0Z' fill='currentColor' fillRule='evenodd' /></svg>
   ),
   ShadcnUI: (props: IconProps) => (
-    <svg
-      viewBox='0 0 24 24'
-      xmlns='http://www.w3.org/2000/svg'
-      fill='currentColor'
-      {...props}
-    >
-      <title>Shadcn UI</title>
-      <path d='M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm0 18a8 8 0 118-8 8.009 8.009 0 01-8 8z' />
-      <path d='M16.5 7h-1a1.5 1.5 0 00-1.5 1.5v4a1.5 1.5 0 001.5 1.5h1a1.5 1.5 0 001.5-1.5v-4A1.5 1.5 0 0016.5 7zm-.5 6h-1v-4h1z' />
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'>
+      <path fill='none' stroke='currentColor' strokeLinecap='round' strokeLinejoin='round' stroke-width='32' d='m208 128-80 80M192 40 40 192' />
     </svg>
+
   ),
   Bookmark: (props: IconProps) => (
     <svg

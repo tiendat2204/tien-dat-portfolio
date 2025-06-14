@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
 @import url('https://fonts.googleapis.com/css2?family=Doto:wght@100..900&display=swap');
 @import "tailwindcss";
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark, .dark *));
 @plugin "@tailwindcss/typography";
 @utility container {
     margin-inline: auto;
@@ -109,21 +109,6 @@
     --font-doto: "Doto", "Doto Fallback", sans-serif;
   }
 }
-.font-doto {
-  font-family: var(--font-doto);
-}
-@utility prose {
-  /* Enhanced typography styles for better readability */
-  @apply max-w-none;
-
-  & pre {
-    @apply px-0! rounded-lg overflow-x-auto;
-  }
-
-  & code {
-    @apply text-sm;
-  }
-}
 
 @layer base {
   :root {
@@ -180,7 +165,7 @@
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
+    --border: 240 3.7% 20.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
 
@@ -228,6 +213,7 @@
 
 
 @layer utilities {
+
   .screen-line-before:before {
     content: "";
     top: 0;
@@ -304,178 +290,42 @@
     display: none;
   }
 }
-.wiki-styled h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 2rem;
-  margin: 2rem 0 1rem;
-}
+@layer components {
+  [data-rehype-pretty-code-figure] {
+    @apply relative my-6 rounded-lg bg-muted text-foreground;
 
-.wiki-styled h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.75rem;
-  margin: 1.75rem 0 1rem;
-}
+    pre {
+      @apply overflow-x-auto px-4 py-4;
+    }
 
-.wiki-styled h4,
-.wiki-styled h5,
-.wiki-styled h6 {
-  font-size: 0.875rem;
-  font-weight: 700;
-  line-height: 1.25rem;
-  margin: 1.25rem 0 1rem;
-}
+    code {
+      @apply font-mono text-sm;
+    }
+  }
 
-.wiki-styled p {
-  font-size: 1rem;
-  line-height: 1.5rem;
-  margin-bottom: 1rem;
-}
+  [data-line] {
+    @apply py-0.5;
+  }
 
-.wiki-styled ul,
-.wiki-styled ol {
-  font-size: 1rem;
-  line-height: 1.5rem;
-  margin: 1.5rem 0;
-  padding-left: 2rem;
-}
+  [data-line] span {
+    @apply text-(--shiki-light) dark:text-(--shiki-dark);
+  }
 
-.wiki-styled ul > li,
-.wiki-styled ol > li {
-  font-size: 1rem;
-  line-height: 1.5rem;
-  margin: 0;
-}
+  [data-rehype-pretty-code-title] {
+    @apply flex items-center gap-2 border-b px-4 py-2.5 text-sm text-muted-foreground;
+  }
 
-.wiki-styled ul > li {
-  list-style: disc;
-}
+  [data-rehype-pretty-code-title] svg {
+    @apply h-4 w-4 text-muted-foreground;
+  }
 
-.wiki-styled ol > li {
-  list-style: decimal;
-}
+  [data-line-numbers] {
+    counter-reset: line;
+  }
 
-.wiki-styled a {
-  color: #1978a7;
-  text-decoration: none;
-  word-break: break-word;
-  hyphens: auto;
-}
-
-.wiki-styled a:hover {
-  text-decoration: underline;
-  background-color: rgba(25, 120, 167, 0.1);
-}
-
-.wiki-styled a:active {
-  text-decoration: underline;
-  background-color: rgba(25, 120, 167, 0.2);
-}
-
-.wiki-styled img {
-  max-width: 100%;
-}
-
-.wiki-styled blockquote {
-  font-size: 1rem;
-  line-height: 1.5rem;
-  margin: 1.5rem 0;
-  padding: 0 1rem;
-  border-left: 0.25rem solid #1a73e8;
-}
-
-.wiki-styled hr {
-  border: 0;
-  height: 1px;
-  background-color: #dadce0;
-  margin: 1.5rem 0;
-}
-
-.wiki-styled table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-}
-
-.wiki-styled table th {
-  font-weight: 700;
-  font-size: 0.75rem;
-  text-align: left;
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid #dadce0;
-}
-
-.wiki-styled table td {
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid #dadce0;
-}
-
-.wiki-styled table tr:last-child td {
-  border-bottom: 0;
-}
-
-
-
-.wiki-styled pre {
-  font-size: 0.85rem;
-  line-height: 1.5rem;
-  margin: 1.5rem 0;
-  padding: 0.5rem;
-  overflow: auto;
-}
-
-.wiki-styled code {
-  font-size: 0.85rem;
-  line-height: 1.5rem;
-  margin: 1.5rem 0;
-  padding: 0.25rem 0.5rem;
-    background-color: #303030;
-  border-radius: 0.25rem;
-}
-
-.wiki-styled .highlight code {
-  padding: 0.25rem 0;
-}
-
-.wiki-styled kbd {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  padding: 0.25rem 0.5rem;
-  background-color: #f1f3f4;
-  border-radius: 0.25rem;
-}
-
-.wiki-styled mark {
-  background-color: #ffeb3b;
-}
-
-.wiki-styled del {
-  text-decoration: line-through;
-}
-
-.wiki-styled ins {
-  text-decoration: underline;
-}
-
-.wiki-styled em,
-.wiki-styled i {
-  font-style: italic;
-}
-
-.wiki-styled figure.img-responsive {
-  margin: 1.5rem 0;
-}
-
-.wiki-styled figure.img-responsive img {
-  max-width: 100%;
-  user-select: none;
-  pointer-events: none;
-}
-
-.wiki-styled figure.img-responsive figcaption {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  text-align: center;
-  color: #6c757d;
+  [data-line-numbers] > [data-line]::before {
+    counter-increment: line;
+    content: counter(line);
+    @apply sticky left-0 inline-block w-12 bg-muted pr-4 text-right text-sm text-muted-foreground;
+  }
 }

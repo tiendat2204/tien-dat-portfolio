@@ -57,9 +57,9 @@ const components: MDXRemoteProps['components'] = {
   },
   figcaption: ({ children, ...props }: React.ComponentProps<'figcaption'>) => {
     const iconExtension =
-            'data-language' in props && typeof props['data-language'] === 'string'
-              ? getIconForLanguageExtension(props['data-language'])
-              : null
+        'data-language' in props && typeof props['data-language'] === 'string'
+          ? getIconForLanguageExtension(props['data-language'])
+          : null
 
     return (
       <figcaption {...props}>
@@ -69,8 +69,10 @@ const components: MDXRemoteProps['components'] = {
     )
   },
   pre ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     __withMeta__,
     __rawString__,
+
     __pnpm__,
     __yarn__,
     __npm__,
@@ -113,7 +115,7 @@ const components: MDXRemoteProps['components'] = {
   CodeTabs,
   Steps: (props) => (
     <div
-      className='md:ml-3.5 md:border-l md:pl-7.5 prose-h3:text-wrap'
+      className=' prose-h3:text-wrap'
       {...props}
     />
   ),
@@ -126,7 +128,7 @@ const components: MDXRemoteProps['components'] = {
   TabsContent,
   TabsTriggerShadcnCLI: () => (
     <TabsTrigger value='cli'>
-      <Icons.ShadcnUI />
+      <Icons.ShadcnUI className='fill-background' />
       shadcn CLI
     </TabsTrigger>
   ),
@@ -184,7 +186,7 @@ const options: MDXRemoteProps['options'] = {
             }
 
             preElement.properties['__withMeta__'] =
-                            node.children.at(0).tagName === 'figcaption'
+                node.children.at(0).tagName === 'figcaption'
             preElement.properties['__rawString__'] = node.__rawString__
           }
         })

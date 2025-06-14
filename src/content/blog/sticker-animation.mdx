@@ -3,9 +3,11 @@ title: Sticker Animation
 description: Delightful animated stickers for React applications with smooth transitions and customizable effects.
 image: https://assets.tiendat.dev/images/blog/sticker-animation.webp
 category: components
-new: true
+new: false
 publishedAt: "2024-12-06"
+tags: ["react", "animation", "components", "ui"]
 ---
+
 
 <ComponentPreview
     name="sticker-animation-demo"
@@ -13,3 +15,64 @@ publishedAt: "2024-12-06"
 />
 
 
+I'll write an installation guide for Sticker Animation using the same structure as your example. Here's the content for your blog post:
+
+## Installation
+
+<CodeTabs className="gap-0">
+
+    <TabsList>
+        <TabsTriggerShadcnCLI />
+        <TabsTrigger value="manual">Manual</TabsTrigger>
+    </TabsList>
+
+    <TabsContent value="cli" className="[&>figure]:mb-0">
+
+        ```bash
+        npx shadcn@latest add https://tiendat.dev/r/sticker-animation.json
+        ```
+
+    </TabsContent>
+
+    <TabsContent value="manual">
+        <Steps>
+            <Step>Copy and paste the following code into your project</Step>
+            <ComponentSource
+                name="sticker-animation"
+                title="components/sticker-animation.tsx"
+                showLineNumbers
+            />
+            <Step>Update the import paths to match your project setup</Step>
+        </Steps>
+    </TabsContent>
+</CodeTabs>
+
+## Usage
+
+```tsx
+import {
+  StickerAnimation,
+  StickerContainer
+} from "@/components/sticker-animation";
+```
+
+```tsx
+export function StickerDemo() {
+  return (
+    <StickerContainer>
+      <StickerAnimation
+        src="/path/to/sticker.png"
+        alt="Animated sticker"
+        size={120}
+        speed={1.2}
+      />
+    </StickerContainer>
+  );
+}
+```
+
+## Examples
+
+### Basic Sticker Animation
+
+<ComponentPreview className="mt-4" name="sticker-animation-demo" />
