@@ -239,6 +239,7 @@ export default function Page () {
                   description={award.description}
                   location={award.location}
                   dates={award.dates}
+                  image={award.image}
                   links={award.links}
                 />
               </BlurFade>
