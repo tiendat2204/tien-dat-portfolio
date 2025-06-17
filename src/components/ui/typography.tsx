@@ -34,7 +34,6 @@ function Prose({
 
 function Code({ className, ...props }: React.ComponentProps<"code">) {
     const isCodeBlock = "data-language" in props;
-    console.log(isCodeBlock);
     return (
         <code
             data-slot={isCodeBlock ? "code-block" : "code-inline"}
