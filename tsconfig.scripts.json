@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2017",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "isolatedModules": false,
+    "allowImportingTsExtensions": true
+  },
+  "include": [
+    "./src/scripts/**/*.{ts,mts}"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

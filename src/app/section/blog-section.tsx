@@ -8,11 +8,11 @@ import type { Post } from '@/types/blog'
 import { BlurFade } from '@/components/magicui/blur-fade'
 import { BLUR_FADE_DELAY } from '@/data/config'
 import React from 'react'
+import Image from 'next/image'
 
 export default function BlogSection () {
   const posts:Post[] = getAllPosts()
   const featuredPosts:Post[] = posts.slice(0, 4)
-
   return (
     <section id='blog' className='relative screen-line-after border-x'>
       <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
@@ -43,13 +43,14 @@ export default function BlogSection () {
                     <div className='group relative flex flex-col overflow-hidden rounded-xl border bg-lines-pattern-light dark:bg-lines-pattern size-full bg-repeat bg-card bg-[length:30px_30px] h-full'>
                       <div className='absolute inset-0 bg-gradient-to-b from-transparent to-background/80 z-10' />
                       <div className='relative z-20 md:p-4 p-3 flex flex-col h-full'>
+
                         <div className='flex justify-between items-center mb-2'>
                           <div className='flex items-center gap-2'>
                             <p className='text-sm text-muted-foreground'>
                               {post.metadata.publishedAt && formatDate(post.metadata.publishedAt)}
                             </p>
                             {post.metadata.new && (
-                              <Badge variant='default' className='bg-primary text-primary-foreground text-xs h-4.5 font-medium px-2 py-0.5'>
+                              <Badge variant='default' className='bg-primary text-primary-foreground text-xs h-4 font-medium px-2 py-0.5'>
                                 NEW
                               </Badge>
                             )}
@@ -60,7 +61,15 @@ export default function BlogSection () {
                             </Badge>
                           )}
                         </div>
-
+                        <BlurFade delay={BLUR_FADE_DELAY * (index + 1)} offset={0}>
+                          <Image
+                            src={post.metadata.image || '/images/default-blog-image.jpg'}
+                            alt={post.metadata.title}
+                            width={600}
+                            height={400}
+                            className='w-full h-40 object-cover rounded-lg mb-3'
+                          />
+                        </BlurFade>
                         <Link href={`/blog/${post.slug}`}>
                           <h3 className='text-lg font-semibold mb-2 group-hover:underline transition-colors line-clamp-1'>
                             {post.metadata.title}

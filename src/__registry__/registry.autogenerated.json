@@ -1,0 +1,31 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "ttdat",
+  "homepage": "https://tiendatdev.me",
+  "items": [
+    {
+      "name": "utils",
+      "type": "registry:lib",
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "files": [
+        {
+          "path": "src/lib/utils.ts",
+          "type": "registry:lib"
+        }
+      ]
+    },
+    {
+      "name": "sticker-animation",
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "src/registry/StickerCop/StickerCop.tsx",
+          "type": "registry:component"
+        }
+      ]
+    }
+  ]
+}

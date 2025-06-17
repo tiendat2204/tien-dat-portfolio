@@ -14,7 +14,7 @@ interface StickerProps {
   onStickerClick?: (id: string) => void; // Thêm prop mới
 }
 
-const StickerCop: React.FC<StickerProps> = ({
+export const StickerCop: React.FC<StickerProps> = ({
   id,
   frameCount,
   frameRate,
@@ -107,5 +107,3 @@ const StickerCop: React.FC<StickerProps> = ({
     </div>
   )
 }
-
-export default StickerCop

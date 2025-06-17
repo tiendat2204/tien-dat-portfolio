@@ -1,0 +1,16 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "utils",
+  "type": "registry:lib",
+  "dependencies": [
+    "clsx",
+    "tailwind-merge"
+  ],
+  "files": [
+    {
+      "path": "src/lib/utils.ts",
+      "content": "import { type ClassValue, clsx } from 'clsx'\r\nimport { twMerge } from 'tailwind-merge'\r\n\r\nexport function cn (...inputs: ClassValue[]) {\r\n  return twMerge(clsx(inputs))\r\n}\r\n\r\nexport function formatDate (date: string) {\r\n  const currentDate = new Date().getTime()\r\n  if (!date.includes('T')) {\r\n    date = `${date}T00:00:00`\r\n  }\r\n  const targetDate = new Date(date).getTime()\r\n  const timeDifference = Math.abs(currentDate - targetDate)\r\n  const daysAgo = Math.floor(timeDifference / (1000 * 60 * 60 * 24))\r\n\r\n  const fullDate = new Date(date).toLocaleString('en-us', {\r\n    month: 'long',\r\n    day: 'numeric',\r\n    year: 'numeric',\r\n  })\r\n\r\n  if (daysAgo < 1) {\r\n    return 'Today'\r\n  } else if (daysAgo < 7) {\r\n    return `${fullDate} (${daysAgo}d ago)`\r\n  } else if (daysAgo < 30) {\r\n    const weeksAgo = Math.floor(daysAgo / 7)\r\n    return `${fullDate} (${weeksAgo}w ago)`\r\n  } else if (daysAgo < 365) {\r\n    const monthsAgo = Math.floor(daysAgo / 30)\r\n    return `${fullDate} (${monthsAgo}mo ago)`\r\n  } else {\r\n    const yearsAgo = Math.floor(daysAgo / 365)\r\n    return `${fullDate} (${yearsAgo}y ago)`\r\n  }\r\n}\r\n",
+      "type": "registry:lib"
+    }
+  ]
+}

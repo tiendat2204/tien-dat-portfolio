@@ -19,16 +19,10 @@ const nextConfig = {
   trailingSlash: true,
   images: {
     domains: [
-      'assets.aceternity.com',
-      'cdn.cosmos.so',
+      'assets.tiendat.dev',
       'github.com',
       'avatars.githubusercontent.com',
       'lh3.googleusercontent.com',
-      'res.cloudinary.com',
-      'images.unsplash.com',
-      'fakeimg.pl',
-      'media-aztm-django.vnscdn.com',
-      'static-aztm-django.vnscdn.com',
       'raw.githubusercontent.com',
       "api.microlink.io",
 

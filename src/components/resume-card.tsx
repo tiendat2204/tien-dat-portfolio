@@ -5,6 +5,7 @@ import { Card, CardHeader } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 import { ChevronRightIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 import React from 'react'
 import { Icon } from '@/components/Icon'
 import { SkillBadge } from '@/app/section/skills-section'
@@ -25,7 +26,7 @@ interface ResumeCardProps {
   href?: string;
   badges?: readonly string[];
   period: string;
-  description?: string | readonly (string | JSX.Element)[];
+  description?: string | readonly (string | ReactNode)[];
   technologies?: readonly TechnologyType[];
   isExpanded?: boolean;
 }

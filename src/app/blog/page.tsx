@@ -10,7 +10,7 @@ import type { Post } from '@/types/blog'
 import { BLUR_FADE_DELAY, GRID_CONFIG, maskStyle } from '@/data/config'
 import { Particles } from '@/components/ui/particles'
 import { Badge } from '@/components/ui/badge'
-
+import Image from 'next/image'
 export default function BlogPage () {
   const posts: Post[] = getAllPosts()
 
@@ -99,34 +99,47 @@ export default function BlogPage () {
                     <Link href={`/blog/${post.slug}`} className='block group'>
                       <div className='p-4 hover:bg-accent/50 transition-colors border-b relative bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[length:4px_4px]'>
                         <span className='absolute left-0 top-0 bottom-0 w-0 group-hover:w-1 bg-primary transition-all duration-300' />
-                        <div className='flex-1'>
-                          <div className='flex items-center gap-3 mb-1'>
-                            <h3 className='text-xl font-bold  line-clamp-1'>{post.metadata.title}</h3>
-                            {post.metadata.new && (
-                              <Badge variant='default' className='bg-primary text-primary-foreground text-xs h-4.5 px-2 py-1'>NEW</Badge>
-                            )}
-                          </div>
-                          <div className='text-sm text-muted-foreground mb-2'>
-                            {new Date(post.metadata.publishedAt).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </div>
-                          <p className='text-sm text-muted-foreground line-clamp-2'>{post.metadata.description || post.metadata.summary}</p>
-                          {post.metadata.tags && post.metadata.tags.length > 0 && (
-                            <div className='flex flex-wrap gap-1.5 mt-2'>
-                              {post.metadata.tags.map((tag: string) => (
-                                <Badge
-                                  key={tag}
-                                  variant='outline'
-                                  className='text-xs hover:bg-primary/10 hover:border-primary/20 transition-colors'
-                                >
-                                  # {tag}
-                                </Badge>
-                              ))}
+                        <div className='flex gap-4'>
+                          {post.metadata.image && (
+                            <div className='flex-shrink-0 relative'>
+                              <Image
+                                src={post.metadata.image}
+                                alt={post.metadata.title}
+                                width={150}
+                                height={120}
+                                className='rounded-lg object-cover h-full w-36 md:w-40 lg:w-48'
+                              />
+                              {post.metadata.new && (
+                                <Badge variant='default' className='bg-primary absolute top-2 left  -2 text-primary-foreground text-xs h-4.5 px-2 py-1'>NEW</Badge>
+                              )}
                             </div>
                           )}
+                          <div className='flex-1'>
+                            <div className='flex items-center gap-3 mb-1'>
+                              <h3 className='text-xl font-bold line-clamp-1'>{post.metadata.title}</h3>
+                            </div>
+                            <div className='text-sm text-muted-foreground mb-2'>
+                              {new Date(post.metadata.publishedAt).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}
+                            </div>
+                            <p className='text-sm text-muted-foreground line-clamp-2'>{post.metadata.description || post.metadata.summary}</p>
+                            {post.metadata.tags && post.metadata.tags.length > 0 && (
+                              <div className='flex flex-wrap gap-1.5 mt-2'>
+                                {post.metadata.tags.map((tag: string) => (
+                                  <Badge
+                                    key={tag}
+                                    variant='outline'
+                                    className='text-xs hover:bg-primary/10 hover:border-primary/20 transition-colors'
+                                  >
+                                    # {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </Link>

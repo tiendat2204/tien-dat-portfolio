@@ -1,6 +1,6 @@
 import React from 'react'
 import Sticker1 from '@/img/image1.png'
-import StickerCop from '../StickerCop/StickerCop'
+import { StickerCop } from '../StickerCop'
 
 const StickerAnimationDemo = () => {
   const stickers = [
