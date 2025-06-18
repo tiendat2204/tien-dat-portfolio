@@ -39,7 +39,7 @@ I'll write an installation guide for Sticker Animation using the same structure 
             <Step>Copy and paste the following code into your project</Step>
             <ComponentSource
                 name="sticker-animation"
-                title="components/sticker-animation.tsx"
+                title="components/StickerCop.tsx"
                 showLineNumbers
             />
             <Step>Update the import paths to match your project setup</Step>
@@ -51,22 +51,24 @@ I'll write an installation guide for Sticker Animation using the same structure 
 
 ```tsx
 import {
-  StickerAnimation,
-  StickerContainer
-} from "@/components/sticker-animation";
+  StickerCop,
+} from "@/components/StickerCop";
 ```
 
 ```tsx
 export function StickerDemo() {
   return (
-    <StickerContainer>
-      <StickerAnimation
-        src="/path/to/sticker.png"
+     <StickerCop
+        id="my-sticker"
+        frameCount={16}
+        frameRate={12}
+        framesPerCol={4}
+        framesPerRow={4}
+        spriteImg="/sprites/sticker-sprite.png"
+        frameSize={120}
+        className="hover:scale-110 transition-transform"
         alt="Animated sticker"
-        size={120}
-        speed={1.2}
       />
-    </StickerContainer>
   );
 }
 ```

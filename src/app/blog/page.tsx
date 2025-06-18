@@ -110,7 +110,7 @@ export default function BlogPage () {
                                 className='rounded-lg object-cover h-full w-36 md:w-40 lg:w-48'
                               />
                               {post.metadata.new && (
-                                <Badge variant='default' className='bg-primary absolute top-2 left  -2 text-primary-foreground text-xs h-4.5 px-2 py-1'>NEW</Badge>
+                                <Badge variant='default' className='bg-primary absolute top-2 left-2 text-primary-foreground text-xs h-4.5 px-2 py-1'>NEW</Badge>
                               )}
                             </div>
                           )}

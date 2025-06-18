@@ -11,4 +11,14 @@ export const components: Registry['items'] = [
       },
     ],
   },
+  {
+    name: 'navigation-menu',
+    type: 'registry:component',
+    files: [
+      {
+        path: 'NavigationMenu/MainNavigation.tsx',
+        type: 'registry:component',
+      },
+    ],
+  },
 ]

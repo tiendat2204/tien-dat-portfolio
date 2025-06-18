@@ -51,7 +51,11 @@ export function ComponentPreview ({
         </TabsList>
 
         <TabsContent value='preview'>
-          <div className='rounded-lg border p-4  bg-radial-[125%_125%_at_50%_10%] from-[rgba(34,34,34,0.6)] from-40% to-[rgba(0,0,0,1)] to-100%'>
+          <div className='rounded-lg border p-4
+  bg-radial-[125%_125%_at_50%_10%]
+  from-[rgba(255,255,255,0.8)] from-40% to-[rgba(240,240,240,1)] to-100%
+  dark:from-[rgba(34,34,34,0.6)] dark:from-40% dark:to-[rgba(0,0,0,1)] dark:to-100%'
+          >
             {(canReplay || openInV0Url) && (
               <div className='flex justify-end gap-2'>
                 {canReplay && (

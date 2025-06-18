@@ -1,0 +1,77 @@
+---
+title: Navigation Menu SSR
+description: Server-side rendered navigation menu with smooth animations and responsive design for better performance.
+image: /blog/navigation-menu-ssr.png
+category: components
+new: false
+publishedAt: "2024-12-06"
+tags: ["react", "navigation", "ssr", "components", "ui"]
+---
+
+
+<ComponentPreview
+    name="navigation-menu-ssr-demo"
+    openInV0Url="https://tiendatdev.me/r/navigation-menu-ssr.json"
+/>
+
+
+## Installation
+
+<CodeTabs className="gap-0">
+
+    <TabsList>
+        <TabsTriggerShadcnCLI />
+        <TabsTrigger value="manual">Manual</TabsTrigger>
+    </TabsList>
+
+    <TabsContent value="cli" className="[&>figure]:mb-0">
+
+        ```bash
+        npx shadcn@latest add https://tiendatdev.me/r/navigation-menu-ssr.json
+        ```
+
+    </TabsContent>
+
+    <TabsContent value="manual">
+        <Steps>
+            <Step>Copy and paste the following code into your project</Step>
+            <ComponentSource
+                name="navigation-menu"
+                title="components/NavigationMenuSSR.tsx"
+                showLineNumbers
+            />
+            <Step>Update the import paths to match your project setup</Step>
+        </Steps>
+    </TabsContent>
+</CodeTabs>
+
+## Usage
+
+```tsx
+import {
+  NavigationMenuSSR,
+} from "@/components/NavigationMenuSSR";
+```
+
+```tsx
+export function NavigationDemo() {
+  return (
+    <NavigationMenuSSR
+      items={[
+        { label: "Home", href: "/" },
+        { label: "About", href: "/about" },
+        { label: "Services", href: "/services" },
+        { label: "Contact", href: "/contact" }
+      ]}
+      className="bg-white shadow-md"
+      variant="horizontal"
+    />
+  );
+}
+```
+
+## Examples
+
+### Basic Navigation Menu SSR
+
+<ComponentPreview className="mt-4" name="navigation-menu-ssr-demo" />
