@@ -1,7 +1,6 @@
 import { Icon } from '@/components/Icon'
-import BlurFadeText from '@/components/magicui/blur-fade-text'
 import Link from 'next/link'
-import React from 'react'
+import React, { Suspense } from 'react'
 import { FlickeringGrid } from '@/components/ui/flickering-grid-hero'
 import { BlurFade } from '@/components/magicui/blur-fade'
 import { Icons } from '@/components/icons'
@@ -11,6 +10,7 @@ import { BLUR_FADE_DELAY, GRID_CONFIG, maskStyle } from '@/data/config'
 import { Particles } from '@/components/ui/particles'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
+import { Back } from '@/app/blog/back'
 export default function BlogPage () {
   const posts: Post[] = getAllPosts()
 
@@ -58,12 +58,11 @@ export default function BlogPage () {
           <div className='flex items-stretch justify-center w-full min-h-[120px]'>
             <div className='flex flex-col justify-between h-full min-h-[140px] md:min-h-[170px] w-full'>
               <div className='flex items-center justify-between border-y w-full'>
-                <BlurFadeText
-                  delay={BLUR_FADE_DELAY}
-                  className='text-3xl font-extrabold tracking-tight sm:text-3xl font-doto px-4'
-                  yOffset={0}
-                  text='Blog'
-                />
+                <Suspense>
+                  <div className='px-4'>
+                    <Back />
+                  </div>
+                </Suspense>
                 <div className='size-6 mr-4'>
                   <Icons.Logo />
                 </div>
