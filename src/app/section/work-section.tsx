@@ -3,6 +3,7 @@ import { DATA } from '@/data/resume'
 import { BlurFade } from '@/components/magicui/blur-fade'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ResumeCard } from '@/components/resume-card'
+import Link from 'next/link'
 const BLUR_FADE_DELAY = 0.04
 const WorkSection = () => {
   return (
@@ -24,16 +25,18 @@ const WorkSection = () => {
               </div>
               <div className='flex items-center gap-3 pl-6'>
                 <div className='flex-none '>
-                  <Avatar className='border size-12 m-auto bg-muted-background dark:bg-foreground '>
-                    <AvatarImage
-                      src={company.logoUrl}
-                      alt={company.company}
-                      className='object-contain'
-                    />
-                    <AvatarFallback>
-                      {company.company.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                  <Link href={company.href} target='_blank' rel='noopener noreferrer'>
+                    <Avatar className='border size-12 m-auto bg-muted-background dark:bg-foreground '>
+                      <AvatarImage
+                        src={company.logoUrl}
+                        alt={company.company}
+                        className='object-contain'
+                      />
+                      <AvatarFallback>
+                        {company.company.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Link>
                 </div>
                 <div>
                   <h3 className='font-bold text-lg text-foreground'>

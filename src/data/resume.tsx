@@ -136,6 +136,37 @@ export const DATA = {
   },
   work: [
     {
+      company: 'TA Consultant',
+      href: '#',
+      location: 'Ho Chi Minh City, Vietnam',
+      logoUrl: '/ta-consultant-logo.jpg',
+      positions: [
+        {
+          title: 'Junior - Frontend Developer',
+          badges: ['Frontend', 'Full Stack'],
+          start: 'July 2025',
+          end: 'Present',
+          isExpanded: true,
+          description: [
+            'Developing advanced document editing applications with React.js for Word, Excel, and PDF formats',
+            'Building interactive document editors with real-time collaboration features',
+            'Implementing file conversion and processing capabilities for multiple document formats',
+            'Creating responsive user interfaces with Vite and TailwindCSS for optimal performance',
+            'Developing efficient data management solutions using TanStack Query for document operations',
+            'Building custom hooks and components for document manipulation and viewing',
+            'Optimizing application performance for handling large documents and complex editing operations',
+          ],
+          technologies: [
+            { name: 'React.js', icon: 'react-icon.svg' },
+            { name: 'Vite', icon: 'vite-icon.svg' },
+            { name: 'TypeScript', icon: 'typescript-icon.svg' },
+            { name: 'TailwindCSS', icon: 'tailwindcss-icon.svg' },
+            { name: 'TanStack Query', icon: 'tanstack-icon.svg' },
+          ],
+        },
+      ],
+    },
+    {
       company: 'VietDev Studio',
       href: 'https://www.facebook.com/vietdevstudio/',
       location: 'Ho Chi Minh City, Vietnam',
@@ -145,7 +176,7 @@ export const DATA = {
           title: 'Fresher - Frontend Developer',
           badges: ['Frontend Lead', 'Full Stack'],
           start: 'Jan 2024',
-          end: 'Present',
+          end: 'June 2025',
           isExpanded: true,
           description: [
             'Leading frontend development for POD Wedding platform using Next.js SSR for optimal performance and SEO',
