@@ -31,6 +31,7 @@ import { CodeTabs } from './code-tabs'
 import { CopyButton } from './copy-button'
 import { getIconForLanguageExtension, Icons } from './icons'
 import { UTM_PARAMS } from '@/data/config'
+import { ImageZoom } from './zoomable-image'
 
 const components: MDXRemoteProps['components'] = {
   h1: (props: React.ComponentProps<'h1'>) => <Heading as='h1' {...props} />,
@@ -45,6 +46,23 @@ const components: MDXRemoteProps['components'] = {
   tr: TableRow,
   th: TableHead,
   td: TableCell,
+  img: ({ src, alt, className, width, height, ...props }: React.ComponentProps<'img'>) => {
+    if (!src || typeof src !== 'string') return <img {...props} />
+
+    return (
+      <ImageZoom
+        src={src}
+        alt={alt || ''}
+        className={cn(
+          'rounded-lg border shadow-sm transition-all duration-200 hover:shadow-md',
+          className
+        )}
+        width={typeof width === 'string' ? parseInt(width) || 800 : width || 800}
+        height={typeof height === 'string' ? parseInt(height) || 600 : height || 600}
+        {...props}
+      />
+    )
+  },
   figure ({ className, ...props }: React.ComponentProps<'figure'>) {
     const hasPrettyCode = 'data-rehype-pretty-code-figure' in props
 
