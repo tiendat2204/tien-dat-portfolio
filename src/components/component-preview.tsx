@@ -26,7 +26,7 @@ export function ComponentPreview ({
 }) {
   const [replay, setReplay] = useState(0)
 
-  const Codes = React.Children.toArray(children) as React.ReactElement[]
+  const Codes = React.Children.toArray(children) as React.ReactElement<any>[]
   const Code = Codes[0]
 
   const Preview = useMemo(() => {

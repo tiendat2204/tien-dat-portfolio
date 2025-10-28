@@ -56,7 +56,7 @@ function Heading<T extends HeadingTypes = "h1">({
                                                     as,
                                                     className,
                                                     ...props
-                                                }: HeadingProps<T>): React.ReactElement {
+                                                }: HeadingProps<T>): React.ReactElement<any> {
     const Comp = as ?? "h1";
 
     if (!props.id) {

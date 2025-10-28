@@ -5,8 +5,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { ReactLenis } from 'lenis/react'
 import { Footer } from '@/components/footer'
-import Navbar from '@/components/navbar'
 import { Providers } from '@/components/Providers'
+import { Header } from '@/components/Header'
 
 export const metadata: Metadata = {
   metadataBase: new URL(DATA.url),
@@ -66,8 +66,9 @@ export default function RootLayout ({
         <TooltipProvider delayDuration={0}>
 
           <Providers>
+            <Header />
+
             {children}
-            <Navbar />
             <Footer
               logo={DATA.footer.logo}
               brandName={DATA.footer.brandName}

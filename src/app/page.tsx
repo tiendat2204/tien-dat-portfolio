@@ -19,7 +19,7 @@ import { BLUR_FADE_DELAY, GRID_CONFIG, maskStyle } from '@/data/config'
 
 export default function Page () {
   return (
-    <main className='flex flex-col min-h-dvh  '>
+    <main className='flex flex-col min-h-dvh'>
       <section
         id='background'
         className='relative screen-line-before  border-x'
@@ -68,11 +68,13 @@ export default function Page () {
                 <div className='flex items-center gap-2 px-4'>
                   <BlurFade delay={BLUR_FADE_DELAY}>
                     <AnimatedSocialLinks
-                      socials={Object.entries(DATA.contact.social).map(([, social]) => ({
-                        icon: social.icon,
-                        image: social.image || '',
-                        url: social.url
-                      }))}
+                      socials={Object.entries(DATA.contact.social).map(
+                        ([, social]) => ({
+                          icon: social.icon,
+                          image: social.image || '',
+                          url: social.url,
+                        })
+                      )}
                     />
                   </BlurFade>
                 </div>
@@ -89,16 +91,16 @@ export default function Page () {
                   <Icons.Logo />
                 </div>
               </div>
-              <BlurFade delay={BLUR_FADE_DELAY} className='bg-lines-pattern-light dark:bg-lines-pattern size-full'>
-                <TextLoop
-                  transition={{ duration: 0.8 }}
-                  interval={4}
-                >
-                  {[
-                    DATA.contact.email,
-                    DATA.contact.tel,
-                  ].map((text) => (
-                    <span key={text} className='block  px-4 font-normal font-ibm text-left dark:text-muted text-gray-400'>
+              <BlurFade
+                delay={BLUR_FADE_DELAY}
+                className='bg-lines-pattern-light dark:bg-lines-pattern size-full'
+              >
+                <TextLoop transition={{ duration: 0.8 }} interval={4}>
+                  {[DATA.contact.email, DATA.contact.tel].map((text) => (
+                    <span
+                      key={text}
+                      className='block  px-4 font-normal font-ibm text-left dark:text-muted text-gray-400'
+                    >
                       {text}
                     </span>
                   ))}
@@ -137,7 +139,10 @@ export default function Page () {
 
         <SkillsSection />
       </section>
-      <section id='work' className='relative screen-line-after border-x font-ibm'>
+      <section
+        id='work'
+        className='relative screen-line-after border-x font-ibm'
+      >
         <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black' />
@@ -145,30 +150,33 @@ export default function Page () {
         <div className='flex min-h-0 flex-col'>
           <div className='border-b'>
             <BlurFade delay={BLUR_FADE_DELAY * 5} offset={0}>
-              <h2 className='text-2xl font-extrabold px-4 font-doto'>Experience</h2>
+              <h2 className='text-2xl font-extrabold px-4 font-doto'>
+                Experience
+              </h2>
             </BlurFade>
           </div>
           <WorkSection />
         </div>
       </section>
-      <section id='education' className='relative screen-line-after border-x font-ibm'>
+      <section
+        id='education'
+        className='relative screen-line-after border-x font-ibm'
+      >
         <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
         <div className='border-b'>
           <BlurFade delay={BLUR_FADE_DELAY * 7}>
-            <h2 className='text-2xl font-extrabold px-4 font-doto'>Education</h2>
+            <h2 className='text-2xl font-extrabold px-4 font-doto'>
+              Education
+            </h2>
           </BlurFade>
         </div>
         <div className='relative p-4 space-y-4'>
           {DATA.education.map((education, id) => (
-            <div
-              key={`${education.school}-${education.degree}`}
-            >
-              <BlurFade
-                delay={BLUR_FADE_DELAY * 8 + id * 0.05}
-              >
+            <div key={`${education.school}-${education.degree}`}>
+              <BlurFade delay={BLUR_FADE_DELAY * 8 + id * 0.05}>
                 <ResumeCard
                   key={education.school}
                   href={education.href}
@@ -176,7 +184,9 @@ export default function Page () {
                   altText={education.school}
                   title={education.school}
                   description={education.description}
-                  technologies={'technologies' in education ? education.technologies : []}
+                  technologies={
+                    'technologies' in education ? education.technologies : []
+                  }
                   subtitle={education.degree}
                   isExpanded={false}
                   period={`${education.start} - ${education.end}`}
@@ -185,10 +195,12 @@ export default function Page () {
             </div>
           ))}
         </div>
-
       </section>
 
-      <section id='projects' className='relative screen-line-after border-x font-ibm'>
+      <section
+        id='projects'
+        className='relative screen-line-after border-x font-ibm'
+      >
         <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black' />
@@ -217,7 +229,10 @@ export default function Page () {
           ))}
         </div>
       </section>
-      <section id='awards' className='relative screen-line-after border-x font-ibm'>
+      <section
+        id='awards'
+        className='relative screen-line-after border-x font-ibm'
+      >
         <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black' />
@@ -249,7 +264,6 @@ export default function Page () {
       </section>
 
       <BlogSection />
-
     </main>
   )
 }
