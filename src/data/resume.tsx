@@ -1,6 +1,6 @@
 import { Icons } from '@/components/icons'
 import { LinkPreview } from '@/components/ui/link-preview'
-import { HomeIcon, NotebookIcon } from 'lucide-react'
+import { NotebookIcon } from 'lucide-react'
 
 export const DATA = {
   name: 'Tien Dat',
@@ -85,7 +85,7 @@ export const DATA = {
     ],
   },
   navbar: [
-    { href: '/', icon: HomeIcon, label: 'Home' },
+    // { href: '/', icon: HomeIcon, label: 'Home' },
     { href: '/blog', icon: NotebookIcon, label: 'Blog' },
   ],
   contact: {

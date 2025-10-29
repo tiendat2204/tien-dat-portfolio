@@ -45,6 +45,7 @@ export function ImageZoom ({
       }}
     >
       {children ?? (
+        // eslint-disable-next-line jsx-a11y/alt-text
         <Image
           className={cn(
             'cursor-zoom-in rounded-md transition-all',
