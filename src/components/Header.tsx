@@ -11,6 +11,9 @@ import { DownloadIcon } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { useScroll } from '@/hooks/use-scroll'
 import { MenuToggleIcon } from './ui/menu-toggle-icon'
+import BlurFadeText from './magicui/blur-fade-text'
+import { BLUR_FADE_DELAY } from '@/data/config'
+import { Icon } from './Icon'
 
 export function Header () {
   const [open, setOpen] = React.useState(false)
@@ -39,6 +42,15 @@ export function Header () {
         }
       )}
     >
+      {!scrolled && !open && (
+        <>
+          <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black' />
+          <Icon className='absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black' />
+        </>
+      )}
+
+      <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
+      <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
       <nav
         className={cn(
           'flex h-14 w-full items-center justify-between px-4 transition-all ease-out border-x',
@@ -49,6 +61,26 @@ export function Header () {
       >
         {/* Logo or Brand - Desktop */}
         <div className='hidden md:flex items-center gap-4'>
+          <Link
+            key='home'
+            href='/'
+            className={cn(
+              buttonVariants({ variant: 'ghost', size: 'icon' }),
+              'size-10 hover:bg-transparent'
+            )}
+          >
+            <BlurFadeText
+              delay={BLUR_FADE_DELAY}
+              className='text-4xl  font-extrabold  tracking-normal sm:text-4xl font-doto ml-8'
+              yOffset={0}
+              text='TTD'
+            />
+
+          </Link>
+        </div>
+
+        {/* Right Side - Desktop */}
+        <div className='hidden md:flex items-center gap-2'>
           {DATA.navbar.map((item) => (
             <Link
               key={item.href}
@@ -61,10 +93,6 @@ export function Header () {
               <item.icon className='size-4' />
             </Link>
           ))}
-        </div>
-
-        {/* Right Side - Desktop */}
-        <div className='hidden md:flex items-center gap-2'>
           <Link
             href='/TrieuTienDatCV.pdf'
             target='_blank'
@@ -105,20 +133,40 @@ export function Header () {
         </div>
 
         {/* Mobile Menu Button */}
-        <Button
-          size='icon'
-          variant='outline'
-          onClick={() => setOpen(!open)}
-          className='md:hidden'
+        <Link
+          key='home'
+          href='/'
+          className={cn(
+            buttonVariants({ variant: 'ghost', size: 'icon' }),
+            'size-10 hover:bg-transparent md:hidden'
+          )}
         >
-          <MenuToggleIcon open={open} className='size-5' duration={300} />
-        </Button>
+          <BlurFadeText
+            delay={BLUR_FADE_DELAY}
+            className='text-3xl   font-extrabold  tracking-normal sm:text-4xl font-doto ml-8'
+            yOffset={0}
+            text='TTD'
+          />
+
+        </Link>
+        <div className='flex items-center gap-4 justify-center md:hidden'>
+          <ModeToggle />
+
+          <Button
+            size='icon'
+            variant='outline'
+            onClick={() => setOpen(!open)}
+            className=''
+          >
+            <MenuToggleIcon open={open} className='size-5' duration={300} />
+          </Button>
+        </div>
       </nav>
 
       {/* Mobile Menu */}
       <div
         className={cn(
-          'bg-background/90 fixed top-14 right-0 bottom-0 left-0 z-50 flex flex-col overflow-hidden border-y md:hidden',
+          'bg-background/90 fixed top-18 right-0 bottom-0 left-0 z-50 flex flex-col overflow-hidden border-y md:hidden',
           open ? 'block' : 'hidden'
         )}
       >
@@ -126,7 +174,7 @@ export function Header () {
           data-slot={open ? 'open' : 'closed'}
           className={cn(
             'data-[slot=open]:animate-in data-[slot=open]:zoom-in-95 data-[slot=closed]:animate-out data-[slot=closed]:zoom-out-95 ease-out',
-            'flex h-full w-full flex-col justify-between gap-y-4 p-4'
+            'flex h-full w-full flex-col gap-y-4 p-4'
           )}
         >
           {/* Navigation Links */}
@@ -162,7 +210,7 @@ export function Header () {
 
           {/* Social Links & Theme Toggle */}
           <div className='flex flex-col gap-2'>
-            <div className='grid grid-cols-4 gap-2'>
+            <div className='grid grid-cols-4 gap-2 items-center justify-between'>
               {Object.entries(DATA.contact.social)
                 .filter(([_, social]) => social.navbar)
                 .map(([name, social]) => (
@@ -171,7 +219,7 @@ export function Header () {
                     href={social.url}
                     className={cn(
                       buttonVariants({ variant: 'outline', size: 'icon' }),
-                      'size-12'
+                      'size-12 mx-auto'
                     )}
                   >
                     {social.icon && (
@@ -186,7 +234,6 @@ export function Header () {
                   </Link>
                 ))}
             </div>
-            <ModeToggle />
           </div>
         </div>
       </div>
