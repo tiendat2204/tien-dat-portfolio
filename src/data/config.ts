@@ -1,6 +1,7 @@
 import { DATA, LOGO_BASE64 } from '@/data/resume'
 
 export const BLUR_FADE_DELAY = 0.04
+export const GITHUB_USERNAME = 'tiendat2204'
 
 export const maskStyle = {
   WebkitMaskImage: `url('${LOGO_BASE64}')`,

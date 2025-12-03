@@ -15,6 +15,7 @@ import AnimatedSocialLinks from '@/components/ui/social-links'
 import { TextLoop } from '@/components/ui/text-loop'
 import { Icons } from '@/components/icons'
 import { BLUR_FADE_DELAY, GRID_CONFIG, maskStyle } from '@/data/config'
+import { GitHubContributions } from './section/github-contributions'
 
 export default function Page () {
   return (
@@ -137,7 +138,10 @@ export default function Page () {
         </div>
 
         <SkillsSection />
+
       </section>
+        <GitHubContributions />
+
       <section
         id='work'
         className='relative screen-line-after border-x font-ibm'
