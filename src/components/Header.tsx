@@ -49,7 +49,6 @@ export function Header () {
         </>
       )}
 
-  
       <nav
         className={cn(
           'flex h-14 w-full items-center justify-between px-4 transition-all ease-out border-x',

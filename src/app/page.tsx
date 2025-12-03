@@ -140,7 +140,7 @@ export default function Page () {
         <SkillsSection />
 
       </section>
-        <GitHubContributions />
+      <GitHubContributions />
 
       <section
         id='work'

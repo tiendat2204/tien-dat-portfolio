@@ -7,7 +7,7 @@ import { BlurFade } from '@/components/magicui/blur-fade'
 import { BLUR_FADE_DELAY } from '@/data/config'
 import { BlogCard } from './blog/BlogCard'
 
-export default function BlogSection() {
+export default function BlogSection () {
   const posts: Post[] = getAllPosts()
   const featuredPosts: Post[] = posts.slice(0, 4)
 
@@ -33,13 +33,13 @@ export default function BlogSection() {
         <div className='grid grid-cols-1 md:grid-cols-2 gap-6 p-4'>
           {featuredPosts.length > 0
             ? featuredPosts.map((post, index) => (
-                <BlogCard key={post.slug || index} post={post} index={index} />
-              ))
+              <BlogCard key={post.slug || index} post={post} index={index} />
+            ))
             : (
               <div className='col-span-full text-center py-10'>
                 <p className='text-muted-foreground'>No blog posts found.</p>
               </div>
-            )}
+              )}
         </div>
       </div>
     </section>

@@ -15,17 +15,16 @@ interface BlogCardProps {
   index: number
 }
 
-export function BlogCard({ post, index }: BlogCardProps) {
-    const [isActive, setIsActive] = useState(false)
-  const [isFlashing, setIsFlashing] = useState(false)
+export function BlogCard ({ post, index }: BlogCardProps) {
+  const [isActive, setIsActive] = useState(false)
+  const [, setIsFlashing] = useState(false)
   const timeoutIds = useRef<NodeJS.Timeout[]>([])
 
-   const handleMouseEnter = () => {
+  const handleMouseEnter = () => {
     timeoutIds.current.forEach(id => clearTimeout(id))
     timeoutIds.current = []
 
-    
-   timeoutIds.current.push(setTimeout(() => setIsActive(false), 100))
+    timeoutIds.current.push(setTimeout(() => setIsActive(false), 100))
     timeoutIds.current.push(setTimeout(() => setIsActive(true), 200))
     timeoutIds.current.push(setTimeout(() => setIsActive(false), 300))
     timeoutIds.current.push(setTimeout(() => {
@@ -37,7 +36,7 @@ export function BlogCard({ post, index }: BlogCardProps) {
   const handleMouseLeave = () => {
     timeoutIds.current.forEach(id => clearTimeout(id))
     timeoutIds.current = []
-    
+
     setIsActive(false)
     setIsFlashing(false)
   }
@@ -55,10 +54,10 @@ export function BlogCard({ post, index }: BlogCardProps) {
       onMouseLeave={handleMouseLeave}
     >
       <div className={`pointer-events-none absolute inset-0 z-10 -m-px border border-dashed border-white/15 bg-muted/15  ${isActive ? 'opacity-100' : 'opacity-0 '}`}>
-        <div className='absolute -left-px -top-px h-2 w-2 border-l border-t border-white/90'></div>
-        <div className='absolute -right-px -top-px h-2 w-2 border-r border-t border-white/90'></div>
-        <div className='absolute -bottom-px -right-px h-2 w-2 border-b border-r border-white/90'></div>
-        <div className='absolute -bottom-px -left-px h-2 w-2 border-b border-l border-white/90'></div>
+        <div className='absolute -left-px -top-px h-2 w-2 border-l border-t border-white/90' />
+        <div className='absolute -right-px -top-px h-2 w-2 border-r border-t border-white/90' />
+        <div className='absolute -bottom-px -right-px h-2 w-2 border-b border-r border-white/90' />
+        <div className='absolute -bottom-px -left-px h-2 w-2 border-b border-l border-white/90' />
       </div>
 
       <div className='relative flex flex-col overflow-hidden bg-lines-pattern-light dark:bg-lines-pattern size-full bg-repeat bg-card bg-[length:30px_30px] h-full'>
