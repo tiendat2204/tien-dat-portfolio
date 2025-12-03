@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { OpenInV0Button } from './open-in-v0'
 import { Button } from './ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
-import { SimpleTooltip } from './ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 import { Code as CodeInline } from './ui/typography'
 import { Index } from '@/__registry__'
 
@@ -59,15 +59,22 @@ export function ComponentPreview ({
             {(canReplay || openInV0Url) && (
               <div className='flex justify-end gap-2'>
                 {canReplay && (
-                  <SimpleTooltip content='Replay'>
-                    <Button
-                      variant='outline'
-                      size='icon'
-                      onClick={() => setReplay((v) => v + 1)}
-                    >
-                      <RepeatIcon />
-                    </Button>
-                  </SimpleTooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        className='rounded-md'
+                        variant='secondary'
+                        size='icon'
+                        onClick={() => setReplay((v) => v + 1)}
+                      >
+                        <RepeatIcon />
+                      </Button>
+                    </TooltipTrigger>
+
+                    <TooltipContent>
+                      <p>Replay</p>
+                    </TooltipContent>
+                  </Tooltip>
                 )}
 
                 {openInV0Url && <OpenInV0Button url={openInV0Url} />}
