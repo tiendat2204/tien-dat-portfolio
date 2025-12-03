@@ -34,9 +34,9 @@ export function Header () {
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 screen-line-before   mx-auto w-full max-w-5xl border-b border-transparent transition-all ease-out',
+        'sticky top-0 z-40 screen-line-before   mx-auto w-full max-w-5xl border-b border-transparent transition-all ease-out',
         {
-          'bg-background/95 supports-[backdrop-filter]:bg-background/50 border-border backdrop-blur-lg shadow':
+          'bg-background/95 supports-[backdrop-filter]:bg-background/50 border-border backdrop-blur-lg':
             scrolled && !open,
           'bg-background/90': open,
         }
@@ -49,8 +49,7 @@ export function Header () {
         </>
       )}
 
-      <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
-      <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
+  
       <nav
         className={cn(
           'flex h-14 w-full items-center justify-between px-4 transition-all ease-out border-x',

@@ -139,7 +139,7 @@ export const DATA = {
       company: 'TA Consultant',
       href: '#',
       location: 'Ho Chi Minh City, Vietnam',
-      logoUrl: '/ta-consultant-logo.jpg',
+      logoUrl: '/LogoTA.svg',
       positions: [
         {
           title: 'Junior - Frontend Developer',
