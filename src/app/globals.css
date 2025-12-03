@@ -377,3 +377,12 @@
     transition-duration: 0.01ms !important;
   }
 }
+@utility hidden-scrollbar {
+  -ms-overflow-style: none; /* Hidden IE and Edge */
+  scrollbar-width: none; /* Hidden Firefox */
+
+  /* Hidden scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
