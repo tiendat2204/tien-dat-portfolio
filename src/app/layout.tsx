@@ -27,6 +27,14 @@ export const metadata: Metadata = {
     siteName: `${DATA.name}`,
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: '/me.jpg',
+        width: 1200,
+        height: 630,
+        alt: DATA.name
+      }
+    ]
   },
   robots: {
     index: true,
