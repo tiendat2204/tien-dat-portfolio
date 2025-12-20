@@ -11,15 +11,16 @@ import SkillsSection from './section/skills-section'
 import WorkSection from '@/app/section/work-section'
 import BlogSection from '@/app/section/blog-section'
 import { Icon } from '@/components/Icon'
-import AnimatedSocialLinks from '@/components/ui/social-links'
 import { TextLoop } from '@/components/ui/text-loop'
 import { Icons } from '@/components/icons'
 import { BLUR_FADE_DELAY, GRID_CONFIG, maskStyle } from '@/data/config'
 import { GitHubContributions } from './section/github-contributions'
+import { Status, StatusIndicator, StatusLabel } from '@/components/kibo-ui/status'
 
 export default function Page () {
   return (
     <main className='flex flex-col min-h-dvh'>
+
       <section
         id='background'
         className='relative screen-line-before  border-x'
@@ -65,18 +66,14 @@ export default function Page () {
 
             <div className='flex flex-1 flex-col justify-between h-full min-h-[140px] md:min-h-[170px] border-l'>
               <div className='flex-1 flex items-end pb-1'>
-                <div className='flex items-center gap-2 px-4'>
-                  <BlurFade delay={BLUR_FADE_DELAY}>
-                    <AnimatedSocialLinks
-                      socials={Object.entries(DATA.contact.social).map(
-                        ([, social]) => ({
-                          icon: social.icon,
-                          image: social.image || '',
-                          url: social.url,
-                        })
-                      )}
-                    />
-                  </BlurFade>
+                <div className='absolute top-4 right-4 '>
+                  <Status
+                    className=''
+                    status='online'
+                  >
+                    <StatusIndicator />
+                    <StatusLabel className='font-mono'>Fully operational</StatusLabel>
+                  </Status>
                 </div>
               </div>
 
@@ -267,6 +264,7 @@ export default function Page () {
       </section>
 
       <BlogSection />
+
     </main>
   )
 }
