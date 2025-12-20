@@ -64,7 +64,7 @@ export function Header () {
             href='/'
             className={cn(
               buttonVariants({ variant: 'ghost', size: 'icon' }),
-              'size-10 hover:bg-transparent'
+              'size-10 dark:hover:bg-transparent  hover:bg-transparent'
             )}
           >
             <BlurFadeText

@@ -33,7 +33,7 @@ export function Footer ({
   copyright,
 }: FooterProps) {
   return (
-    <footer className='md:py-18 py-8 border-x font-ibm relative screen-line-before'>
+    <footer className='md:py-18 py-8 border-x font-ibm relative '>
       <div className='px-4 lg:px-8'>
         <div className='md:flex md:items-start md:justify-between'>
           <Link
@@ -52,7 +52,7 @@ export function Footer ({
                 <Button
                   variant='secondary'
                   size='icon'
-                  className='h-10 w-10 rounded-full'
+                  className='h-10 w-10 '
                   asChild
                 >
                   <a href={link.href} target='_blank' aria-label={link.label} rel='noreferrer'>

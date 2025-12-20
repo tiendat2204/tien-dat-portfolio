@@ -25,9 +25,9 @@ const GitContributionSection = ({ contributions }: GitContributionSectionProps) 
     <ContributionGraph
       className='mx-auto p-4'
       data={data}
-      blockSize={10}
-      blockMargin={3}
-      blockRadius={2}
+      blockSize={11}
+      blockMargin={4}
+      blockRadius={0}
     >
       <ContributionGraphCalendar
         className='hidden-scrollbar '
