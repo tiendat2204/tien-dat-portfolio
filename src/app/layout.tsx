@@ -10,6 +10,7 @@ import { Header } from '@/components/Header'
 import type { WebSite, WithContext } from 'schema-dts'
 import { SITE_INFO } from '@/data/config'
 import Script from 'next/script'
+import Section from '@/components/landing/section'
 
 export const metadata: Metadata = {
   metadataBase: new URL(DATA.url),
@@ -122,42 +123,54 @@ export default function RootLayout ({
           }}
         />
       </head>
+
       <body
         className={cn(
-          'min-h-screen bg-background antialiased max-w-3xl mx-auto py-2  md:py-5 mt-2 md:mt-0 overflow-x-hidden px-4'
+          'min-h-screen bg-background antialiased   mt-2 md:mt-0 overflow-x-hidden px-4'
         )}
         suppressHydrationWarning
       >
-        <ReactLenis root />
-        <TooltipProvider delayDuration={0}>
+        <Section
+          className='overflow-y-clip w-full'
+          crosses
+          crossesOffset='lg:translate-y-[3.15rem]'
+          customPaddings
+          id='hero'
+        >
+          <div className='max-w-3xl mx-auto'>
 
-          <Providers>
-            <Header />
+            <ReactLenis root />
+            <TooltipProvider delayDuration={0}>
 
-            {children}
-            <Footer
-              logo={DATA.footer.logo}
-              brandName={DATA.footer.brandName}
-              socialLinks={DATA.footer.socialLinks.map(link => ({
-                icon: link.icon,
-                href: link.url,
-                label: link.name
-              }))}
-              mainLinks={DATA.footer.mainLinks.map(link => ({
-                href: link.href,
-                label: link.name
-              }))}
-              legalLinks={DATA.footer.legalLinks.map(link => ({
-                href: link.href,
-                label: link.name
-              }))}
-              copyright={{
-                text: DATA.footer.copyright,
-              }}
-            />
-          </Providers>
-        </TooltipProvider>
+              <Providers>
+                <Header />
 
+                {children}
+                <Footer
+                  logo={DATA.footer.logo}
+                  brandName={DATA.footer.brandName}
+                  socialLinks={DATA.footer.socialLinks.map(link => ({
+                    icon: link.icon,
+                    href: link.url,
+                    label: link.name
+                  }))}
+                  mainLinks={DATA.footer.mainLinks.map(link => ({
+                    href: link.href,
+                    label: link.name
+                  }))}
+                  legalLinks={DATA.footer.legalLinks.map(link => ({
+                    href: link.href,
+                    label: link.name
+                  }))}
+                  copyright={{
+                    text: DATA.footer.copyright,
+                  }}
+                />
+              </Providers>
+            </TooltipProvider>
+          </div>
+
+        </Section>
       </body>
     </html>
   )
