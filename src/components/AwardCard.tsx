@@ -39,7 +39,7 @@ export function AwardCard ({
       <div className='absolute -left-17 top-2 flex items-center justify-center'>
         <Badge
           variant='outline'
-          className='size-10 rounded-full p-1 flex items-center justify-center bg-background border-2'
+          className='size-10 rounded-none p-1 border-0 flex items-center justify-center bg-background '
         >
           {links && links.length > 0
             ? (

@@ -56,11 +56,11 @@ export function ProjectCard ({
 
   return (
     <div className='block cursor-pointer border-b' onClick={handleClick}>
-      <Card className='flex items-start justify-start '>
+      <Card className='flex items-start justify-start ring-0 flex-row  gap-0'>
         <div className='flex items-center gap-1 justify-start p-4'>
           <Avatar
             className={cn(
-              'h-6 w-6 bg-accent rounded-md transition-all duration-300',
+              'h-6 w-6 bg-accent rounded-full transition-all duration-300',
               isExpanded ? 'ring-2 ring-primary/80 ring-offset-1' : 'ring-0'
             )}
           >
@@ -68,8 +68,8 @@ export function ProjectCard ({
             <AvatarFallback>{title.charAt(0)}</AvatarFallback>
           </Avatar>
         </div>
-        <div className='grow p-4 items-center flex-col group justify-center border-l border-dashed'>
-          <CardHeader>
+        <div className='grow px-4 items-center flex-col group justify-center border-l border-dashed'>
+          <CardHeader className='p-0'>
             <div className='flex items-center justify-between gap-x-2 text-base'>
               <div className='flex flex-col items-start gap-2'>
                 <h3 className='inline-flex items-center justify-center font-semibold leading-none text-xs sm:text-sm'>
@@ -99,7 +99,7 @@ export function ProjectCard ({
                     target='_blank'
                     rel='noopener noreferrer'
                     onClick={(e) => e.stopPropagation()}
-                    className='inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md bg-secondary hover:bg-secondary/80 transition-colors'
+                    className='inline-flex items-center gap-1 text-xs px-2 py-1  bg-secondary hover:bg-secondary/80 transition-colors'
                   >
                     {link.icon}
                     <span>{link.type}</span>

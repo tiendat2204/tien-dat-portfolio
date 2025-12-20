@@ -16,8 +16,8 @@ interface SkillBadgeProps {
 export function SkillBadge ({ name, icon }: SkillBadgeProps) {
   return (
     <Badge
-      variant='outline'
-      className='text-xs font-medium px-2 py-1 rounded-md border flex items-center gap-1.5'
+      variant='secondary'
+      className='text-xs font-medium py-2.5'
     >
       {icon && (
         <Image
@@ -55,7 +55,7 @@ function CategorySection ({ title, skills, delay = 0 }: CategorySectionProps) {
             <BlurFade key={skill.name} delay={delay + 0.1 + id * 0.05}>
               <Badge
                 variant='outline'
-                className='text-xs font-medium px-2 py-1 rounded-md border flex items-center gap-1.5'
+                className='text-xs font-medium py-2.5'
               >
                 <Image
                   src={`/icons/${skill.icon}`}
@@ -95,6 +95,16 @@ export default function SkillsSection () {
                   icon={DATA.skills.mainStack.framework.icon}
                 />
               </BlurFade>{' '}
+              and
+              {' '}
+              <BlurFade delay={BLUR_FADE_DELAY * 4} className='inline-block'>
+                <SkillBadge
+                  name={DATA.skills.mainStack.framework2.name}
+                  icon={DATA.skills.mainStack.framework2.icon}
+                />
+              </BlurFade>{' '}
+              as a frontend
+
               framework with{' '}
               <BlurFade delay={BLUR_FADE_DELAY * 4} className='inline-block'>
                 <SkillBadge

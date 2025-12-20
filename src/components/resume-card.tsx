@@ -54,8 +54,8 @@ export const ResumeCard = ({
       className='block cursor-pointer'
       onClick={handleClick}
     >
-      <Card className='flex items-start justify-start '>
-        <div className='flex items-center gap-1 justify-start bg-accent rounded-md'>
+      <Card className='flex items-start flex-nowrap justify-start flex-row ring-0 p-0'>
+        <div className='flex items-center gap-1 justify-start bg-accent '>
           <Icon
             className={cn(
               'h-5 w-5 sm:h-6 sm:w-6 text-gray-300 transition-transform duration-300',
@@ -64,7 +64,7 @@ export const ResumeCard = ({
           />
         </div>
         <div className='grow ml-1 sm:ml-2 items-center flex-col group justify-center'>
-          <CardHeader className='pl-4'>
+          <CardHeader className='p-0'>
             <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-x-2 text-lg'>
               <div className='flex flex-col items-start gap-1 sm:gap-2'>
                 <h3 className='inline-flex items-center justify-center font-semibold leading-none text-xs sm:text-sm'>

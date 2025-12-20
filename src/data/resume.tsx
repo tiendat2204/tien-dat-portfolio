@@ -21,6 +21,10 @@ export const DATA = {
         name: 'Next.js',
         icon: 'nextjs-icon.svg',
       },
+      framework2: {
+        name: 'React',
+        icon: 'react-icon.svg',
+      },
       styling: {
         name: 'TailwindCSS',
         icon: 'tailwindcss-icon.svg',
