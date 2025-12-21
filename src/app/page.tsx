@@ -5,7 +5,6 @@ import { ResumeCard } from '@/components/resume-card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DATA } from '@/data/resume'
 import Markdown from 'react-markdown'
-import { FlickeringGrid } from '@/components/ui/flickering-grid-hero'
 import { BlurFade } from '@/components/magicui/blur-fade'
 import SkillsSection from './section/skills-section'
 import WorkSection from '@/app/section/work-section'
@@ -13,9 +12,10 @@ import BlogSection from '@/app/section/blog-section'
 import { Icon } from '@/components/Icon'
 import { TextLoop } from '@/components/ui/text-loop'
 import { Icons } from '@/components/icons'
-import { BLUR_FADE_DELAY, GRID_CONFIG, maskStyle } from '@/data/config'
+import { BLUR_FADE_DELAY } from '@/data/config'
 import { GitHubContributions } from './section/github-contributions'
 import { Status, StatusIndicator, StatusLabel } from '@/components/kibo-ui/status'
+import { BackgroundHero } from '@/components/landing/background-hero'
 
 export default function Page () {
   return (
@@ -25,25 +25,11 @@ export default function Page () {
         id='background'
         className='relative screen-line-before  border-x'
       >
-        <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black' />
+        <Icon className='absolute z-41 h-6 w-6 -top-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
-        <Icon className='absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black' />
+        <Icon className='absolute z-41 h-6 w-6 -top-3 -right-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
-        <div className='flex w-full h-[200px]  justify-center items-center'>
-          <FlickeringGrid
-            className='absolute inset-0 z-0 [mask-image:radial-gradient(1000px_circle_at_center,white,transparent)] motion-safe:animate-pulse'
-            {...GRID_CONFIG.background}
-          />
-          <div
-            className='absolute  inset-0 z-0  motion-safe:animate-fade-in'
-            style={{
-              ...maskStyle,
-              animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            }}
-          >
-            <FlickeringGrid {...GRID_CONFIG.logo} />
-          </div>
-        </div>
+        <BackgroundHero />
       </section>
       <section
         id='information'
