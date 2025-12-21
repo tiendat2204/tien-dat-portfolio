@@ -1,6 +1,10 @@
 import { Icons } from '@/components/icons'
+import { GitHub } from '@/components/icons/github-icon'
+import { Facebook } from '@/components/icons/facebook-icon'
+import { LinkedIn } from '@/components/icons/linked-icon'
 import { LinkPreview } from '@/components/ui/link-preview'
 import { NotebookIcon } from 'lucide-react'
+import { Zalo } from '@/components/icons/zalo-icon'
 
 export const DATA = {
   name: 'Tien Dat',
@@ -98,7 +102,7 @@ export const DATA = {
     social: {
       GitHub: {
         name: 'GitHub',
-        icon: 'github-icon.svg',
+        icon: GitHub,
         url: 'https://tiendatdev.me/',
         image:
           'https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg',
@@ -106,24 +110,16 @@ export const DATA = {
       },
       LinkedIn: {
         name: 'LinkedIn',
-        icon: 'linkedin-icon.svg',
+        icon: LinkedIn,
         url: 'https://www.linkedin.com/in/ttd-7796b5341/',
         image:
           'https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png',
         navbar: true,
       },
-      Instagram: {
-        name: 'Instagram',
-        url: 'https://www.instagram.com/tiendat_224/?igsh=OXh2MmN4YjhsY3h6&utm_source=qr#',
-        icon: 'instagram-icon.svg',
-        image:
-          'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png',
-        navbar: false,
-      },
       Facebook: {
         name: 'Facebook',
         url: 'https://www.facebook.com/tien.at.761069/',
-        icon: 'facebook-icon.svg',
+        icon: Facebook,
         image:
           'https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg',
         navbar: true,
@@ -131,7 +127,7 @@ export const DATA = {
       Zalo: {
         name: 'Zalo',
         url: 'https://zalo.me/0354411541',
-        icon: 'zalo-icon.svg',
+        icon: Zalo,
         image:
           'https://upload.wikimedia.org/wikipedia/commons/d/d6/Logo_Zalo.png',
         navbar: true,
@@ -162,7 +158,7 @@ export const DATA = {
           ],
           technologies: [
             { name: 'React.js', icon: 'react-icon.svg' },
-            { name: 'Vite', icon: 'vite-icon.svg' },
+            { name: 'Next.js', icon: 'nextjs-icon.svg' },
             { name: 'TypeScript', icon: 'typescript-icon.svg' },
             { name: 'TailwindCSS', icon: 'tailwindcss-icon.svg' },
             { name: 'TanStack Query', icon: 'tanstack-icon.svg' },
