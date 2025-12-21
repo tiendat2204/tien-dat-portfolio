@@ -132,7 +132,6 @@ export default function RootLayout ({
       >
         <Section
           className='overflow-y-clip w-full'
-          crosses
           crossesOffset='lg:translate-y-[3.15rem]'
           customPaddings
           id='hero'
