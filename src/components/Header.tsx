@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils'
 import { ModeToggle } from '@/components/mode-toggle'
 import { DATA } from '@/data/resume'
 import Link from 'next/link'
-import Image from 'next/image'
 import { DownloadIcon } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { useScroll } from '@/hooks/use-scroll'
@@ -14,11 +13,11 @@ import { MenuToggleIcon } from './ui/menu-toggle-icon'
 import BlurFadeText from './magicui/blur-fade-text'
 import { BLUR_FADE_DELAY } from '@/data/config'
 import { Icon } from './Icon'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
 
 export function Header () {
   const [open, setOpen] = React.useState(false)
   const scrolled = useScroll(10)
-
   React.useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden'
@@ -103,28 +102,30 @@ export function Header () {
           >
             <DownloadIcon className='size-4' />
           </Link>
-          <Separator orientation='vertical' className='h-6' />
+          <Separator orientation='vertical' className='h-10' />
           {Object.entries(DATA.contact.social)
             .filter(([_, social]) => social.navbar)
             .map(([name, social]) => (
-              <Link
-                key={name}
-                href={social.url}
-                className={cn(
-                  buttonVariants({ variant: 'ghost', size: 'icon' }),
-                  'size-10'
-                )}
-              >
-                {social.icon && (
-                  <Image
-                    src={`/icons/${social.icon}`}
-                    alt={social.icon}
-                    width={20}
-                    height={20}
-                    className='w-5 h-5'
-                  />
-                )}
-              </Link>
+              <TooltipProvider key={name}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href={social.url}
+                      className={cn(
+                        buttonVariants({ variant: 'ghost', size: 'icon' }),
+                        'size-10'
+                      )}
+                    >
+                      {social.icon && (
+                        <social.icon className='size-4' />
+                      )}
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{name}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             ))}
           <Separator orientation='vertical' className='h-6' />
           <ModeToggle />
@@ -221,13 +222,7 @@ export function Header () {
                     )}
                   >
                     {social.icon && (
-                      <Image
-                        src={`/icons/${social.icon}`}
-                        alt={social.icon}
-                        width={20}
-                        height={20}
-                        className='w-5 h-5'
-                      />
+                      <social.icon className='size-6' />
                     )}
                   </Link>
                 ))}
