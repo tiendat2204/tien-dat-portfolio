@@ -1,0 +1,197 @@
+---
+title: Dynamic Color Extraction
+description: Create YouTube-style adaptive background colors that extract and animate the dominant color from images on hover.
+image: /blog/dynamic-color-extraction.png
+category: components
+new: true
+publishedAt: "2026-01-13"
+tags: ["react", "canvas", "animation", "ui", "color"]
+---
+
+<ComponentPreview
+  name="dynamic-color-extraction-demo"
+  openInV0Url="https://tiendatdev.me/r/dynamic-color-extraction.json"
+/>
+
+## What is Dynamic Color Extraction?
+
+Dynamic Color Extraction (also known as Average Color Calculation) is a technique that analyzes an image to extract its dominant color. This creates adaptive, visually cohesive interfaces where backgrounds automatically match the color palette of displayed images - similar to YouTube's hover effects.
+
+## Installation
+
+<CodeTabs className="gap-0">
+  <TabsList>
+    <TabsTriggerShadcnCLI />
+    <TabsTrigger value="manual">Manual</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="cli" className="[&>figure]:mb-0">
+    ```bash
+    npx shadcn@latest add https://tiendatdev.me/r/dynamic-color-extraction.json
+    ```
+  </TabsContent>
+
+  <TabsContent value="manual">
+    <Steps>
+            <Step>Copy and paste the following code into your project</Step>
+            <ComponentSource
+                name="dynamic-color-extraction"
+                title="components/ProductCardClient.tsx"
+                showLineNumbers
+            />
+            <Step>Update the import paths to match your project setup</Step>
+        </Steps>
+  </TabsContent>
+</CodeTabs>
+
+## How It Works
+
+The technique uses HTML Canvas API to analyze image pixels and calculate the average RGB values. This creates the YouTube-style effect where the background color adapts to match the image content.
+
+### The Algorithm
+
+1. **Create a canvas** - Draw the image at a reduced size (50x50) for performance optimization
+2. **Extract pixel data** - Use `getImageData()` to access raw RGB values from all pixels
+3. **Calculate average** - Sum all RGB values and divide by pixel count to get dominant color
+4. **Apply with opacity** - Use the extracted color as a background with transparency for visual cohesion
+
+### Color Extraction Function
+
+```tsx
+const extractDominantColor = (img: HTMLImageElement): string => {
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })
+
+  if (!ctx) return 'transparent'
+
+  // Resize for performance - 50x50 is sufficient for color extraction
+  canvas.width = 50
+  canvas.height = 50
+  ctx.drawImage(img, 0, 0, 50, 50)
+
+  // Get pixel data from the canvas
+  const imageData = ctx.getImageData(0, 0, 50, 50)
+  const data = imageData.data
+
+  let r = 0, g = 0, b = 0
+  const pixelCount = data.length / 4
+
+  // Calculate average RGB values
+  for (let i = 0; i < data.length; i += 4) {
+    r += data[i]       // Red
+    g += data[i + 1]   // Green
+    b += data[i + 2]   // Blue
+    // data[i + 3] is Alpha, skipped
+  }
+
+  r = Math.floor(r / pixelCount)
+  g = Math.floor(g / pixelCount)
+  b = Math.floor(b / pixelCount)
+
+  // Return with 30% opacity for subtle effect
+  return `rgba(${r}, ${g}, ${b}, 0.3)`
+}
+```
+
+## CORS Requirements
+
+⚠️ **Important:** When using images from external domains, proper CORS configuration is required.
+
+### Why CORS is Needed
+
+The Canvas API's `getImageData()` method cannot read pixel data from images unless CORS is properly configured. Without it, you'll get a `SecurityError`.
+
+### Solution: Set crossOrigin Attribute
+
+```tsx
+useEffect(() => {
+  const img = new window.Image()
+  
+  // 🔑 Required for external images
+  img.crossOrigin = 'anonymous'
+  img.src = data.coverImage || '/book.png'
+
+  img.onload = () => {
+    const color = extractDominantColor(img)
+    setBgColor(color)
+  }
+
+  img.onerror = () => {
+    console.error('Failed to load image')
+  }
+}, [data.coverImage])
+```
+
+### Common CORS Issues & Solutions
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| `SecurityError: The operation is insecure` | External image without CORS headers | Set `img.crossOrigin = 'anonymous'` + ensure server has `Access-Control-Allow-Origin: *` |
+| Tainted canvas | Missing `crossOrigin` attribute | Always set `img.crossOrigin = 'anonymous'` before loading |
+| Colors not extracting | Server blocks CORS | Use self-hosted images or CORS-enabled CDNs (Unsplash, Cloudinary, Imgix) |
+
+### Recommended Approach
+
+For production applications, **proxy external images through your server** to avoid client-side CORS issues:
+
+```tsx
+// Instead of loading directly from CDN
+// ❌ img.src = 'https://cdn.example.com/image.jpg'
+
+// ✅ Load through your API
+const response = await fetch('/api/proxy-image', { 
+  body: JSON.stringify({ imageUrl: externalUrl }) 
+})
+const data = await response.blob()
+const objectUrl = URL.createObjectURL(data)
+img.src = objectUrl
+```
+
+## Usage Example
+
+Here's a complete example of using the Dynamic Color Extraction component:
+
+```tsx
+import { ProductCardClient } from '@/components/DynamicColorExtraction'
+import Image from 'next/image'
+
+export function MyProduct() {
+  const product = {
+    id: '1',
+    title: 'Awesome Book',
+    coverImage: '/images/book-cover.jpg',
+    author: 'John Doe'
+  }
+
+  return (
+    <ProductCardClient data={product}>
+      <div className='p-4'>
+        <Image 
+          src={product.coverImage} 
+          alt={product.title} 
+          width={500} 
+          height={500} 
+        />
+        <h3 className='mt-2 font-bold'>{product.title}</h3>
+        <p className='text-sm text-gray-600'>{product.author}</p>
+      </div>
+    </ProductCardClient>
+  )
+}
+```
+
+## Features
+
+✅ **Smooth Animations** - Uses Framer Motion for fluid color transitions  
+✅ **Performance Optimized** - Canvas resized to 50x50 for fast processing  
+✅ **YouTube Style** - Adaptive background colors on hover  
+✅ **CORS Compatible** - Works with external image CDNs  
+✅ **TypeScript Support** - Full type safety included  
+✅ **Responsive Design** - Works on all screen sizes  
+
+## Browser Support
+
+- ✅ Chrome/Edge 90+
+- ✅ Firefox 88+
+- ✅ Safari 14+
+- ✅ Mobile browsers (iOS Safari, Chrome Mobile)

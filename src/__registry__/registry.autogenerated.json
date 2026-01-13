@@ -26,6 +26,26 @@
           "type": "registry:component"
         }
       ]
+    },
+    {
+      "name": "navigation-menu",
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "src/registry/MainNavigation/MainNavigation.tsx",
+          "type": "registry:component"
+        }
+      ]
+    },
+    {
+      "name": "dynamic-color-extraction",
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "src/registry/DynamicColorExtraction/ProductCardClient.tsx",
+          "type": "registry:component"
+        }
+      ]
     }
   ]
 }

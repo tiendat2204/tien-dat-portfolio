@@ -25,6 +25,24 @@ export const Index: Record<string, any> = {
       type: 'registry:component',
     }],
   },
+  'navigation-menu': {
+    name: 'navigation-menu',
+    description: '',
+    type: 'registry:component',
+    files: [{
+      path: 'src/registry/MainNavigation/MainNavigation.tsx',
+      type: 'registry:component',
+    }],
+  },
+  'dynamic-color-extraction': {
+    name: 'dynamic-color-extraction',
+    description: '',
+    type: 'registry:component',
+    files: [{
+      path: 'src/registry/DynamicColorExtraction/ProductCardClient.tsx',
+      type: 'registry:component',
+    }],
+  },
   'sticker-animation-demo': {
     name: 'sticker-animation-demo',
     description: '',
@@ -35,15 +53,6 @@ export const Index: Record<string, any> = {
     }],
     component: React.lazy(() => import('@/registry/examples/sticker-animation-demo.tsx')),
   },
-  'navigation-menu': {
-    name: 'navigation-menu',
-    description: '',
-    type: 'registry:component',
-    files: [{
-      path: 'src/registry/MainNavigation/MainNavigation.tsx',
-      type: 'registry:component',
-    }],
-  },
   'navigation-menu-ssr-demo': {
     name: 'navigation-menu-ssr-demo',
     description: '',
@@ -53,5 +62,15 @@ export const Index: Record<string, any> = {
       type: 'registry:example',
     }],
     component: React.lazy(() => import('@/registry/examples/navigation-menu-ssr-demo.tsx')),
+  },
+  'dynamic-color-extraction-demo': {
+    name: 'dynamic-color-extraction-demo',
+    description: '',
+    type: 'registry:example',
+    files: [{
+      path: 'src/registry/examples/dynamic-color-extraction-demo.tsx',
+      type: 'registry:example',
+    }],
+    component: React.lazy(() => import('@/registry/examples/dynamic-color-extraction-demo.tsx')),
   },
 }

@@ -16,7 +16,17 @@ export const components: Registry['items'] = [
     type: 'registry:component',
     files: [
       {
-        path: 'NavigationMenu/MainNavigation.tsx',
+        path: 'MainNavigation/MainNavigation.tsx',
+        type: 'registry:component',
+      },
+    ],
+  },
+  {
+    name: 'dynamic-color-extraction',
+    type: 'registry:component',
+    files: [
+      {
+        path: 'DynamicColorExtraction/ProductCardClient.tsx',
         type: 'registry:component',
       },
     ],
