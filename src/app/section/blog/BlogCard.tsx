@@ -80,13 +80,12 @@ export function BlogCard ({ post, index }: BlogCardProps) {
             )}
           </div>
           <BlurFade delay={BLUR_FADE_DELAY * (index + 1)} offset={0}>
-            <div className='h-40 min-h-40 overflow-hidden rounded-sm mb-3'>
+            <div className='w-full aspect-[5/4] relative mb-3 overflow-hidden'>
               <Image
                 src={post.metadata.image || '/images/default-blog-image.jpg'}
                 alt={post.metadata.title}
-                width={600}
-                height={400}
-                className='w-full h-full object-cover object-top  '
+                fill
+                className='object-cover transition-transform group-hover:scale-105 duration-500'
               />
             </div>
           </BlurFade>
