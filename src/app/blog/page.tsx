@@ -1,19 +1,18 @@
 import { Icon } from '@/components/Icon'
 import Link from 'next/link'
 import React, { Suspense } from 'react'
-import { FlickeringGrid } from '@/components/ui/flickering-grid-hero'
 import { BlurFade } from '@/components/magicui/blur-fade'
 import { Icons } from '@/components/icons'
 import { getAllPosts } from '@/data/blog'
 import type { Post } from '@/types/blog'
-import { BLUR_FADE_DELAY, GRID_CONFIG, maskStyle } from '@/data/config'
-import { Particles } from '@/components/ui/particles'
+import { BLUR_FADE_DELAY } from '@/data/config'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 import { Back } from '@/app/blog/back'
+import ParticlesClient from './_components/ParticlesClient'
+import { BackgroundHero } from '@/components/landing/background-hero'
 export default function BlogPage () {
   const posts: Post[] = getAllPosts()
-
   return (
     <main className='flex flex-col '>
       <section
@@ -24,34 +23,14 @@ export default function BlogPage () {
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
-        <div className='flex w-full h-[200px] justify-center items-center'>
-          <FlickeringGrid
-            className='absolute inset-0 z-0 [mask-image:radial-gradient(1000px_circle_at_center,white,transparent)] motion-safe:animate-pulse'
-            {...GRID_CONFIG.background}
-          />
-          <div
-            className='absolute inset-0 z-0 motion-safe:animate-fade-in'
-            style={{
-              ...maskStyle,
-              animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            }}
-          >
-            <FlickeringGrid {...GRID_CONFIG.logo} />
-          </div>
-        </div>
+        <BackgroundHero />
       </section>
 
       <section
         id='blog-header'
         className='relative screen-line-before screen-line-after'
       >
-        <Particles
-          className='absolute inset-0'
-          quantity={100}
-          ease={80}
-          color='#fff'
-          refresh
-        />
+        <ParticlesClient />
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
         <div className='mx-auto w-full border-x'>
@@ -106,7 +85,7 @@ export default function BlogPage () {
                                 alt={post.metadata.title}
                                 width={150}
                                 height={120}
-                                className='rounded-lg object-cover h-full w-36 md:w-40 lg:w-48'
+                                className='rounded-none object-cover h-full w-36 md:w-40 lg:w-48'
                               />
                               {post.metadata.new && (
                                 <Badge variant='default' className='bg-primary absolute top-2 left-2 text-primary-foreground text-xs h-4.5 px-2 py-1'>NEW</Badge>
