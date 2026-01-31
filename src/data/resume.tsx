@@ -595,6 +595,37 @@ export const DATA = {
   ],
   awards: [
     {
+      title: 'Gemini Certified Educator',
+      dates: 'January 30, 2026',
+      location: 'Google for Education',
+      description:
+    'Earned Gemini Certified Educator qualification for demonstrating the knowledge, skills, and basic competencies needed to use Google AI in education. Certificate valid through January 30, 2029.',
+      image: '/awards/gemini-certified.jpg',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Google className='h-4 w-4' />,
+          href: 'https://edu.google.accredible.com/80df331f-3095-420b-afed-694d2ad17f92#acc.Oidue54E',
+        },
+      ],
+    },
+    {
+      title: 'Google AI for K12 Educators Certificate',
+      dates: 'January 30, 2026',
+      location: 'Google for Education',
+      description:
+    'Completed the Google AI for K12 Educators course with a perfect score of 100. Demonstrated proficiency in using Google AI tools to boost productivity and enhance work as an education professional.',
+      image: '/awards/google-ai-k12.jpg',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Google className='h-4 w-4' />,
+          href: '#',
+        },
+      ],
+    },
+
+    {
       title: 'Next.js SEO Fundamentals Certificate',
       dates: 'June 14, 2024',
       location: 'Next.js Learn Platform',

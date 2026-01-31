@@ -68,7 +68,7 @@ export function BlogCard ({ post, index }: BlogCardProps) {
                 {post.metadata.publishedAt && formatDate(post.metadata.publishedAt)}
               </p>
               {post.metadata.new && (
-                <Badge variant='default' className='bg-primary text-primary-foreground text-xs h-4 font-medium px-2 py-0.5'>
+                <Badge variant='default' className='bg-primary text-primary-foreground '>
                   NEW
                 </Badge>
               )}
