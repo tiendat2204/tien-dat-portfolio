@@ -24,6 +24,11 @@ import { Back } from './back'
 export const revalidate = 3600
 export const dynamicParams = false
 
+function toIsoDateOrUndefined (value: string) {
+  const parsed = dayjs(value)
+  return parsed.isValid() ? parsed.toISOString() : undefined
+}
+
 export async function generateStaticParams () {
   const posts = getAllPosts()
   return posts.map((post) => ({
@@ -47,6 +52,7 @@ export async function generateMetadata ({
 
   const canonicalUrl = buildCanonicalUrl(SITE_INFO.url, `/blog/${post.slug}`)
   const ogImage = buildOgImageUrl(image, title)
+  const publishedTime = toIsoDateOrUndefined(publishedAt)
 
   return {
     title,
@@ -57,8 +63,12 @@ export async function generateMetadata ({
     openGraph: {
       url: canonicalUrl,
       type: 'article',
-      publishedTime: dayjs(publishedAt).toISOString(),
-      modifiedTime: dayjs(publishedAt).toISOString(),
+      ...(publishedTime !== undefined
+        ? {
+            publishedTime,
+            modifiedTime: publishedTime,
+          }
+        : {}),
       images: {
         url: ogImage,
         width: 1200,

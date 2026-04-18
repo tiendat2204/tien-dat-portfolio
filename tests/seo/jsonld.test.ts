@@ -103,3 +103,48 @@ test('buildBlogPostingJsonLd builds schema.org BlogPosting payload', () => {
     image: 'https://assets.tiendatdev/images/avatar.jpeg',
   })
 })
+
+test('buildBlogPostingJsonLd does not throw on invalid publishedAt input', () => {
+  let result: ReturnType<typeof buildBlogPostingJsonLd> | undefined
+
+  assert.doesNotThrow(() => {
+    result = buildBlogPostingJsonLd({
+      slug: 'hello-world',
+      title: 'Hello World',
+      description: 'My first blog post',
+      publishedAt: 'not-a-date',
+      siteUrl: 'https://tiendatdev.me',
+      author: {
+        name: 'Tiến Đạt',
+        identifier: 'tiendat2204',
+        image: 'https://assets.tiendatdev/images/avatar.jpeg',
+      },
+    })
+  })
+
+  assert.equal(result?.datePublished, undefined)
+  assert.equal(result?.dateModified, undefined)
+})
+
+test('buildBlogPostingJsonLd falls back to safe URLs when siteUrl is malformed', () => {
+  let result: ReturnType<typeof buildBlogPostingJsonLd> | undefined
+
+  assert.doesNotThrow(() => {
+    result = buildBlogPostingJsonLd({
+      slug: 'hello-world',
+      title: 'Hello World',
+      description: 'My first blog post',
+      image: '/images/hello-world.webp',
+      publishedAt: '2024-06-01',
+      siteUrl: 'not-a-valid-url',
+      author: {
+        name: 'Tiến Đạt',
+        identifier: 'tiendat2204',
+        image: 'https://assets.tiendatdev/images/avatar.jpeg',
+      },
+    })
+  })
+
+  assert.equal(result?.image, 'https://example.com/images/hello-world.webp')
+  assert.equal(result?.url, 'https://example.com/blog/hello-world')
+})

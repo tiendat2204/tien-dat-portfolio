@@ -19,17 +19,44 @@ type BuildBlogPostingJsonLdInput = {
   author: BlogAuthorInput;
 }
 
-function buildAbsoluteUrl (url: string, siteUrl: string) {
-  return new URL(url, siteUrl).toString()
+const FALLBACK_SITE_URL = 'https://example.com'
+
+function getSafeSiteUrl (siteUrl: string) {
+  try {
+    const parsed = new URL(siteUrl)
+
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return parsed.origin
+    }
+  } catch {}
+
+  return FALLBACK_SITE_URL
+}
+
+function buildAbsoluteUrl (url: string, siteUrl: string, fallbackPath: string) {
+  try {
+    return new URL(url, siteUrl).toString()
+  } catch {
+    return new URL(fallbackPath, siteUrl).toString()
+  }
+}
+
+function toIsoDateOrUndefined (value: string) {
+  const parsed = dayjs(value)
+  return parsed.isValid() ? parsed.toISOString() : undefined
 }
 
 export function buildBlogPostingJsonLd (
   input: BuildBlogPostingJsonLdInput
 ): WithContext<BlogPosting> {
+  const safeSiteUrl = getSafeSiteUrl(input.siteUrl)
+  const fallbackImagePath = buildOgImageUrl(undefined, input.title)
   const image = buildAbsoluteUrl(
     buildOgImageUrl(input.image, input.title),
-    input.siteUrl
+    safeSiteUrl,
+    fallbackImagePath
   )
+  const publishedDate = toIsoDateOrUndefined(input.publishedAt)
 
   return {
     '@context': 'https://schema.org',
@@ -37,9 +64,13 @@ export function buildBlogPostingJsonLd (
     headline: input.title,
     description: input.description,
     image,
-    url: buildCanonicalUrl(input.siteUrl, `/blog/${input.slug}`),
-    datePublished: dayjs(input.publishedAt).toISOString(),
-    dateModified: dayjs(input.publishedAt).toISOString(),
+    url: buildCanonicalUrl(safeSiteUrl, `/blog/${input.slug}`),
+    ...(publishedDate !== undefined
+      ? {
+          datePublished: publishedDate,
+          dateModified: publishedDate,
+        }
+      : {}),
     author: {
       '@type': 'Person',
       name: input.author.name,
