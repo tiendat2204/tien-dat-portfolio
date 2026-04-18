@@ -37,3 +37,6 @@ next-env.d.ts
 
 # local worktrees
 .worktrees/
+
+#superpowers
+/docs/superpowers
