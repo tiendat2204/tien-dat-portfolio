@@ -95,6 +95,7 @@ export function BlogCard ({ post, index }: BlogCardProps) {
                 className='text-sm font-medium text-primary flex items-center'
               >
                 Read more
+                <span className='sr-only'> about {post.metadata.title}</span>
                 <ArrowRightIcon className='ml-1 h-3 w-3 transition-transform group-hover:translate-x-1' />
               </Link>
             </div>
