@@ -55,6 +55,14 @@ This project is optimized for deployment on Vercel. You can deploy it instantly 
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftiendat2204%2Ftien-dat-portfolio)
 
+## ✅ Quality Checks
+
+```bash
+pnpm test:unit
+pnpm lint
+pnpm build
+```
+
 ## 📄 License
 
 This project is licensed under the [MIT License](./LICENSE.md).

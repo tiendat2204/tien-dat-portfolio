@@ -1,8 +1,12 @@
 import fs from 'fs'
 import matter from 'gray-matter'
 import path from 'path'
+import { cache } from 'react'
 
+import { indexPostsBySlug, sortPostsNewestFirst } from '@/lib/blog/post-index'
 import type { Post, PostMetadata } from '@/types/blog'
+
+const blogContentDir = path.join(process.cwd(), 'src', 'content', 'blog')
 
 function parseFrontmatter (fileContent: string) {
   const file = matter(fileContent)
@@ -38,16 +42,21 @@ function getMDXData (dir: string) {
   })
 }
 
+const getCachedBlogData = cache(() => {
+  const sorted = sortPostsNewestFirst(getMDXData(blogContentDir))
+
+  return {
+    sorted,
+    bySlug: indexPostsBySlug(sorted),
+  }
+})
+
 export function getAllPosts () {
-  return getMDXData(path.join(process.cwd(), 'src', 'content', 'blog')).sort(
-    (a, b) =>
-      new Date(b.metadata.publishedAt).getTime() -
-          new Date(a.metadata.publishedAt).getTime()
-  )
+  return getCachedBlogData().sorted
 }
 
 export function getPostBySlug (slug: string) {
-  return getAllPosts().find((post) => post.slug === slug)
+  return getCachedBlogData().bySlug.get(slug)
 }
 
 export function getPostsByCategory (category: string) {
