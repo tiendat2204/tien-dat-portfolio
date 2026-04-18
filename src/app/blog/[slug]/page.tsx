@@ -3,19 +3,26 @@ import { getTableOfContents } from 'fumadocs-core/server'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import React, { Suspense } from 'react'
-import type { BlogPosting as PageSchema, WithContext } from 'schema-dts'
 
 import { InlineTOC } from '@/components/inline-toc'
 import { MDX } from '@/components/mdx'
-import { Prose } from '@/components/ui/typography'
-import { getAllPosts, getPostBySlug } from '@/data/blog'
-import { USER } from '@/data/user'
-import type { Post } from '@/types/blog'
-
-import { Back } from './back'
-import { BLUR_FADE_DELAY, SITE_INFO } from '@/data/config'
 import { Icon } from '@/components/Icon'
 import { BlurFade } from '@/components/magicui/blur-fade'
+import { Prose } from '@/components/ui/typography'
+import { getAllPosts, getPostBySlug } from '@/data/blog'
+import { BLUR_FADE_DELAY, SITE_INFO } from '@/data/config'
+import { USER } from '@/data/user'
+import { buildBlogPostingJsonLd } from '@/lib/seo/jsonld'
+import {
+  buildCanonicalUrl,
+  buildMissingPostMetadata,
+  buildOgImageUrl,
+} from '@/lib/seo/metadata'
+
+import { Back } from './back'
+
+export const revalidate = 3600
+export const dynamicParams = false
 
 export async function generateStaticParams () {
   const posts = getAllPosts()
@@ -33,21 +40,22 @@ export async function generateMetadata ({
   const post = getPostBySlug(slug)
 
   if (!post) {
-    return notFound()
+    return buildMissingPostMetadata(slug)
   }
 
   const { title, description, image, publishedAt } = post.metadata
 
-  const ogImage = image || `/og/simple?title=${encodeURIComponent(title)}`
+  const canonicalUrl = buildCanonicalUrl(SITE_INFO.url, `/blog/${post.slug}`)
+  const ogImage = buildOgImageUrl(image, title)
 
   return {
     title,
     description,
     alternates: {
-      canonical: `/blog/${post.slug}`,
+      canonical: canonicalUrl,
     },
     openGraph: {
-      url: `/blog/${post.slug}`,
+      url: canonicalUrl,
       type: 'article',
       publishedTime: dayjs(publishedAt).toISOString(),
       modifiedTime: dayjs(publishedAt).toISOString(),
@@ -61,27 +69,6 @@ export async function generateMetadata ({
     twitter: {
       card: 'summary_large_image',
       images: [ogImage],
-    },
-  }
-}
-
-function getPageJsonLd (post: Post): WithContext<PageSchema> {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: post.metadata.title,
-    description: post.metadata.description,
-    image:
-        post.metadata.image ||
-        `/og/simple?title=${encodeURIComponent(post.metadata.title)}`,
-    url: `${SITE_INFO.url}/blog/${post.slug}`,
-    datePublished: dayjs(post.metadata.publishedAt).toISOString(),
-    dateModified: dayjs(post.metadata.publishedAt).toISOString(),
-    author: {
-      '@type': 'Person',
-      name: USER.displayName,
-      identifier: USER.username,
-      image: USER.avatar,
     },
   }
 }
@@ -101,6 +88,19 @@ export default async function Page ({
   }
 
   const toc = getTableOfContents(post.content)
+  const pageJsonLd = buildBlogPostingJsonLd({
+    slug: post.slug,
+    title: post.metadata.title,
+    description: post.metadata.description,
+    image: post.metadata.image,
+    publishedAt: post.metadata.publishedAt,
+    siteUrl: SITE_INFO.url,
+    author: {
+      name: USER.displayName,
+      identifier: USER.username,
+      image: USER.avatar,
+    },
+  })
   // const tocDepth2Count = toc.reduce(
   //   (count, item) => (item.depth === 2 ? count + 1 : count),
   //   0
@@ -114,7 +114,7 @@ export default async function Page ({
       <script
         type='application/ld+json'
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(getPageJsonLd(post)).replace(/</g, '\\u003c'),
+          __html: JSON.stringify(pageJsonLd).replace(/</g, '\\u003c'),
         }}
       />
       <div className=' relative screen-line-after flex items-center justify-between p-2 pl-4 mx-auto max-w-3xl'>
