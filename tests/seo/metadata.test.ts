@@ -9,6 +9,13 @@ test('buildCanonicalUrl joins base URL and route path', () => {
   )
 })
 
+test('buildCanonicalUrl normalizes missing leading slash', () => {
+  assert.equal(
+    buildCanonicalUrl('https://tiendatdev.me', 'blog'),
+    'https://tiendatdev.me/blog'
+  )
+})
+
 test('buildOgImageUrl falls back to generated OG endpoint', () => {
   assert.equal(
     buildOgImageUrl(undefined, 'Hello Next'),
