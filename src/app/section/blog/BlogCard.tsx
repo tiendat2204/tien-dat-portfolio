@@ -1,10 +1,8 @@
-'use client'
-
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRightIcon } from '@radix-ui/react-icons'
-import { useState, useEffect, useRef } from 'react'
 import { formatDate } from '@/lib/utils'
+import { getBlogCardImageProps } from '@/lib/performance/blog-card-image'
 import { Badge } from '@/components/ui/badge'
 import { BlurFade } from '@/components/magicui/blur-fade'
 import { BLUR_FADE_DELAY } from '@/data/config'
@@ -16,44 +14,11 @@ interface BlogCardProps {
 }
 
 export function BlogCard ({ post, index }: BlogCardProps) {
-  const [isActive, setIsActive] = useState(false)
-  const [, setIsFlashing] = useState(false)
-  const timeoutIds = useRef<NodeJS.Timeout[]>([])
-
-  const handleMouseEnter = () => {
-    timeoutIds.current.forEach(id => clearTimeout(id))
-    timeoutIds.current = []
-
-    timeoutIds.current.push(setTimeout(() => setIsActive(false), 100))
-    timeoutIds.current.push(setTimeout(() => setIsActive(true), 200))
-    timeoutIds.current.push(setTimeout(() => setIsActive(false), 300))
-    timeoutIds.current.push(setTimeout(() => {
-      setIsActive(true)
-      setIsFlashing(false)
-    }, 400))
-  }
-
-  const handleMouseLeave = () => {
-    timeoutIds.current.forEach(id => clearTimeout(id))
-    timeoutIds.current = []
-
-    setIsActive(false)
-    setIsFlashing(false)
-  }
-
-  useEffect(() => {
-    return () => {
-      timeoutIds.current.forEach(id => clearTimeout(id))
-    }
-  }, [])
+  const imageProps = getBlogCardImageProps()
 
   return (
-    <div
-      className='group relative flex cursor-pointer flex-col border border-dashed border-border/50 p-2'
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div className={`pointer-events-none absolute inset-0 z-10 -m-px border border-dashed border-white/15 bg-muted/15  ${isActive ? 'opacity-100' : 'opacity-0 '}`}>
+    <div className='group relative flex cursor-pointer flex-col border border-dashed border-border/50 p-2'>
+      <div className='pointer-events-none absolute inset-0 z-10 -m-px border border-dashed border-white/15 bg-muted/15 opacity-0 transition-opacity duration-300 group-hover:opacity-100'>
         <div className='absolute -left-px -top-px h-2 w-2 border-l border-t border-white/90' />
         <div className='absolute -right-px -top-px h-2 w-2 border-r border-t border-white/90' />
         <div className='absolute -bottom-px -right-px h-2 w-2 border-b border-r border-white/90' />
@@ -85,6 +50,8 @@ export function BlogCard ({ post, index }: BlogCardProps) {
                 src={post.metadata.image || '/images/default-blog-image.jpg'}
                 alt={post.metadata.title}
                 fill
+                loading={imageProps.loading}
+                sizes={imageProps.sizes}
                 className='object-cover transition-transform group-hover:scale-105 duration-500'
               />
             </div>
