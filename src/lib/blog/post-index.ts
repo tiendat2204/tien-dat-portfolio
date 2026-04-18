@@ -1,12 +1,18 @@
 import type { Post } from '@/types/blog'
 
+function getPublishedTimestamp (publishedAt: string) {
+  const timestamp = Date.parse(publishedAt)
+  return Number.isNaN(timestamp) ? Number.NEGATIVE_INFINITY : timestamp
+}
+
 export function sortPostsNewestFirst (posts: Post[]) {
   return [...posts].sort((a, b) => {
-    const newestFirst =
-      new Date(b.metadata.publishedAt).getTime() -
-      new Date(a.metadata.publishedAt).getTime()
+    const aTimestamp = getPublishedTimestamp(a.metadata.publishedAt)
+    const bTimestamp = getPublishedTimestamp(b.metadata.publishedAt)
 
-    if (newestFirst !== 0) return newestFirst
+    if (aTimestamp !== bTimestamp) {
+      return aTimestamp > bTimestamp ? -1 : 1
+    }
     return a.slug.localeCompare(b.slug)
   })
 }

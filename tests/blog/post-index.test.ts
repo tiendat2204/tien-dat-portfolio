@@ -64,3 +64,46 @@ test('indexPostsBySlug builds a slug lookup map', () => {
   assert.equal(bySlug.get('z-post'), postsFixture[0])
   assert.equal(bySlug.get('missing-post'), undefined)
 })
+
+test('sortPostsNewestFirst handles invalid dates deterministically', () => {
+  const sorted = sortPostsNewestFirst([
+    {
+      slug: 'invalid-b',
+      content: 'invalid b',
+      metadata: {
+        title: 'Invalid B',
+        summary: 'Summary invalid b',
+        description: 'Description invalid b',
+        publishedAt: 'not-a-date',
+        tags: [],
+      },
+    },
+    {
+      slug: 'valid-post',
+      content: 'valid',
+      metadata: {
+        title: 'Valid',
+        summary: 'Summary valid',
+        description: 'Description valid',
+        publishedAt: '2025-01-01',
+        tags: [],
+      },
+    },
+    {
+      slug: 'invalid-a',
+      content: 'invalid a',
+      metadata: {
+        title: 'Invalid A',
+        summary: 'Summary invalid a',
+        description: 'Description invalid a',
+        publishedAt: 'also-not-a-date',
+        tags: [],
+      },
+    },
+  ])
+
+  assert.deepEqual(
+    sorted.map((post) => post.slug),
+    ['valid-post', 'invalid-a', 'invalid-b']
+  )
+})

@@ -52,7 +52,7 @@ const getCachedBlogData = cache(() => {
 })
 
 export function getAllPosts () {
-  return getCachedBlogData().sorted
+  return [...getCachedBlogData().sorted]
 }
 
 export function getPostBySlug (slug: string) {
