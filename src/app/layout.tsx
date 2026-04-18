@@ -9,16 +9,23 @@ import { Providers } from '@/components/Providers'
 import { Header } from '@/components/Header'
 import type { WebSite, WithContext } from 'schema-dts'
 import { SITE_INFO } from '@/data/config'
+import { buildCanonicalUrl, buildOgImageUrl } from '@/lib/seo/metadata'
 import Script from 'next/script'
 import Section from '@/components/landing/section'
 
+const rootCanonicalUrl = buildCanonicalUrl(SITE_INFO.url, '/')
+const rootOgImageUrl = buildOgImageUrl(SITE_INFO.ogImage, DATA.name)
+
 export const metadata: Metadata = {
-  metadataBase: new URL(DATA.url),
+  metadataBase: new URL(SITE_INFO.url),
   title: {
     default: DATA.name,
     template: `%s | ${DATA.name}`,
   },
   description: DATA.description,
+  alternates: {
+    canonical: rootCanonicalUrl,
+  },
   icons: {
     icon: [
       {
@@ -38,13 +45,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: `${DATA.name}`,
     description: DATA.description,
-    url: DATA.url,
+    url: rootCanonicalUrl,
     siteName: `${DATA.name}`,
     locale: 'en_US',
     type: 'website',
     images: [
       {
-        url: `${DATA.url}me.jpg`,
+        url: rootOgImageUrl,
         width: 1200,
         height: 630,
         alt: DATA.name
@@ -65,6 +72,7 @@ export const metadata: Metadata = {
   twitter: {
     title: `${DATA.name}`,
     card: 'summary_large_image',
+    images: [rootOgImageUrl],
   },
   verification: {
     google: '',
