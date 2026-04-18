@@ -127,7 +127,7 @@ export function Header () {
                 </Tooltip>
               </TooltipProvider>
             ))}
-          <Separator orientation='vertical' className='h-6' />
+          <Separator orientation='vertical' className='h-10' />
           <ModeToggle />
         </div>
 
