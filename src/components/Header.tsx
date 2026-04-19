@@ -33,7 +33,7 @@ export function Header () {
   return (
     <header
       className={cn(
-        'sticky top-0 z-40 screen-line-before   mx-auto w-full max-w-5xl border-b border-transparent transition-all ease-out',
+        'sticky top-0 z-40 screen-line-before   mx-auto w-full max-w-3xl border-b border-transparent transition-all ease-out',
         {
           'bg-background/95 supports-[backdrop-filter]:bg-background/50 border-border backdrop-blur-lg':
             scrolled && !open,

@@ -14,7 +14,7 @@ import { BackgroundHero } from '@/components/landing/background-hero'
 export default function BlogPage () {
   const posts: Post[] = getAllPosts()
   return (
-    <main className='flex flex-col '>
+    <main className='flex flex-col mx-auto w-full max-w-3xl '>
       <section
         id='background'
         className='relative screen-line-before border-x'
