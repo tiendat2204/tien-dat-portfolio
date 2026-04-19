@@ -130,7 +130,13 @@ export default async function Page ({
           __html: JSON.stringify(pageJsonLd).replace(/</g, '\\u003c'),
         }}
       />
-      <div className=' relative screen-line-after flex items-center justify-between p-2 pl-4 mx-auto max-w-3xl'>
+      <div
+        className={
+          hasToc
+            ? 'relative screen-line-after flex items-center justify-between p-2 pl-4 mx-auto max-w-5xl'
+            : 'relative screen-line-after flex items-center justify-between p-2 pl-4 mx-auto max-w-3xl'
+        }
+      >
         <Suspense>
           <Back />
         </Suspense>
