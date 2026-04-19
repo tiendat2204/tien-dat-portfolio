@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import React, { Suspense } from 'react'
 
-import { InlineTOC } from '@/components/inline-toc'
+import { BlogTOC } from '@/components/blog-toc'
 import { MDX } from '@/components/mdx'
 import { Icon } from '@/components/Icon'
 import { BlurFade } from '@/components/magicui/blur-fade'
@@ -12,6 +12,7 @@ import { Prose } from '@/components/ui/typography'
 import { getAllPosts, getPostBySlug } from '@/data/blog'
 import { BLUR_FADE_DELAY, SITE_INFO } from '@/data/config'
 import { USER } from '@/data/user'
+import { filterBlogTOCItems } from '@/lib/blog/toc'
 import { buildBlogPostingJsonLd } from '@/lib/seo/jsonld'
 import {
   buildCanonicalUrl,
@@ -98,6 +99,8 @@ export default async function Page ({
   }
 
   const toc = getTableOfContents(post.content)
+  const filteredToc = filterBlogTOCItems(toc)
+  const hasToc = filteredToc.length > 0
   const pageJsonLd = buildBlogPostingJsonLd({
     slug: post.slug,
     title: post.metadata.title,
@@ -137,24 +140,37 @@ export default async function Page ({
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
       </div>
 
-      <Prose className=' max-w-3xl mx-auto'>
-        <div className='border-b'>
-          <BlurFade delay={BLUR_FADE_DELAY * 3} offset={0}>
-            <h1 className=' font-heading font-extrabold font-doto text-3xl md:text-4xl  p-4'>
-              {post.metadata.title}
-            </h1>
-          </BlurFade>
-        </div>
-        <p className='lead p-4  text-muted-foreground border-b'>{post.metadata.description}</p>
-        <div className='border-b'>
-          <InlineTOC items={toc} />
-        </div>
-
-        <div className='p-4'>
-          {/* eslint-disable-next-line @stylistic/jsx-pascal-case */}
-          <MDX code={post.content} />
-        </div>
-      </Prose>
+      <div
+        className={
+          hasToc
+            ? 'mx-auto max-w-5xl md:grid md:grid-cols-[minmax(0,1fr)_18rem] md:gap-6'
+            : 'mx-auto max-w-3xl'
+        }
+      >
+        <Prose className=' max-w-3xl mx-auto'>
+          <div className='border-b'>
+            <BlurFade delay={BLUR_FADE_DELAY * 3} offset={0}>
+              <h1 className=' font-heading font-extrabold font-doto text-3xl md:text-4xl  p-4'>
+                {post.metadata.title}
+              </h1>
+            </BlurFade>
+          </div>
+          <p className='lead p-4  text-muted-foreground border-b'>{post.metadata.description}</p>
+          <div className='p-4'>
+            {/* eslint-disable-next-line @stylistic/jsx-pascal-case */}
+            <MDX code={post.content} />
+          </div>
+        </Prose>
+        {hasToc
+          ? (
+            <div className='hidden md:block'>
+              <div className='sticky top-[var(--doc-cols-top,0px)]'>
+                <BlogTOC items={filteredToc} />
+              </div>
+            </div>
+            )
+          : null}
+      </div>
 
       <div className='screen-line-after relative h-16' />
     </div>
