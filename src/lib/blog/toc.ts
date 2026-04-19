@@ -1,7 +1,7 @@
 import type { TOCItemType } from 'fumadocs-core/server'
 
 function hasTextTitle (title: TOCItemType['title']) {
-  return typeof title === 'string' ? title.trim().length > 0 : title != null
+  return typeof title === 'string' && title.trim().length > 0
 }
 
 function isHashUrl (url: string) {
