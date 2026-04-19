@@ -120,7 +120,7 @@ export default async function Page ({
   // );
   return (
     <div className='relative'>
-      {hasToc
+      {/* {hasToc
         ? (
           <aside className='pointer-events-none absolute inset-y-0 left-[calc(50%+24rem+2rem)] hidden xl:block w-56 2xl:w-72'>
             <div className='pointer-events-auto sticky top-32 z-10'>
@@ -128,7 +128,7 @@ export default async function Page ({
             </div>
           </aside>
           )
-        : null}
+        : null} */}
       <div className='mx-auto w-full max-w-3xl'>
         <div className='relative w-full border-x screen-line-before min-h-screen'>
 
