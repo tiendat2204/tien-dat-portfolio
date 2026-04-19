@@ -14,5 +14,5 @@ test('BlogTOC uses fumadocs toc primitives and exits early when empty', () => {
   assert.match(source, /ScrollProvider/)
   assert.match(source, /TOCItem/)
   assert.match(source, /if \(items\.length === 0\) return null/)
-  assert.match(source, /data-active/)
+  assert.match(source, /data-\[active=true\]/)
 })

@@ -39,7 +39,6 @@ export function BlogTOC ({ items, className }: BlogTOCProps) {
                 >
                   <TOCItem
                     href={item.url}
-                    data-active={false}
                     className='block rounded px-2 py-1 text-sm text-muted-foreground transition-colors hover:text-foreground data-[active=true]:bg-muted data-[active=true]:text-foreground'
                   >
                     {item.title}
