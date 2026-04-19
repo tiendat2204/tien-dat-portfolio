@@ -33,7 +33,7 @@ export function Footer ({
   copyright,
 }: FooterProps) {
   return (
-    <footer className='md:py-18 py-8 border-x font-ibm relative '>
+    <footer className='md:py-18 py-8 border-x font-ibm relative mx-auto w-full max-w-3xl '>
       <div className='px-4 lg:px-8'>
         <div className='md:flex md:items-start md:justify-between'>
           <Link

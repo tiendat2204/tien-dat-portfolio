@@ -19,7 +19,7 @@ import { BackgroundHero } from '@/components/landing/background-hero'
 
 export default function Page () {
   return (
-    <main className='flex flex-col min-h-dvh'>
+    <main className='flex flex-col min-h-dvh mx-auto w-full max-w-3xl'>
 
       <section
         id='background'

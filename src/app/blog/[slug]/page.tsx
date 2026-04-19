@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import React, { Suspense } from 'react'
 
-import { InlineTOC } from '@/components/inline-toc'
+import { BlogTOC } from '@/components/blog-toc'
 import { MDX } from '@/components/mdx'
 import { Icon } from '@/components/Icon'
 import { BlurFade } from '@/components/magicui/blur-fade'
@@ -12,6 +12,7 @@ import { Prose } from '@/components/ui/typography'
 import { getAllPosts, getPostBySlug } from '@/data/blog'
 import { BLUR_FADE_DELAY, SITE_INFO } from '@/data/config'
 import { USER } from '@/data/user'
+import { filterBlogTOCItems } from '@/lib/blog/toc'
 import { buildBlogPostingJsonLd } from '@/lib/seo/jsonld'
 import {
   buildCanonicalUrl,
@@ -98,6 +99,8 @@ export default async function Page ({
   }
 
   const toc = getTableOfContents(post.content)
+  const filteredToc = filterBlogTOCItems(toc)
+  const hasToc = filteredToc.length > 0
   const pageJsonLd = buildBlogPostingJsonLd({
     slug: post.slug,
     title: post.metadata.title,
@@ -116,47 +119,62 @@ export default async function Page ({
   //   0
   // );
   return (
-    <div className='relative border-x screen-line-before  min-h-screen '>
-      <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black' />
-      <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
-      <Icon className='absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black' />
-      <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
-      <script
-        type='application/ld+json'
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(pageJsonLd).replace(/</g, '\\u003c'),
-        }}
-      />
-      <div className=' relative screen-line-after flex items-center justify-between p-2 pl-4 mx-auto max-w-3xl'>
-        <Suspense>
-          <Back />
-        </Suspense>
-        <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black' />
-        <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
-        <Icon className='absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black' />
-        <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
+    <div className='relative'>
+      {hasToc
+        ? (
+          <aside className='pointer-events-none absolute inset-y-0 left-[calc(50%+24rem+2rem)] hidden xl:block w-56 2xl:w-72'>
+            <div className='pointer-events-auto sticky top-32 z-10'>
+              <BlogTOC items={filteredToc} />
+            </div>
+          </aside>
+          )
+        : null}
+      <div className='mx-auto w-full max-w-3xl'>
+        <div className='relative w-full border-x screen-line-before min-h-screen'>
+
+          <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black' />
+          <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
+          <Icon className='absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black' />
+          <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
+          <script
+            type='application/ld+json'
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(pageJsonLd).replace(/</g, '\\u003c'),
+            }}
+          />
+          <div
+            className='relative screen-line-after flex items-center justify-between p-2 pl-4 mx-auto max-w-3xl'
+          >
+            <Suspense>
+              <Back />
+            </Suspense>
+            <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black' />
+            <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
+            <Icon className='absolute z-20 h-6 w-6 -top-3 -right-3 dark:text-white text-black' />
+            <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
+          </div>
+
+          <div className='mx-auto max-w-3xl'>
+            <Prose className=' max-w-3xl mx-auto'>
+              <div className='border-b'>
+                <BlurFade delay={BLUR_FADE_DELAY * 3} offset={0}>
+                  <h1 className=' font-heading font-extrabold font-doto text-3xl md:text-4xl  p-4'>
+                    {post.metadata.title}
+                  </h1>
+                </BlurFade>
+              </div>
+              <p className='lead p-4  text-muted-foreground border-b'>{post.metadata.description}</p>
+              <div className='p-4'>
+                {/* eslint-disable-next-line @stylistic/jsx-pascal-case */}
+                <MDX code={post.content} />
+              </div>
+            </Prose>
+
+          </div>
+
+          <div className='screen-line-after relative h-16' />
+        </div>
       </div>
-
-      <Prose className=' max-w-3xl mx-auto'>
-        <div className='border-b'>
-          <BlurFade delay={BLUR_FADE_DELAY * 3} offset={0}>
-            <h1 className=' font-heading font-extrabold font-doto text-3xl md:text-4xl  p-4'>
-              {post.metadata.title}
-            </h1>
-          </BlurFade>
-        </div>
-        <p className='lead p-4  text-muted-foreground border-b'>{post.metadata.description}</p>
-        <div className='border-b'>
-          <InlineTOC items={toc} />
-        </div>
-
-        <div className='p-4'>
-          {/* eslint-disable-next-line @stylistic/jsx-pascal-case */}
-          <MDX code={post.content} />
-        </div>
-      </Prose>
-
-      <div className='screen-line-after relative h-16' />
     </div>
   )
 }

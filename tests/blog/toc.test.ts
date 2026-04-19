@@ -30,3 +30,19 @@ test('filterBlogTOCItems returns empty list when no eligible headings exist', ()
 
   assert.equal(result.length, 0)
 })
+
+test('filterBlogTOCItems filters edge cases: hash-only url, whitespace-only title, non-string title', () => {
+  const items: TOCItemType[] = [
+    { title: 'Valid', url: '#valid', depth: 2 },
+    { title: '   ', url: '#space', depth: 2 },
+    { title: 123 as any, url: '#num', depth: 2 },
+    { title: 'HashOnly', url: '#', depth: 2 },
+  ]
+
+  const result = filterBlogTOCItems(items)
+
+  assert.deepEqual(
+    result.map((item) => ({ title: item.title, url: item.url, depth: item.depth })),
+    [{ title: 'Valid', url: '#valid', depth: 2 }]
+  )
+})
