@@ -103,7 +103,7 @@ export const DATA = {
       GitHub: {
         name: 'GitHub',
         icon: GitHub,
-        url: 'https://tiendatdev.me/',
+        url: 'https://github.com/tiendat2204',
         image:
           'https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg',
         navbar: true,
