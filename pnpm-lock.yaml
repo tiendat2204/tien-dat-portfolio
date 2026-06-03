@@ -81,6 +81,9 @@ importers:
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
+      gsap:
+        specifier: ^3.15.0
+        version: 3.15.0
       jotai:
         specifier: ^2.12.5
         version: 2.12.5(@types/react@19.2.2)(react@19.2.0)
@@ -102,6 +105,9 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      next-transition-router:
+        specifier: ^0.2.11
+        version: 0.2.11(next@16.0.10(@babel/core@7.27.4)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       qss:
         specifier: ^3.0.0
         version: 3.0.0
@@ -2562,6 +2568,9 @@ packages:
     resolution: {integrity: sha512-8QmQKqEASLd5nx0U1B1okLElbUuuttJ/AnYmRXbbbGDWh6uS208EjD4Xqq/I9wK7u0v6O08XhTWnt5XtEbR6Dg==}
     engines: {node: '>= 0.4'}
 
+  delegate-it@6.4.0:
+    resolution: {integrity: sha512-NbMljKgnyvQQFLRx3hjPs2x++R3GzIZgvtINq/Q7PzxiC58CSG+N2RT8x4qF7JhkFZI4h9zZ1BszoJYdYREkbA==}
+
   depd@2.0.0:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
     engines: {node: '>= 0.8'}
@@ -3135,6 +3144,9 @@ packages:
   gray-matter@4.0.3:
     resolution: {integrity: sha512-5v6yZd4JK3eMI3FqqCouswVqwugaA9r4dNZB1wwcmrD02QkV5H0y7XBQW8QwQqEaZY1pM9aqORSORhJRdNK44Q==}
     engines: {node: '>=6.0'}
+
+  gsap@3.15.0:
+    resolution: {integrity: sha512-dMW4CWBTUK1AEEDeZc1g4xpPGIrSf9fJF960qbTZmN/QwZIWY5wgliS6JWl9/25fpTGJrMRtSjGtOmPnfjZB+A==}
 
   has-bigints@1.1.0:
     resolution: {integrity: sha512-R3pbpkcIqv2Pm3dUwgjclDRVmWpTJW2DcMzcIhEXEx1oh/CEMObMm3KLmRJOdvhM7o4uQBnwr8pzRK2sJWIqfg==}
@@ -3963,6 +3975,13 @@ packages:
       react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
       react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
 
+  next-transition-router@0.2.11:
+    resolution: {integrity: sha512-jQwogg1CwfUHKRT9fCNEtsQ6Nl8Vpm0ipXcwkn50GM2WfFzkP1MT6tDuHbLq2HLqUabPQe+crvb6yVm8iJz3ng==}
+    peerDependencies:
+      next: '>=14.0.0'
+      react: '>=18.2.0'
+      react-dom: '>=18.2.0'
+
   next@16.0.10:
     resolution: {integrity: sha512-RtWh5PUgI+vxlV3HdR+IfWA1UUHu0+Ram/JBO4vWB54cVPentCD0e+lxyAYEsDTqGGMg7qpjhKh6dc6aW7W/sA==}
     engines: {node: '>=20.9.0'}
@@ -4760,6 +4779,9 @@ packages:
   typed-array-length@1.0.7:
     resolution: {integrity: sha512-3KS2b+kL7fsuk/eJZ7EQdnEmQoaho/r6KUef7hxvltNA5DR8NAUM+8wJMbJyZ4G9/7i3v5zPBIMN5aybAh2/Jg==}
     engines: {node: '>= 0.4'}
+
+  typed-query-selector@2.12.2:
+    resolution: {integrity: sha512-EOPFbyIub4ngnEdqi2yOcNeDLaX/0jcE1JoAXQDDMIthap7FoN795lc/SHfIq2d416VufXpM8z/lD+WRm2gfOQ==}
 
   typescript-eslint@8.46.2:
     resolution: {integrity: sha512-vbw8bOmiuYNdzzV3lsiWv6sRwjyuKJMQqWulBOU7M0RrxedXledX8G8kBbQeiOYDnTfiXz0Y4081E1QMNB6iQg==}
@@ -7393,6 +7415,10 @@ snapshots:
       has-property-descriptors: 1.0.2
       object-keys: 1.1.1
 
+  delegate-it@6.4.0:
+    dependencies:
+      typed-query-selector: 2.12.2
+
   depd@2.0.0: {}
 
   dequal@2.0.3: {}
@@ -8187,6 +8213,8 @@ snapshots:
       kind-of: 6.0.3
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
+
+  gsap@3.15.0: {}
 
   has-bigints@1.1.0: {}
 
@@ -9270,6 +9298,13 @@ snapshots:
 
   next-themes@0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
+      react: 19.2.0
+      react-dom: 19.2.0(react@19.2.0)
+
+  next-transition-router@0.2.11(next@16.0.10(@babel/core@7.27.4)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+    dependencies:
+      delegate-it: 6.4.0
+      next: 16.0.10(@babel/core@7.27.4)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
 
@@ -10358,6 +10393,8 @@ snapshots:
       is-typed-array: 1.1.15
       possible-typed-array-names: 1.1.0
       reflect.getprototypeof: 1.0.10
+
+  typed-query-selector@2.12.2: {}
 
   typescript-eslint@8.46.2(eslint@9.38.0(jiti@2.4.2))(typescript@5.8.3):
     dependencies:
