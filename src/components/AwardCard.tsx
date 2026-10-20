@@ -3,13 +3,17 @@ import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Award, ChevronRightIcon } from 'lucide-react'
+import Image from 'next/image'
+import { Award, ChevronRightIcon, ExternalLinkIcon } from 'lucide-react'
+import { ImageZoom } from '@/components/zoomable-image'
 
 interface Props {
   title: string;
   description: string;
   dates: string;
   image?: string;
+  images?: readonly string[];
+  logo?: string;
   location: string;
   links?: readonly {
     icon: React.ReactNode;
@@ -24,6 +28,8 @@ export function AwardCard ({
   dates,
   location,
   image,
+  images,
+  logo,
   links,
 }: Props) {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -41,13 +47,17 @@ export function AwardCard ({
           variant='outline'
           className='size-10 rounded-none p-1 border-0 flex items-center justify-center bg-background '
         >
-          {links && links.length > 0
+          {logo
             ? (
-              <span className='size-4 fill-white text-white'>{links[0].icon}</span>
+              <Image src={logo} alt={title} width={24} height={24} className='size-6 rounded-full' />
               )
-            : (
-              <Award className='size-4 fill-amber-400 text-amber-400' />
-              )}
+            : links && links.length > 0
+              ? (
+                <span className='size-4 fill-white text-white'>{links[0].icon}</span>
+                )
+              : (
+                <Award className='size-4 fill-amber-400 text-amber-400' />
+                )}
         </Badge>
       </div>
       <div className='flex flex-col justify-start '>
@@ -84,6 +94,24 @@ export function AwardCard ({
             </span>
           )}
 
+          {images && images.length > 0 && (
+            <div
+              className='mt-3 pr-4 grid grid-cols-1 sm:grid-cols-2 gap-2'
+              onClick={(e) => e.stopPropagation()}
+            >
+              {images.map((src) => (
+                <ImageZoom
+                  key={src}
+                  src={src}
+                  alt={title}
+                  width={1600}
+                  height={1066}
+                  className='w-full h-auto border'
+                />
+              ))}
+            </div>
+          )}
+
           {links && links.length > 0 && (
             <div className='mt-2 flex flex-row flex-wrap items-start gap-2'>
               {links.map((link, idx) => (
@@ -94,6 +122,7 @@ export function AwardCard ({
                 >
                   <Badge key={idx} title={link.title} className='flex gap-2'>
                     {link.title}
+                    <ExternalLinkIcon className='size-3' />
                   </Badge>
                 </Link>
               ))}

@@ -9,16 +9,18 @@ import { Zalo } from '@/components/icons/zalo-icon'
 export const DATA = {
   name: 'Tien Dat',
   initials: 'TD',
-  url: 'https://tiendatdev.me/',
+  url: 'https://tiendat.work/',
   location:
-    '256 Duong Quang Ham Street, Go Vap District, Ho Chi Minh City, Vietnam',
+    '106/02/07 Quang Trung Street, Go Vap District, Ho Chi Minh City, Vietnam',
   locationLink:
-    'https://www.google.com/maps/place/256+Duong+Quang+Ham,+Phuong+7,+Quan+Go+Vap,+Thanh+Pho+Ho+Chi+Minh,+Vietnam/@10.848634,106.688626,17z/data=!3m1!4b1!4m6!3m5!1s0x31752f2c8d9e2a7b:0x5d6f8c8e9f8c8e9f!8m2!3d10.848634!4d106.6908147!16s%2Fg%2F11c1qv_5j',
+    'https://www.google.com/maps/search/?api=1&query=106%2F02%2F07+Quang+Trung,+Go+Vap,+Ho+Chi+Minh+City,+Vietnam',
   description:
     'Fullstack developer with a strong focus on frontend development and a passion for building scalable, user-centric web applications. I have experience in React, Next.js, Typescript, Node.js, Python, and more. I love to build products that solve real-world problems and help people achieve their goals.',
   summary:
     'I am a fullstack developer with a strong focus on frontend development and a passion for building scalable, user-centric web applications. I have experience in React, Next.js, Typescript, Node.js, Python, and more. I love to build products that solve real-world problems and help people achieve their goals. I am always looking for new challenges and opportunities to learn and grow.',
   avatarUrl: '/me.jpg',
+  avatarLineArtUrl: '/me-lineart.svg?v=9',
+  avatarLineArtDarkUrl: '/me-lineart-dark.svg?v=1',
   skills: {
     mainStack: {
       framework: {
@@ -63,6 +65,8 @@ export const DATA = {
       { name: 'Node.js', icon: 'nodejs-icon.svg' },
       { name: 'Postgres', icon: 'postgresql-icon.svg' },
       { name: 'MongoDB', icon: 'mongodb-icon.svg' },
+      { name: 'MySQL', icon: 'mysql-icon.svg' },
+      { name: 'SQLite', icon: 'sqlite-icon.svg' },
       { name: 'SVG Animation', icon: 'svg-icon.svg' },
     ],
     frameworks: [
@@ -71,11 +75,24 @@ export const DATA = {
       { name: 'Next.js', icon: 'nextjs-icon.svg' },
       { name: 'ExpressJS', icon: 'expressjs-icon.svg' },
       { name: 'TailwindCSS', icon: 'tailwindcss-icon.svg' },
-      { name: 'TankStack Query', icon: 'tanstack-icon.svg' },
+      { name: 'TanStack Query', icon: 'tanstack-icon.svg' },
+      { name: 'TanStack Router & Table', icon: 'tanstack-icon.svg' },
+      { name: 'NestJS', icon: 'nestjs-icon.svg' },
+      { name: 'Redux', icon: 'redux-icon.svg' },
+      { name: 'React Hook Form', icon: 'react-hook-form-icon.svg' },
+      { name: 'Zod', icon: 'zod-icon.svg' },
+      { name: 'Leaflet/MapLibre', icon: 'leaflet-icon.svg' },
+      { name: 'Prisma', icon: 'prisma-icon.svg' },
+      { name: 'Drizzle', icon: 'drizzle-icon.svg' },
+      { name: 'Vite', icon: 'vite-icon.svg' },
       { name: 'Motion.dev', icon: 'motiondev-icon.svg' },
       { name: 'BetterAuth', icon: 'betterauth-icon.svg' },
     ],
-    tools: [{ name: 'Nginx', icon: 'nginx-icon.svg' }],
+    tools: [
+      { name: 'Nginx', icon: 'nginx-icon.svg' },
+      { name: 'Playwright', icon: 'playwright-icon.svg' },
+      { name: 'Vitest', icon: 'vitest-icon.svg' },
+    ],
     platforms: [
       { name: 'GitHub', icon: 'github-icon.svg' },
       { name: 'Vercel', icon: 'vercel-icon.svg' },
@@ -86,9 +103,11 @@ export const DATA = {
       { name: 'Postman', icon: 'postman-icon.svg' },
       { name: 'Figma', icon: 'figma-icon.svg' },
       { name: 'Photoshop', icon: 'photoshop-icon.svg' },
+      { name: 'Claude Code', icon: 'claude-icon.svg' },
     ],
     devOps: [
       { name: 'GitHub Actions (CI/CD)', icon: 'github-icon.svg' },
+      { name: 'Docker (basic)', icon: 'docker-icon.svg' },
       { name: 'Authentication (OAuth, JWT)', icon: 'auth-icon.svg' },
     ],
   },
@@ -142,13 +161,21 @@ export const DATA = {
       logoUrl: '/LogoTA.svg',
       positions: [
         {
-          title: 'Junior - Frontend Developer',
+          title: 'Fullstack Developer',
           badges: ['Frontend', 'Full Stack'],
-          start: 'July 2025',
+          start: 'Jun 2025',
           end: 'Present',
           isExpanded: true,
           description: [
-            'Developing advanced document editing applications with React.js for Word, Excel, and PDF formats',
+            'AGRITA - Agricultural Cooperative SaaS Platform: owning UI/UX design and frontend for 3 connected apps (admin console, farm management, public marketplace) from BA requirements',
+            'Won the Consolation Prize and Most Favorite Project Award at HUIT Startup 2026 (Business Track, city-level, 244 entries) with AGRITA',
+            'Built a shared design system (semantic tokens, data tables, permission-aware screens, loading, empty and error states) reused across all three apps',
+            'Delivered map-based plot management for cooperatives, drawing and editing field boundaries with Leaflet/MapLibre',
+            'Built the marketplace buyer journey: storefronts, product pages, cart, checkout and QR origin tracing',
+            'Added Playwright E2E and axe-core accessibility tests',
+            'E-Office Workflow (separate client): built business workflow features and secure APIs, reducing approval workflow time by 70% with an automated system',
+            'Digital Library for a Pagoda: developed and maintained a full-stack system with book catalog management, borrowing records and role-based access control, managing 40,000+ books for 1,000+ active users',
+            'Developing advanced document editing applications with React.js, TipTap and Redux for Word, Excel, and PDF formats',
             'Building interactive document editors with real-time collaboration features',
             'Implementing file conversion and processing capabilities for multiple document formats',
             'Creating responsive user interfaces with Vite and TailwindCSS for optimal performance',
@@ -162,6 +189,14 @@ export const DATA = {
             { name: 'TypeScript', icon: 'typescript-icon.svg' },
             { name: 'TailwindCSS', icon: 'tailwindcss-icon.svg' },
             { name: 'TanStack Query', icon: 'tanstack-icon.svg' },
+            { name: 'TanStack Router & Table', icon: 'tanstack-icon.svg' },
+            { name: 'Shadcn UI', icon: 'shadcn-icon.svg' },
+            { name: 'Leaflet/MapLibre', icon: 'leaflet-icon.svg' },
+            { name: 'React Hook Form', icon: 'react-hook-form-icon.svg' },
+            { name: 'Zod', icon: 'zod-icon.svg' },
+            { name: 'Redux', icon: 'redux-icon.svg' },
+            { name: 'Playwright', icon: 'playwright-icon.svg' },
+            { name: 'Vitest', icon: 'vitest-icon.svg' },
           ],
         },
       ],
@@ -173,53 +208,30 @@ export const DATA = {
       logoUrl: '/vietdev-logo.jpg',
       positions: [
         {
-          title: 'Fresher - Frontend Developer',
+          title: 'Fullstack Developer',
           badges: ['Frontend Lead', 'Full Stack'],
-          start: 'Jan 2024',
-          end: 'June 2025',
+          start: 'Sep 2024',
+          end: 'Jun 2025',
           isExpanded: true,
           description: [
-            'Leading frontend development for POD Wedding platform using Next.js SSR for optimal performance and SEO',
-            'Implementing modern UI components with ShadcnUI and TailwindCSS for responsive design',
-            'Building efficient data fetching patterns with TanStack Query',
-            'Developing secure authentication system with JWT tokens and Django Rest Framework',
-            'Creating scalable e-commerce solutions with PostgreSQL database integration',
-            'Implementing CI/CD workflows with GitHub Actions for automated testing and deployment',
-            'Building reusable UI components and custom hooks for consistent user experience',
+            'Led frontend development for a story community platform using Next.js SSR to optimize performance and SEO',
+            'Built and maintained a story community forum with over 10,000 users, supporting reading, community interaction and content sharing',
+            'Built responsive interfaces with Shadcn UI and Tailwind CSS, with efficient data fetching and server-state management using TanStack Query',
+            'Developed secure authentication and authorization with JWT and Django REST Framework',
+            'Set up CI/CD pipelines with GitHub Actions for automated testing and deployment',
+            'Created reusable UI components and custom React hooks to keep the interface consistent',
           ],
           technologies: [
             { name: 'Next.js', icon: 'nextjs-icon.svg' },
-            { name: 'TypeScript', icon: 'typescript-icon.svg' },
             { name: 'React', icon: 'react-icon.svg' },
+            { name: 'TypeScript', icon: 'typescript-icon.svg' },
+            { name: 'Shadcn UI', icon: 'shadcn-icon.svg' },
             { name: 'TailwindCSS', icon: 'tailwindcss-icon.svg' },
             { name: 'TanStack Query', icon: 'tanstack-icon.svg' },
             { name: 'Django', icon: 'django-icon.svg' },
             { name: 'PostgreSQL', icon: 'postgresql-icon.svg' },
+            { name: 'Python', icon: 'python-icon.svg' },
             { name: 'JWT Authentication', icon: 'auth-icon.svg' },
-          ],
-        },
-        {
-          title: 'Intern - Frontend Developer',
-          badges: ['Frontend Lead', 'Social Media'],
-          start: 'Sep 2023',
-          end: 'Jan 2024',
-          isExpanded: false,
-          description: [
-            'Developed a social media platform focused on storytelling and novel sharing',
-            'Built with Next.js SSR for optimal SEO performance and initial page load',
-            'Implemented consistent design system with ShadcnUI and custom components',
-            'Created efficient data fetching strategies with TanStack Query for caching and prefetching',
-            'Integrated real-time features using WebSockets for notifications and messages',
-            'Developed user engagement systems including liking, sharing, and commenting functionality',
-            'Implemented responsive layouts for mobile and desktop experiences',
-          ],
-          technologies: [
-            { name: 'Next.js', icon: 'nextjs-icon.svg' },
-            { name: 'TypeScript', icon: 'typescript-icon.svg' },
-            { name: 'React', icon: 'react-icon.svg' },
-            { name: 'TailwindCSS', icon: 'tailwindcss-icon.svg' },
-            { name: 'TanStack Query', icon: 'tanstack-icon.svg' },
-            { name: 'Vercel', icon: 'vercel-icon.svg' },
           ],
         },
       ],
@@ -262,10 +274,10 @@ export const DATA = {
     {
       school: 'FPT College',
       href: 'https://fpt.edu.vn',
-      degree: 'Software Engineering',
+      degree: 'B.S. Web Development',
       logoUrl: '/fpt-logo.png',
-      start: '2023',
-      end: '2024',
+      start: 'Aug 2022',
+      end: 'May 2024',
       isExpanded: true,
       description: [
         'Studying modern software development methodologies and practices',
@@ -335,7 +347,7 @@ export const DATA = {
   projects: [
     {
       title: 'Tien Dat Portfolio',
-      href: 'https://tiendatdev.me/',
+      href: 'https://tiendat.work/',
       logoUrl: '/project-logo.png',
       positions: [
         {
@@ -373,7 +385,7 @@ export const DATA = {
       links: [
         {
           type: 'Website',
-          href: 'https://tiendatdev.me/',
+          href: 'https://tiendat.work/',
           icon: <Icons.Globe className='size-3' />,
         },
         {
@@ -392,8 +404,8 @@ export const DATA = {
         {
           title: 'Frontend Developer',
           badges: ['Active'],
-          start: 'Mar 2024',
-          end: 'Jun 2024',
+          start: 'Feb 2024',
+          end: 'Oct 2024',
           isExpanded: true,
           description: [
             'Developed a comprehensive online booking system for Diamond Medical Clinic to streamline appointment scheduling process',
@@ -595,6 +607,33 @@ export const DATA = {
   ],
   awards: [
     {
+      title: 'Consolation Prize & Most Favorite Project Award - HUIT Startup 2026',
+      dates: 'October 18, 2026',
+      location: 'Ho Chi Minh City University of Industry and Trade (HUIT)',
+      description:
+        'AGRITA, the agricultural cooperative SaaS platform built at TA Consultant, won the Consolation Prize and the Most Favorite Project Award in the Business Track of the 7th HUIT Startup competition (city-level), which drew 244 projects and over 1,000 contestants, with 37 finalists.',
+      image: '/huit-startup-2026.jpg',
+      images: ['/huit-startup-2026.jpg', '/huit-startup-2026-stage.jpg'],
+      logo: '/huit-startup-logo.png',
+      links: [
+        {
+          title: 'Diễn đàn Doanh nghiệp',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://diendandoanhnghiep.vn/huit-startup-2026-ket-noi-nguon-luc-mo-duong-ra-thi-truong-10186204.html',
+        },
+        {
+          title: 'Công Thương',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://congthuong.vn/tim-ra-quan-quan-cuoc-thi-huit-startup-lan-thu-vii-nam-2026-477503.html',
+        },
+        {
+          title: 'Giáo dục Thời đại',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://giaoducthoidai.vn/244-du-an-tranh-tai-tai-huit-startup-2026-tong-gia-tri-ho-tro-5-ty-dong-post796532.html',
+        },
+      ],
+    },
+    {
       title: 'Gemini Certified Educator',
       dates: 'January 30, 2026',
       location: 'Google for Education',
@@ -642,10 +681,10 @@ export const DATA = {
     },
     {
       title: '3rd Place in JS Talent Competition',
-      dates: 'March, 2024',
+      dates: '2023',
       location: 'FPT College HCM',
       description:
-        'Won 3rd place in the 2024 JS Talent competition organized by FPT College, demonstrating advanced front-end development skills and creating innovative web applications.',
+        'Won 3rd place in the 2023 JS Talent competition organized by FPT College, demonstrating advanced front-end development skills and creating innovative web applications.',
       image: '/awards/js-talent.jpg',
       links: [],
     },
@@ -680,6 +719,15 @@ export const DATA = {
   footer: {
     logo: '/logo.svg',
     brandName: 'Tien Dat',
+    tagline: 'Open to full-stack roles',
+    inspiredBy: [
+      { name: 'shadcn/ui', url: 'https://ui.shadcn.com' },
+      { name: 'Magic UI', url: 'https://magicui.design' },
+      { name: 'Kibo UI', url: 'https://www.kibo-ui.com' },
+      { name: 'Fumadocs', url: 'https://fumadocs.dev' },
+      { name: 'Tailwind CSS', url: 'https://tailwindcss.com' },
+      { name: 'Vercel', url: 'https://vercel.com' },
+    ],
     socialLinks: [
       {
         name: 'GitHub',
@@ -695,7 +743,7 @@ export const DATA = {
     mainLinks: [
       { name: 'Home', href: '/' },
       { name: 'Projects', href: '#projects' },
-      { name: 'Experience', href: '#experience' },
+      { name: 'Experience', href: '#work' },
       { name: 'Education', href: '#education' },
       { name: 'Awards', href: '#awards' },
     ],
@@ -706,8 +754,6 @@ export const DATA = {
     copyright: `© ${new Date().getFullYear()} Tien Dat. All rights reserved.`,
   },
 } as const
-export const LOGO_BASE64 =
-  'data:image/svg+xml;base64,CiAgICAgIDxzdmcgZGF0YS1sb2dvPSJsb2dvIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NCAyNyI+CiAgICAgICAgPGcgaWQ9ImxvZ29ncmFtIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLCAxMy41KSByb3RhdGUoMCkiPjwvZz4KICAgICAgICA8ZyBpZD0ibG9nb3R5cGUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAsIDEpIj48cGF0aCBmaWxsPSIjMTExMTExIiBkPSJNMTIuMjkgNi44N0wxMi4yOSAyNC40NFExMi4yOSAyNS4xNCA4LjgyIDI1LjE0UTUuMzYgMjUuMTQgNS4zNiAyNC40NEw1LjM2IDI0LjQ0TDUuMzYgNi44N0wxLjE2IDYuODdRMC41NiA2Ljg3IDAuMzIgNS4yNkwwLjMyIDUuMjZRMC4yMSA0LjQ5IDAuMjEgMy42OFEwLjIxIDIuODggMC4zMiAyLjExTDAuMzIgMi4xMVEwLjU2IDAuNTAgMS4xNiAwLjUwTDEuMTYgMC41MEwxNi4zOCAwLjUwUTE2Ljk4IDAuNTAgMTcuMjIgMi4xMUwxNy4yMiAyLjExUTE3LjMzIDIuODggMTcuMzMgMy42OFExNy4zMyA0LjQ5IDE3LjIyIDUuMjZMMTcuMjIgNS4yNlExNi45OCA2Ljg3IDE2LjM4IDYuODdMMTYuMzggNi44N0wxMi4yOSA2Ljg3Wk0yMy44NyAyMy4zOUwyMy44NyAyMy4zOUwyMy44NyAyLjM5UTIzLjg3IDEuNTEgMjQuMzEgMS4wMVEyNC43NSAwLjUwIDI1LjQ1IDAuNTBMMjUuNDUgMC41MEwzMS4yOSAwLjUwUTM2Ljg2IDAuNTAgMzkuNzQgMy4zMFE0Mi42MyA2LjEwIDQyLjYzIDEyLjEyTDQyLjYzIDEyLjEyUTQyLjYzIDI1IDMxLjY0IDI1TDMxLjY0IDI1TDI1LjY2IDI1UTIzLjg3IDI1IDIzLjg3IDIzLjM5Wk0zMC45NCA3LjE1TDMwLjU5IDcuMTVMMzAuNTkgMTcuNjFRMzAuNTkgMTguMzUgMzAuNzAgMTguNTRRMzAuODAgMTguNzMgMzEuMzMgMTguNzNMMzEuMzMgMTguNzNRMzMuMjUgMTguNzMgMzQuMjUgMTcuMzBRMzUuMjUgMTUuODYgMzUuMjUgMTIuNTJRMzUuMjUgOS4xOCAzNC4yMSA4LjE2UTMzLjE4IDcuMTUgMzAuOTQgNy4xNUwzMC45NCA3LjE1WiIvPjwvZz4KICAgICAgICAKICAgICAgPC9zdmc+CiAgICA='
 export const META_THEME_COLORS = {
   light: '#ffffff',
   dark: '#09090b',

@@ -13,9 +13,9 @@ export const USER = {
   address: 'Ho Chi Minh City, Viet Nam',
   phoneNumber: 'NANA', // Not provided
   email: 'NANA', // Not provided
-  website: 'https://tiendatdev.me',
+  website: 'https://tiendat.work',
   otherWebsites: [
-    'https://tiendatdev.me',
+    'https://tiendat.work',
   ],
   dateOfBirth: '2004-04-22',
   jobTitle: 'Software Developer & UI/UX Designer',
@@ -23,7 +23,7 @@ export const USER = {
     {
       title: 'Frontend Developer',
       company: 'Freelancer',
-      website: 'https://tiendatdev.me',
+      website: 'https://tiendat.work',
     }
   ],
   about: `

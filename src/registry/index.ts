@@ -7,7 +7,7 @@ import { lib } from './registry-lib'
 
 const registry = {
   name: 'ttdat',
-  homepage: 'https://tiendatdev.me',
+  homepage: 'https://tiendat.work',
   items: [
     ...lib,
     ...hook,
