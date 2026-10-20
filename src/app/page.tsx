@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { AwardCard } from '@/components/AwardCard'
 import BlurFadeText from '@/components/magicui/blur-fade-text'
 import { ProjectCard } from '@/components/project-card'
@@ -14,6 +15,7 @@ import { TextLoop } from '@/components/ui/text-loop'
 import { Icons } from '@/components/icons'
 import { BLUR_FADE_DELAY } from '@/data/config'
 import { GitHubContributions } from './section/github-contributions'
+import { InsightsSection } from './section/insights-section'
 import { Status, StatusIndicator, StatusLabel } from '@/components/kibo-ui/status'
 import { BackgroundHero } from '@/components/landing/background-hero'
 
@@ -40,12 +42,29 @@ export default function Page () {
         <div className='mx-auto w-full space-y-8 border-x'>
           <div className='flex items-stretch justify-center min-h-[120px]'>
             <div className=''>
-              <Avatar className='size-32 text rounded-full m-1 ring-1 ring-border ring-offset-2 ring-offset-background select-none sm:size-40'>
+              <Avatar className='group size-32 text overflow-hidden rounded-full m-1 ring-1 ring-border ring-offset-2 ring-offset-background select-none sm:size-40'>
                 <AvatarImage
                   alt={DATA.name}
                   src={DATA.avatarUrl}
-                  className='object-cover object-top'
+                  className='scale-110 object-cover object-top transition-transform duration-700 ease-out group-hover:scale-100'
                 />
+                {/* Line art sits on top and fades out on hover to reveal the photo. */}
+                {[
+                  { src: DATA.avatarLineArtUrl, className: 'bg-white dark:hidden' },
+                  { src: DATA.avatarLineArtDarkUrl, className: 'hidden bg-background dark:block' },
+                ].map(({ src, className }) => (
+                  <Image
+                    key={src}
+                    alt=''
+                    aria-hidden='true'
+                    src={src}
+                    width={160}
+                    height={160}
+                    unoptimized
+                    priority
+                    className={`absolute inset-0 size-full rounded-full object-cover transition-[opacity,scale,filter] duration-500 ease-out group-hover:scale-105 group-hover:opacity-0 group-hover:blur-[2px] ${className}`}
+                  />
+                ))}
                 <AvatarFallback>{DATA.initials}</AvatarFallback>
               </Avatar>
             </div>
@@ -124,6 +143,7 @@ export default function Page () {
 
       </section>
       <GitHubContributions />
+      <InsightsSection />
 
       <section
         id='work'
@@ -241,6 +261,8 @@ export default function Page () {
                   location={award.location}
                   dates={award.dates}
                   image={award.image}
+                  images={'images' in award ? award.images : undefined}
+                  logo={'logo' in award ? award.logo : undefined}
                   links={award.links}
                 />
               </BlurFade>

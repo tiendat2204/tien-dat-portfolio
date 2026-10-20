@@ -8,7 +8,7 @@ import { Footer } from '@/components/footer'
 import { Providers } from '@/components/Providers'
 import { Header } from '@/components/Header'
 import type { WebSite, WithContext } from 'schema-dts'
-import { SITE_INFO } from '@/data/config'
+import { SITE_INFO, UMAMI_WEBSITE_ID } from '@/data/config'
 import { buildCanonicalUrl, buildOgImageUrl } from '@/lib/seo/metadata'
 import Script from 'next/script'
 import Section from '@/components/landing/section'
@@ -154,31 +154,20 @@ export default function RootLayout ({
                 <Header />
 
                 {children}
-                <Footer
-                  logo={DATA.footer.logo}
-                  brandName={DATA.footer.brandName}
-                  socialLinks={DATA.footer.socialLinks.map(link => ({
-                    icon: link.icon,
-                    href: link.url,
-                    label: link.name
-                  }))}
-                  mainLinks={DATA.footer.mainLinks.map(link => ({
-                    href: link.href,
-                    label: link.name
-                  }))}
-                  legalLinks={DATA.footer.legalLinks.map(link => ({
-                    href: link.href,
-                    label: link.name
-                  }))}
-                  copyright={{
-                    text: DATA.footer.copyright,
-                  }}
-                />
+                <Footer />
               </Providers>
             </TooltipProvider>
 
           </Section>
         </TransitionProvider>
+        {UMAMI_WEBSITE_ID && (
+          <Script
+            src='https://cloud.umami.is/script.js'
+            data-website-id={UMAMI_WEBSITE_ID}
+            data-domains={new URL(SITE_INFO.url).host}
+            strategy='afterInteractive'
+          />
+        )}
       </body>
     </html>
   )
