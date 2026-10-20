@@ -3,7 +3,7 @@ import { GitHub } from '@/components/icons/github-icon'
 import { Facebook } from '@/components/icons/facebook-icon'
 import { LinkedIn } from '@/components/icons/linked-icon'
 import { LinkPreview } from '@/components/ui/link-preview'
-import { NotebookIcon } from 'lucide-react'
+import { CpuIcon, NotebookIcon } from 'lucide-react'
 import { Zalo } from '@/components/icons/zalo-icon'
 
 export const DATA = {
@@ -23,97 +23,84 @@ export const DATA = {
   avatarLineArtDarkUrl: '/me-lineart-dark.svg?v=1',
   skills: {
     mainStack: {
-      framework: {
-        name: 'Next.js',
-        icon: 'nextjs-icon.svg',
-      },
-      framework2: {
-        name: 'React',
-        icon: 'react-icon.svg',
-      },
-      styling: {
-        name: 'TailwindCSS',
-        icon: 'tailwindcss-icon.svg',
-      },
-      database: {
-        name: 'Postgres',
-        icon: 'postgresql-icon.svg',
-      },
-      deployment: {
-        name: 'Nginx',
-        icon: 'nginx-icon.svg',
-      },
-      orm: {
-        name: 'Django',
-        icon: 'django-icon.svg',
-      },
-      databaseTool: {
-        name: 'SQL',
-        icon: 'sqlite-icon.svg',
-      },
-      ide: {
-        name: 'Vscode',
-        icon: 'vscode-icon.svg',
-      },
+      framework: { name: 'Next.js', icon: 'skills/nextjs.svg', iconDark: 'skills/nextjs-dark.svg' },
+      framework2: { name: 'React', icon: 'skills/react.svg', iconDark: 'skills/react-dark.svg' },
+      styling: { name: 'Tailwind', icon: 'skills/tailwindcss.svg' },
+      database: { name: 'PostgreSQL', icon: 'skills/postgresql.svg' },
+      deployment: { name: 'Nginx', icon: 'skills/nginx.svg' },
+      orm: { name: 'Django', icon: 'skills/django.svg' },
+      databaseTool: { name: 'SQL', icon: 'skills/sqlite.svg' },
+      ide: { name: 'VS Code', icon: 'skills/vscode.svg' },
     },
+    // Grouped like the CV. Icons live in /public/icons; `iconDark` is used in dark mode when set.
     languages: [
-      { name: 'JavaScript', icon: 'javascript-icon.svg' },
-      { name: 'TypeScript', icon: 'typescript-icon.svg' },
-      { name: 'Python', icon: 'python-icon.svg' },
-      { name: 'HTML', icon: 'html-icon.svg' },
-      { name: 'CSS', icon: 'css-icon.svg' },
-      { name: 'Node.js', icon: 'nodejs-icon.svg' },
-      { name: 'Postgres', icon: 'postgresql-icon.svg' },
-      { name: 'MongoDB', icon: 'mongodb-icon.svg' },
-      { name: 'MySQL', icon: 'mysql-icon.svg' },
-      { name: 'SQLite', icon: 'sqlite-icon.svg' },
-      { name: 'SVG Animation', icon: 'svg-icon.svg' },
+      { name: 'TypeScript', icon: 'skills/typescript.svg' },
+      { name: 'JavaScript', icon: 'skills/javascript.svg' },
+      { name: 'Python', icon: 'skills/python.svg' },
+      { name: 'HTML', icon: 'skills/html.svg' },
+      { name: 'CSS', icon: 'skills/css.svg' },
     ],
-    frameworks: [
-      { name: 'Django', icon: 'django-icon.svg' },
-      { name: 'React', icon: 'react-icon.svg' },
-      { name: 'Next.js', icon: 'nextjs-icon.svg' },
-      { name: 'ExpressJS', icon: 'expressjs-icon.svg' },
-      { name: 'TailwindCSS', icon: 'tailwindcss-icon.svg' },
-      { name: 'TanStack Query', icon: 'tanstack-icon.svg' },
-      { name: 'TanStack Router & Table', icon: 'tanstack-icon.svg' },
-      { name: 'NestJS', icon: 'nestjs-icon.svg' },
-      { name: 'Redux', icon: 'redux-icon.svg' },
+    frontend: [
+      { name: 'React', icon: 'skills/react.svg', iconDark: 'skills/react-dark.svg' },
+      { name: 'Next.js', icon: 'skills/nextjs.svg', iconDark: 'skills/nextjs-dark.svg' },
+      { name: 'TanStack Router · Query · Table', icon: 'skills/tanstack.svg', iconDark: 'skills/tanstack-dark.svg' },
+      { name: 'Zustand' },
+      { name: 'Redux', icon: 'skills/redux.svg' },
+      { name: 'Tailwind CSS', icon: 'skills/tailwindcss.svg' },
+      { name: 'shadcn/ui', icon: 'skills/shadcn.svg', iconDark: 'skills/shadcn-dark.svg' },
       { name: 'React Hook Form', icon: 'react-hook-form-icon.svg' },
-      { name: 'Zod', icon: 'zod-icon.svg' },
-      { name: 'Leaflet/MapLibre', icon: 'leaflet-icon.svg' },
-      { name: 'Prisma', icon: 'prisma-icon.svg' },
-      { name: 'Drizzle', icon: 'drizzle-icon.svg' },
-      { name: 'Vite', icon: 'vite-icon.svg' },
-      { name: 'Motion.dev', icon: 'motiondev-icon.svg' },
-      { name: 'BetterAuth', icon: 'betterauth-icon.svg' },
+      { name: 'Zod', icon: 'skills/zod.svg' },
+      { name: 'Vite', icon: 'skills/vite.svg' },
+      { name: 'Motion', icon: 'skills/motion.svg', iconDark: 'skills/motion-dark.svg' },
+      { name: 'Leaflet / MapLibre', icon: 'leaflet-icon.svg' },
+    ],
+    backend: [
+      { name: 'Node.js', icon: 'skills/nodejs.svg' },
+      { name: 'NestJS', icon: 'skills/nestjs.svg' },
+      { name: 'Express', icon: 'skills/express.svg', iconDark: 'skills/express-dark.svg' },
+      { name: 'Django REST Framework', icon: 'skills/django.svg' },
+      { name: 'Prisma', icon: 'skills/prisma.svg', iconDark: 'skills/prisma-dark.svg' },
+      { name: 'Drizzle', icon: 'skills/drizzle.svg', iconDark: 'skills/drizzle-dark.svg' },
+      { name: 'Better Auth', icon: 'skills/better-auth.svg', iconDark: 'skills/better-auth-dark.svg' },
+      { name: 'Cloudinary', icon: 'skills/cloudinary.svg' },
+    ],
+    database: [
+      { name: 'PostgreSQL', icon: 'skills/postgresql.svg' },
+      { name: 'MySQL', icon: 'skills/mysql.svg', iconDark: 'skills/mysql-dark.svg' },
+      { name: 'MongoDB', icon: 'skills/mongodb.svg', iconDark: 'skills/mongodb-dark.svg' },
+      { name: 'SQLite', icon: 'skills/sqlite.svg' },
+    ],
+    testingDevOps: [
+      { name: 'Playwright', icon: 'skills/playwright.svg' },
+      { name: 'Vitest', icon: 'skills/vitest.svg' },
+      { name: 'axe-core' },
+      { name: 'Docker', icon: 'skills/docker.svg' },
+      { name: 'GitHub Actions', icon: 'skills/github.svg', iconDark: 'skills/github-dark.svg' },
+      { name: 'Git', icon: 'skills/git.svg' },
+      { name: 'Nginx', icon: 'skills/nginx.svg' },
+    ],
+    aiTools: [
+      { name: 'Claude Code', icon: 'skills/claude.svg' },
+      { name: 'Codex', icon: 'skills/openai.svg', iconDark: 'skills/openai-dark.svg' },
+      { name: 'GitHub Copilot', icon: 'skills/copilot.svg', iconDark: 'skills/copilot-dark.svg' },
     ],
     tools: [
-      { name: 'Nginx', icon: 'nginx-icon.svg' },
-      { name: 'Playwright', icon: 'playwright-icon.svg' },
-      { name: 'Vitest', icon: 'vitest-icon.svg' },
+      { name: 'WebStorm', icon: 'skills/webstorm.svg' },
+      { name: 'VS Code', icon: 'skills/vscode.svg' },
+      { name: 'Postman', icon: 'skills/postman.svg' },
+      { name: 'Figma', icon: 'skills/figma.svg' },
+      { name: 'Photoshop', icon: 'skills/photoshop.svg' },
     ],
     platforms: [
-      { name: 'GitHub', icon: 'github-icon.svg' },
-      { name: 'Vercel', icon: 'vercel-icon.svg' },
-    ],
-    softwares: [
-      { name: 'VSCode', icon: 'vscode-icon.svg' },
-      { name: 'Python', icon: 'python-icon.svg' },
-      { name: 'Postman', icon: 'postman-icon.svg' },
-      { name: 'Figma', icon: 'figma-icon.svg' },
-      { name: 'Photoshop', icon: 'photoshop-icon.svg' },
-      { name: 'Claude Code', icon: 'claude-icon.svg' },
-    ],
-    devOps: [
-      { name: 'GitHub Actions (CI/CD)', icon: 'github-icon.svg' },
-      { name: 'Docker (basic)', icon: 'docker-icon.svg' },
-      { name: 'Authentication (OAuth, JWT)', icon: 'auth-icon.svg' },
+      { name: 'GitHub', icon: 'skills/github.svg', iconDark: 'skills/github-dark.svg' },
+      { name: 'Netlify', icon: 'skills/netlify.svg' },
+      { name: 'Vercel', icon: 'skills/vercel.svg', iconDark: 'skills/vercel-dark.svg' },
     ],
   },
   navbar: [
     // { href: '/', icon: HomeIcon, label: 'Home' },
     { href: '/blog', icon: NotebookIcon, label: 'Blog' },
+    { href: '/uses', icon: CpuIcon, label: 'Uses' },
   ],
   contact: {
     email: 'tiendat220404@gmail.com',
@@ -742,10 +729,11 @@ export const DATA = {
     ],
     mainLinks: [
       { name: 'Home', href: '/' },
-      { name: 'Projects', href: '#projects' },
-      { name: 'Experience', href: '#work' },
-      { name: 'Education', href: '#education' },
-      { name: 'Awards', href: '#awards' },
+      { name: 'Projects', href: '/#projects' },
+      { name: 'Experience', href: '/#work' },
+      { name: 'Education', href: '/#education' },
+      { name: 'Awards', href: '/#awards' },
+      { name: 'Uses', href: '/uses' },
     ],
     legalLinks: [
       { name: 'Privacy Policy', href: '/privacy' },

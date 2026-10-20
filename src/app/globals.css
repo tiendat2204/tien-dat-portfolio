@@ -402,3 +402,250 @@
     display: none;
   }
 }
+/* Hero voxels: drop in letter by letter, lift on hover. */
+@keyframes voxel-drop {
+  from {
+    transform: translateY(-28px);
+    opacity: 0;
+  }
+}
+.voxel {
+  /* `backwards` only holds the start frame, so hover can move the cube afterwards. */
+  animation: voxel-drop 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  transition: transform 0.25s ease-out;
+}
+.voxel:hover {
+  transform: translateY(-5px);
+}
+
+/* Avatar: line art prints in top to bottom behind a scanline. */
+@keyframes avatar-reveal {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes avatar-scan {
+  0% {
+    top: 0;
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+.avatar-reveal {
+  animation: avatar-reveal 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+}
+.avatar-scanline {
+  animation: avatar-scan 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+}
+
+/* Theme switch: the new theme grows as a circle from the toggle (see mode-toggle.tsx). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voxel,
+  .avatar-reveal,
+  .avatar-scanline {
+    animation: none;
+    transition: none;
+  }
+  .avatar-scanline {
+    display: none;
+  }
+}
+
+/* Scroll reveal (see ui-effects.tsx): sections fade up, headings type out. */
+@keyframes type-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+section[data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+section[data-reveal][data-revealed] {
+  opacity: 1;
+  transform: none;
+}
+section[data-reveal] h2.font-doto {
+  clip-path: inset(0 100% 0 0);
+}
+section[data-reveal][data-revealed] h2.font-doto {
+  animation: type-in calc(var(--chars, 8) * 55ms) steps(var(--chars, 8), end) 0.15s forwards;
+}
+
+/* Pixel cursor (desktop only, see ui-effects.tsx). */
+.pixel-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: difference;
+  transition: opacity 0.2s;
+}
+.pixel-cursor[data-visible] {
+  opacity: 1;
+}
+.pixel-cursor span {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  translate: 10px 12px;
+  background: #fff;
+  transition: width 0.2s, height 0.2s, translate 0.2s, background-color 0.2s;
+}
+.pixel-cursor[data-active="true"] span {
+  /* Frame the target with pixel corner brackets. */
+  width: 30px;
+  height: 30px;
+  translate: -15px -15px;
+  background:
+    linear-gradient(#fff 0 0) top left / 8px 2px,
+    linear-gradient(#fff 0 0) top left / 2px 8px,
+    linear-gradient(#fff 0 0) top right / 8px 2px,
+    linear-gradient(#fff 0 0) top right / 2px 8px,
+    linear-gradient(#fff 0 0) bottom left / 8px 2px,
+    linear-gradient(#fff 0 0) bottom left / 2px 8px,
+    linear-gradient(#fff 0 0) bottom right / 8px 2px,
+    linear-gradient(#fff 0 0) bottom right / 2px 8px;
+  background-repeat: no-repeat;
+}
+.pixel-cursor[data-pressed] span {
+  scale: 0.8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  section[data-reveal],
+  section[data-reveal] h2.font-doto {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+    animation: none;
+  }
+}
+@media (pointer: coarse) {
+  .pixel-cursor {
+    display: none;
+  }
+}
+
+/* Mobile menu rows slide in one after another (index in --i). */
+@keyframes menu-row-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+.menu-row {
+  animation: menu-row-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 35ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu-row {
+    animation: none;
+  }
+}
+
+/* Konami easter egg: voxels fly apart and snap back (see keyboard-shortcuts.tsx). */
+@keyframes voxel-burst {
+  0% {
+    transform: none;
+  }
+  35%,
+  55% {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
+    opacity: 0.6;
+  }
+  100% {
+    transform: none;
+  }
+}
+.voxel-burst .voxel {
+  animation: voxel-burst 1.6s cubic-bezier(0.5, 0, 0.2, 1) both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Shared by the /uses workflow explorer: dashes travel along an edge. */
+@keyframes workflow-flow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+/* /uses workflow explorer (workflow-explorer.tsx): steps appear, edges draw in, then flow. */
+@keyframes wf-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes wf-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes wf-show {
+  to {
+    opacity: 1;
+  }
+}
+.wf-node {
+  animation: wf-in 0.4s ease-out backwards;
+  animation-delay: var(--d, 0ms);
+}
+.wf-edge {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  /* Once the flowing dashes take over (--done), the solid line fades back. */
+  animation:
+    wf-draw 0.45s ease-out forwards var(--d, 0ms),
+    wf-dim 0.3s ease-out forwards var(--done, 99s);
+}
+@keyframes wf-dim {
+  to {
+    opacity: 0.2;
+  }
+}
+.wf-flow {
+  opacity: 0;
+  stroke-dasharray: 4 6;
+  animation:
+    wf-show 0.3s ease-out forwards var(--d, 0ms),
+    workflow-flow 1.2s linear infinite var(--d, 0ms);
+}
+.wf-flow-fast {
+  animation:
+    wf-show 0.3s ease-out forwards var(--d, 0ms),
+    workflow-flow 0.8s linear infinite var(--d, 0ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .wf-node,
+  .wf-edge,
+  .wf-flow,
+  .wf-flow-fast {
+    animation: none;
+  }
+  .wf-edge {
+    stroke-dashoffset: 0;
+  }
+}

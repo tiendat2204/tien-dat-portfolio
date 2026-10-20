@@ -120,7 +120,7 @@ export function AwardCard ({
                   key={idx}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Badge key={idx} title={link.title} className='flex gap-2'>
+                  <Badge key={idx} title={link.title} className='flex min-h-8 gap-2 px-2.5 sm:min-h-0'>
                     {link.title}
                     <ExternalLinkIcon className='size-3' />
                   </Badge>

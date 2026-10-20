@@ -15,7 +15,7 @@ const WorkSection = () => {
             key={`header-${company.company}`}
           >
             <div className='company-header py-4 border-b border-muted '>
-              <div className='absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2'>
+              <div className='absolute left-1.5 top-1/2 -translate-y-1/2 sm:left-0 sm:-translate-x-1/2'>
                 <div className='relative'>
                   <div className='w-3 h-3 bg-primary rounded-full relative z-10' />
                   <div className='absolute inset-0 w-3 h-3 bg-primary/30 rounded-full animate-ping' />

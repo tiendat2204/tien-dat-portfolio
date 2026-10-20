@@ -11,6 +11,8 @@ import { Icon } from '@/components/Icon'
 import { SkillBadge } from '@/app/section/skills-section'
 import { BlurFade } from '@/components/magicui/blur-fade'
 
+const DESCRIPTION_LIMIT = 6
+
 const BLUR_FADE_DELAY = 0.1
 
 interface TechnologyType {
@@ -44,6 +46,11 @@ export const ResumeCard = ({
   isExpanded: initialIsExpanded = false,
 }: ResumeCardProps) => {
   const [isExpanded, setIsExpanded] = React.useState(initialIsExpanded)
+  const [showAll, setShowAll] = React.useState(false)
+  const items = Array.isArray(description) ? description : []
+  // Long lists start collapsed so a single role doesn't fill a phone screen.
+  const visibleItems = showAll ? items : items.slice(0, DESCRIPTION_LIMIT)
+  const hiddenCount = items.length - visibleItems.length
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     setIsExpanded(!isExpanded)
@@ -81,7 +88,7 @@ export const ResumeCard = ({
                     {badges.map((badge, index) => (
                       <Badge
                         variant='secondary'
-                        className='align-middle text-[10px] sm:text-xs px-1 sm:px-2'
+                        className='align-middle text-[11px] sm:text-xs px-1.5 sm:px-2'
                         key={index}
                       >
                         {badge}
@@ -91,11 +98,11 @@ export const ResumeCard = ({
                 )}
               </div>
 
-              <div className='text-[10px] sm:text-xs tabular-nums text-muted-foreground text-left sm:text-right mt-1 sm:mt-0'>
+              <div className='text-[11px] sm:text-xs tabular-nums text-muted-foreground text-left sm:text-right mt-1 sm:mt-0'>
                 {period}
               </div>
             </div>
-            {subtitle && <div className='font-sans text-[10px] sm:text-xs mt-1'>{subtitle}</div>}
+            {subtitle && <div className='font-sans text-[11px] sm:text-xs mt-1'>{subtitle}</div>}
           </CardHeader>
           {description && (
             <motion.div
@@ -117,13 +124,24 @@ export const ResumeCard = ({
                   ease: [0.16, 1, 0.3, 1],
                 }}
               >
-                {description && Array.isArray(description) &&
-                                    description.map((item, index) => (
-                                      <li key={index} className='text-muted-foreground'>
-                                        {typeof item === 'string' ? item : item}
-                                      </li>
-                                    ))}
+                {visibleItems.map((item, index) => (
+                  <li key={index} className='text-muted-foreground'>
+                    {item}
+                  </li>
+                ))}
               </motion.ul>
+              {items.length > DESCRIPTION_LIMIT && (
+                <button
+                  type='button'
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setShowAll(!showAll)
+                  }}
+                  className='mt-2 min-h-8 pl-3 text-xs text-foreground underline decoration-dotted underline-offset-4 hover:decoration-solid sm:pl-4'
+                >
+                  {showAll ? 'Show less' : `Show ${hiddenCount} more`}
+                </button>
+              )}
 
               {technologies && technologies.length > 0 && (
                 <div className='mt-2 sm:mt-4 flex flex-wrap gap-1 sm:gap-2'>

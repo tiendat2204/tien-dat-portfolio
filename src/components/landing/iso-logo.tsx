@@ -42,7 +42,17 @@ function cubeFaces ({ x, y }: Voxel) {
 }
 
 // Back to front so nearer cubes cover farther ones.
-const FACES = [...VOXELS].sort((a, b) => a.x + a.y - (b.x + b.y)).map(cubeFaces)
+// Each cube also gets a drop-in delay that sweeps left to right, like the letters being typed.
+const FACES = [...VOXELS]
+  .sort((a, b) => a.x + a.y - (b.x + b.y))
+  .map((v, i) => ({
+    ...cubeFaces(v),
+    delay: Math.round(v.x * 45 + v.y * 15),
+    // Fixed pseudo-random burst direction (Konami easter egg), same on server and client.
+    dx: Math.round(Math.sin(i * 12.9898) * 140),
+    dy: Math.round(Math.cos(i * 78.233) * 90 - 40),
+    rot: Math.round(Math.sin(i * 3.7) * 180),
+  }))
 
 const corners = VOXELS.flatMap(({ x, y }) => [
   project(x, y + CUBE, 0),
@@ -67,7 +77,11 @@ export function IsoLogo ({ className }: { className?: string }) {
       </defs>
       <g strokeWidth='0.75' strokeLinejoin='round' className='stroke-neutral-700 dark:stroke-neutral-400'>
         {FACES.map((face, i) => (
-          <g key={i}>
+          <g
+            key={i}
+            className='voxel'
+            style={{ animationDelay: `${face.delay}ms`, '--dx': `${face.dx}px`, '--dy': `${face.dy}px`, '--rot': `${face.rot}deg` } as React.CSSProperties}
+          >
             <polygon points={face.right} className='fill-neutral-200 dark:fill-neutral-800' />
             <polygon points={face.front} className='fill-neutral-100 dark:fill-neutral-900' />
             <polygon points={face.top} className='fill-background' />
@@ -81,7 +95,7 @@ export function IsoLogo ({ className }: { className?: string }) {
 
 export function IsoHero () {
   return (
-    <div className='absolute inset-0 overflow-hidden'>
+    <div className='absolute inset-0 touch-manipulation overflow-hidden'>
       <div className='absolute inset-0 bg-[radial-gradient(var(--color-neutral-300)_1px,transparent_1px)] dark:bg-[radial-gradient(var(--color-neutral-700)_1px,transparent_1px)] [background-size:12px_12px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]' />
       <div className='absolute inset-x-0 inset-y-4 flex justify-center'>
         <IsoLogo className='h-full w-auto' />

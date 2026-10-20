@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { ModeToggle } from '@/components/mode-toggle'
 import { DATA } from '@/data/resume'
 import Link from 'next/link'
-import { DownloadIcon } from 'lucide-react'
+import { ArrowRightIcon, DownloadIcon, SearchIcon } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { useScroll } from '@/hooks/use-scroll'
 import { MenuToggleIcon } from './ui/menu-toggle-icon'
@@ -14,20 +14,43 @@ import BlurFadeText from './magicui/blur-fade-text'
 import { BLUR_FADE_DELAY } from '@/data/config'
 import { Icon } from './Icon'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
+import { useLenis } from 'lenis/react'
+import { openCommandMenu } from './command-menu'
+
+const MENU_SECTIONS = [
+  { id: 'about', label: 'about' },
+  { id: 'skills', label: 'skills' },
+  { id: 'work', label: 'experience' },
+  { id: 'projects', label: 'projects' },
+  { id: 'awards', label: 'awards' },
+  { id: 'blog', label: 'articles' },
+]
 
 export function Header () {
   const [open, setOpen] = React.useState(false)
   const scrolled = useScroll(10)
+  const lenis = useLenis()
   React.useEffect(() => {
+    // Lock the page (and its smooth scroll) behind the open menu.
     if (open) {
       document.body.style.overflow = 'hidden'
+      lenis?.stop()
     } else {
       document.body.style.overflow = ''
+      lenis?.start()
     }
 
     return () => {
       document.body.style.overflow = ''
+      lenis?.start()
     }
+  }, [open, lenis])
+
+  React.useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
   return (
@@ -128,6 +151,15 @@ export function Header () {
               </TooltipProvider>
             ))}
           <Separator orientation='vertical' className='h-10' />
+          <button
+            type='button'
+            onClick={openCommandMenu}
+            aria-label='Open command menu'
+            className='flex h-8 items-center gap-2 border px-2 text-xs text-muted-foreground transition-colors hover:text-foreground'
+          >
+            <SearchIcon className='size-3.5' />
+            <kbd className='font-ibm'>⌘K</kbd>
+          </button>
           <ModeToggle />
         </div>
 
@@ -155,7 +187,9 @@ export function Header () {
             size='icon'
             variant='outline'
             onClick={() => setOpen(!open)}
-            className=''
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+            aria-controls='mobile-menu'
           >
             <MenuToggleIcon open={open} className='size-5' duration={300} />
           </Button>
@@ -163,73 +197,97 @@ export function Header () {
       </nav>
 
       {/* Mobile Menu */}
-      <div
-        className={cn(
-          'bg-background/90 fixed top-18 right-0 bottom-0 left-0 z-50 flex flex-col overflow-hidden border-y md:hidden',
-          open ? 'block' : 'hidden'
-        )}
-      >
+      {open && (
         <div
-          data-slot={open ? 'open' : 'closed'}
-          className={cn(
-            'data-[slot=open]:animate-in data-[slot=open]:zoom-in-95 data-[slot=closed]:animate-out data-[slot=closed]:zoom-out-95 ease-out',
-            'flex h-full w-full flex-col gap-y-4 p-4'
-          )}
+          id='mobile-menu'
+          data-lenis-prevent
+          className='fixed inset-x-0 top-14 bottom-0 z-50 overflow-y-auto overscroll-contain bg-background px-4 md:hidden'
         >
-          {/* Navigation Links */}
-          <div className='grid gap-y-2'>
-            {DATA.navbar.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={buttonVariants({
-                  variant: 'ghost',
-                  className: 'justify-start',
-                })}
-              >
-                <item.icon className='size-4 mr-2' />
-                {item.label}
-              </Link>
-            ))}
-            <Separator className='my-2' />
-            <Link
-              href='/TrieuTienDatCV.pdf'
-              target='_blank'
-              rel='noopener noreferrer'
-              className={buttonVariants({
-                variant: 'ghost',
-                className: 'justify-start',
-              })}
-              download
+          <div className='mx-auto flex min-h-full max-w-3xl flex-col border-x font-ibm'>
+            <button
+              type='button'
+              onClick={() => { setOpen(false); openCommandMenu() }}
+              className='menu-row m-4 flex items-center gap-2 border px-3 py-2.5 text-sm text-muted-foreground'
+              style={{ '--i': 0 } as React.CSSProperties}
             >
-              <DownloadIcon className='size-4 mr-2' />
-              Download Resume
-            </Link>
-          </div>
+              <SearchIcon className='size-4' />
+              Search the site…
+              <kbd className='ml-auto border px-1.5 text-[11px]'>⌘K</kbd>
+            </button>
 
-          {/* Social Links & Theme Toggle */}
-          <div className='flex flex-col gap-2'>
-            <div className='grid grid-cols-4 gap-2 items-center justify-between'>
+            <p className='px-4 pb-1 text-xs text-muted-foreground'># navigate</p>
+            <ul className='border-y border-dashed'>
+              {MENU_SECTIONS.map((item, i) => (
+                <li key={item.id} className='menu-row border-b border-dashed last:border-b-0' style={{ '--i': i + 1 } as React.CSSProperties}>
+                  <Link
+                    href={`/#${item.id}`}
+                    onClick={() => setOpen(false)}
+                    className='group flex min-h-12 items-center gap-4 px-4 text-base active:bg-muted'
+                  >
+                    <span className='tabular-nums text-xs text-muted-foreground'>{String(i + 1).padStart(2, '0')}</span>
+                    <span className='font-doto text-xl font-extrabold'>{item.label}</span>
+                    <ArrowRightIcon className='ml-auto size-4 text-muted-foreground transition-transform group-active:translate-x-1' />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <p className='px-4 pt-5 pb-1 text-xs text-muted-foreground'># actions</p>
+            <div className='grid grid-cols-3 gap-px border-y bg-border'>
+              {DATA.navbar.map((item, i) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className='menu-row flex min-h-14 items-center gap-2 bg-background px-4 text-sm active:bg-muted'
+                  style={{ '--i': MENU_SECTIONS.length + 1 + i } as React.CSSProperties}
+                >
+                  <item.icon className='size-4' />
+                  {item.label}
+                </Link>
+              ))}
+              <Link
+                href='/TrieuTienDatCV.pdf'
+                target='_blank'
+                rel='noopener noreferrer'
+                download
+                className='menu-row flex min-h-14 items-center gap-2 bg-background px-4 text-sm active:bg-muted'
+                style={{ '--i': MENU_SECTIONS.length + 2 } as React.CSSProperties}
+              >
+                <DownloadIcon className='size-4' />
+                Resume
+              </Link>
+            </div>
+
+            <p className='px-4 pt-5 pb-1 text-xs text-muted-foreground'># connect</p>
+            <div className='grid grid-cols-4 gap-px border-y bg-border'>
               {Object.entries(DATA.contact.social)
-                .filter(([_, social]) => social.navbar)
-                .map(([name, social]) => (
+                .filter(([, social]) => social.navbar)
+                .map(([name, social], i) => (
                   <Link
                     key={name}
                     href={social.url}
-                    className={cn(
-                      buttonVariants({ variant: 'outline', size: 'icon' }),
-                      'size-12 mx-auto'
-                    )}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='menu-row flex min-h-16 flex-col items-center justify-center gap-1.5 bg-background text-[11px] text-muted-foreground active:bg-muted'
+                    style={{ '--i': MENU_SECTIONS.length + 3 + i } as React.CSSProperties}
                   >
-                    {social.icon && (
-                      <social.icon className='size-6' />
-                    )}
+                    {social.icon && <social.icon className='size-5 text-foreground' />}
+                    {name}
                   </Link>
                 ))}
             </div>
+
+            <div className='mt-auto flex items-center justify-between border-t px-4 py-3'>
+              <span className='text-sm'>
+                <span className='text-muted-foreground'>~/</span>tiendat.work
+                <span className='ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-foreground motion-safe:animate-pulse' />
+              </span>
+              <ModeToggle />
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </header>
   )
 }

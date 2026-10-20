@@ -18,6 +18,8 @@ import { GitHubContributions } from './section/github-contributions'
 import { InsightsSection } from './section/insights-section'
 import { Status, StatusIndicator, StatusLabel } from '@/components/kibo-ui/status'
 import { BackgroundHero } from '@/components/landing/background-hero'
+import { LocalTime } from '@/components/local-time'
+import { HowIBuildSection } from './section/how-i-build-section'
 
 export default function Page () {
   return (
@@ -40,13 +42,13 @@ export default function Page () {
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
         <div className='mx-auto w-full space-y-8 border-x'>
-          <div className='flex items-stretch justify-center min-h-[120px]'>
-            <div className=''>
-              <Avatar className='group size-32 text overflow-hidden rounded-full m-1 ring-1 ring-border ring-offset-2 ring-offset-background select-none sm:size-40'>
+          <div className='flex items-stretch justify-start min-h-[120px]'>
+            <div className='flex shrink-0 items-center'>
+              <Avatar className='group size-32 text overflow-hidden rounded-full m-1.5 ring-1 ring-border ring-offset-2 ring-offset-background select-none sm:size-40'>
                 <AvatarImage
                   alt={DATA.name}
                   src={DATA.avatarUrl}
-                  className='scale-110 object-cover object-top transition-transform duration-700 ease-out group-hover:scale-100'
+                  className='scale-110 object-cover object-top opacity-0 transition-[opacity,scale] duration-700 ease-out group-hover:scale-100 group-hover:opacity-100'
                 />
                 {/* Line art sits on top and fades out on hover to reveal the photo. */}
                 {[
@@ -62,14 +64,15 @@ export default function Page () {
                     height={160}
                     unoptimized
                     priority
-                    className={`absolute inset-0 size-full rounded-full object-cover transition-[opacity,scale,filter] duration-500 ease-out group-hover:scale-105 group-hover:opacity-0 group-hover:blur-[2px] ${className}`}
+                    className={`avatar-reveal absolute inset-0 size-full rounded-full object-cover transition-[opacity,scale,filter] duration-500 ease-out group-hover:scale-105 group-hover:opacity-0 group-hover:blur-[2px] ${className}`}
                   />
                 ))}
+                <span aria-hidden='true' className='avatar-scanline pointer-events-none absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-foreground/70 to-transparent shadow-[0_0_8px_1px] shadow-foreground/40' />
                 <AvatarFallback>{DATA.initials}</AvatarFallback>
               </Avatar>
             </div>
 
-            <div className='flex flex-1 flex-col justify-between h-full min-h-[140px] md:min-h-[170px] border-l'>
+            <div className='flex min-w-0 flex-1 flex-col justify-between h-full min-h-[140px] sm:min-h-[172px] border-l'>
               <div className='flex-1 flex items-end pb-1'>
                 <div className='absolute top-4 right-4 '>
                   <Status
@@ -77,7 +80,9 @@ export default function Page () {
                     status='online'
                   >
                     <StatusIndicator />
-                    <StatusLabel className='font-mono'>Fully operational</StatusLabel>
+                    <StatusLabel className='font-mono'>
+                      HCMC <LocalTime /> <span className='text-muted-foreground'>·</span> open to work
+                    </StatusLabel>
                   </Status>
                 </div>
               </div>
@@ -85,11 +90,11 @@ export default function Page () {
               <div className='flex items-center justify-between border-y'>
                 <BlurFadeText
                   delay={BLUR_FADE_DELAY}
-                  className='text-3xl  font-extrabold  tracking-tight sm:text-3xl font-doto px-4'
+                  className='truncate text-2xl font-extrabold tracking-tight sm:text-3xl font-doto px-3 sm:px-4'
                   yOffset={0}
                   text={DATA.name}
                 />
-                <div className='size-6 mr-4'>
+                <div className='size-6 shrink-0 mr-3 sm:mr-4'>
                   <Icons.Logo />
                 </div>
               </div>
@@ -97,11 +102,11 @@ export default function Page () {
                 delay={BLUR_FADE_DELAY}
                 className='bg-lines-pattern-light dark:bg-lines-pattern size-full'
               >
-                <TextLoop transition={{ duration: 0.8 }} interval={4}>
+                <TextLoop className='block w-full overflow-hidden' transition={{ duration: 0.8 }} interval={4}>
                   {[DATA.contact.email, DATA.contact.tel].map((text) => (
                     <span
                       key={text}
-                      className='block  px-4 font-normal font-ibm text-left dark:text-muted text-gray-400'
+                      className='block truncate px-3 text-sm font-normal font-ibm text-left text-muted-foreground sm:px-4 sm:text-base'
                     >
                       {text}
                     </span>
@@ -142,6 +147,7 @@ export default function Page () {
         <SkillsSection />
 
       </section>
+      <HowIBuildSection />
       <GitHubContributions />
       <InsightsSection />
 
