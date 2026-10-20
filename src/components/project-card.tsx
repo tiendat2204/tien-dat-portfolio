@@ -70,7 +70,7 @@ export function ProjectCard ({
         </div>
         <div className='grow px-4 items-center flex-col group justify-center border-l border-dashed'>
           <CardHeader className='p-0'>
-            <div className='flex items-center justify-between gap-x-2 text-base'>
+            <div className='flex flex-col items-start justify-between gap-1 text-base sm:flex-row sm:items-center sm:gap-x-2'>
               <div className='flex flex-col items-start gap-2'>
                 <h3 className='inline-flex items-center justify-center font-semibold leading-none text-xs sm:text-sm'>
                   {title}
@@ -83,7 +83,7 @@ export function ProjectCard ({
                 </h3>
               </div>
 
-              <div className='text-xs sm:text-sm tabular-nums text-muted-foreground text-right'>
+              <div className='text-xs sm:text-sm tabular-nums text-muted-foreground sm:text-right'>
                 {positions[0]?.start &&
                                     `${positions[0].start}${positions[0].end ? ` - ${positions[0].end}` : ' - Present'}`}
               </div>
@@ -91,7 +91,7 @@ export function ProjectCard ({
 
             {positions[0]?.title && <div className='font-sans text-xs'>{positions[0].title}</div>}
             {links && links.length > 0 && (
-              <div className='flex gap-2 mt-2'>
+              <div className='flex flex-wrap gap-2 mt-2'>
                 {links.map((link, index) => (
                   <Link
                     key={index}
@@ -99,7 +99,7 @@ export function ProjectCard ({
                     target='_blank'
                     rel='noopener noreferrer'
                     onClick={(e) => e.stopPropagation()}
-                    className='inline-flex items-center gap-1 text-xs px-2 py-1  bg-secondary hover:bg-secondary/80 transition-colors'
+                    className='inline-flex min-h-8 items-center gap-1 px-3 py-1.5 text-xs bg-secondary hover:bg-secondary/80 transition-colors sm:min-h-0 sm:px-2 sm:py-1'
                   >
                     {link.icon}
                     <span>{link.type}</span>

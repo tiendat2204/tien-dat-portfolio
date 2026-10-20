@@ -60,7 +60,7 @@ async function umami<T> (client: Client, path: string, params: Record<string, st
 }
 
 function change (current: number, previous: number) {
-  if (!previous) return 0
+  if (!previous) return null
   return ((current - previous) / previous) * 100
 }
 
@@ -133,7 +133,7 @@ export async function getUmamiInsights (): Promise<{
       daily: [...byDay.values()],
     }
   } catch (error) {
-    console.error('[umami] failed to load insights', error)
+    console.warn('[umami] failed to load insights', error)
     return null
   }
 }

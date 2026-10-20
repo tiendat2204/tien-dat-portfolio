@@ -28,7 +28,7 @@ export function InsightsChart ({ data }: { data: InsightDay[] }) {
       className='h-56 w-full'
     >
       <EvilAreaChart.Grid />
-      <EvilAreaChart.XAxis dataKey='date' tickFormatter={formatDay} />
+      <EvilAreaChart.XAxis dataKey='date' tickFormatter={formatDay} minTickGap={36} padding={{ left: 16, right: 16 }} />
       <EvilAreaChart.Tooltip />
       <EvilAreaChart.Legend isClickable />
       <EvilAreaChart.Area dataKey='pageViews' variant='dotted' strokeVariant='solid' isClickable>

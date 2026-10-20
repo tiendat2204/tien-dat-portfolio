@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { GITHUB_USERNAME } from '@/data/config'
 import { format } from 'date-fns'
 import { LoaderIcon } from 'lucide-react'
-import { use } from 'react'
+import { use, useEffect, useRef } from 'react'
 
 interface GitContributionSectionProps {
   contributions: Promise<Activity[]>;
@@ -21,71 +21,81 @@ interface GitContributionSectionProps {
 
 const GitContributionSection = ({ contributions }: GitContributionSectionProps) => {
   const data = use(contributions)
+  const ref = useRef<HTMLDivElement>(null)
+
+  // On narrow screens the calendar scrolls horizontally; start at the latest weeks.
+  useEffect(() => {
+    const scroller = ref.current?.querySelector<HTMLElement>('.overflow-x-auto')
+    if (scroller) scroller.scrollLeft = scroller.scrollWidth
+  }, [data])
+
   return (
-    <ContributionGraph
-      className='mx-auto p-4'
-      data={data}
-      blockSize={11}
-      blockMargin={4}
-      blockRadius={0}
-    >
-      <ContributionGraphCalendar
-        className='hidden-scrollbar '
-        title='GitHub Contributions'
+    <div ref={ref}>
+      <ContributionGraph
+        className='mx-auto p-4'
+        data={data}
+        blockSize={11}
+        blockMargin={4}
+        blockRadius={0}
       >
-        {({ activity, dayIndex, weekIndex }) => (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <g>
-                <ContributionGraphBlock
-                  activity={activity}
-                  className={
+        <ContributionGraphCalendar
+          className='hidden-scrollbar '
+          title='GitHub Contributions'
+        >
+          {({ activity, dayIndex, weekIndex }) => (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <g>
+                  <ContributionGraphBlock
+                    activity={activity}
+                    className={
             activity.level > 3
               ? 'animate-pulse stroke-1 stroke-primary dark:stroke-primary'
               : activity.level === 0
                 ? 'opacity-50'
                 : ''
           }
-                  dayIndex={dayIndex}
-                  style={{
-                    filter: activity.level > 2 ? 'brightness(1.2)' : undefined,
-                  }}
-                  weekIndex={weekIndex}
-                />
-              </g>
-            </TooltipTrigger>
+                    dayIndex={dayIndex}
+                    style={{
+                      filter: activity.level > 2 ? 'brightness(1.2)' : undefined,
+                    }}
+                    weekIndex={weekIndex}
+                  />
+                </g>
+              </TooltipTrigger>
 
-            <TooltipContent className='font-ibm text-white dark:text-black'>
-              <p>
-                {activity.count} contribution{activity.count > 1 ? 's' : null}{' '}
-                on {format(new Date(activity.date), 'dd.MM.yyyy')}
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        )}
-      </ContributionGraphCalendar>
-
-      <ContributionGraphFooter className=''>
-        <ContributionGraphTotalCount>
-          {({ totalCount, year }) => (
-            <div className='text-muted-foreground'>
-              {totalCount.toLocaleString('en')} contributions in {year} on{' '}
-              <a
-                className='font-medium underline underline-offset-4'
-                href={`https://github.com/${GITHUB_USERNAME}`}
-                target='_blank'
-                rel='noopener noreferrer'
-              >
-                GitHub
-              </a>
-              .
-            </div>
+              <TooltipContent className='font-ibm text-white dark:text-black'>
+                <p>
+                  {activity.count} contribution{activity.count > 1 ? 's' : null}{' '}
+                  on {format(new Date(activity.date), 'dd.MM.yyyy')}
+                </p>
+              </TooltipContent>
+            </Tooltip>
           )}
-        </ContributionGraphTotalCount>
+        </ContributionGraphCalendar>
 
-        <ContributionGraphLegend />
-      </ContributionGraphFooter>
-    </ContributionGraph>
+        <ContributionGraphFooter className=''>
+          <ContributionGraphTotalCount>
+            {({ totalCount, year }) => (
+              <div className='text-muted-foreground'>
+                {totalCount.toLocaleString('en')} contributions in {year} on{' '}
+                <a
+                  className='font-medium underline underline-offset-4'
+                  href={`https://github.com/${GITHUB_USERNAME}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  GitHub
+                </a>
+                .
+              </div>
+            )}
+          </ContributionGraphTotalCount>
+
+          <ContributionGraphLegend />
+        </ContributionGraphFooter>
+      </ContributionGraph>
+    </div>
   )
 }
 

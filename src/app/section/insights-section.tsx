@@ -30,23 +30,30 @@ export async function InsightsSection () {
           style={{ '--cols': metrics.length } as React.CSSProperties}
         >
           {metrics.map((metric) => {
-            const up = metric.change >= 0
+            const hasChange = metric.change !== null
+            const up = (metric.change ?? 0) >= 0
             const good = metric.lowerIsBetter ? !up : up
             return (
-              <div key={metric.label} className='border-r border-b p-4 last:border-r-0 sm:border-b-0'>
+              <div key={metric.label} className='border-r border-b p-4 last:border-r-0 sm:border-b-0 max-sm:even:border-r-0 max-sm:[&:nth-last-child(-n+2)]:border-b-0'>
                 <dt className='text-xs text-muted-foreground'>
                   <span className='text-foreground/40'>&gt;</span> {metric.label.toLowerCase()}
                 </dt>
                 <dd className='mt-1 flex items-baseline gap-2'>
                   <span className='font-doto text-2xl font-extrabold tabular-nums'>{metric.value}</span>
-                  <span
-                    className={cn(
-                      'text-xs tabular-nums',
-                      good ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
-                    )}
-                  >
-                    {up ? '▲' : '▼'} {Math.abs(metric.change).toFixed(1)}%
-                  </span>
+                  {hasChange
+                    ? (
+                      <span
+                        className={cn(
+                          'text-xs tabular-nums',
+                          good ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
+                        )}
+                      >
+                        {up ? '▲' : '▼'} {Math.abs(metric.change ?? 0).toFixed(1)}%
+                      </span>
+                      )
+                    : (
+                      <span className='text-xs text-muted-foreground' title='No data for the previous period'>new</span>
+                      )}
                 </dd>
               </div>
             )

@@ -13,6 +13,10 @@ import { buildCanonicalUrl, buildOgImageUrl } from '@/lib/seo/metadata'
 import Script from 'next/script'
 import Section from '@/components/landing/section'
 import TransitionProvider from '@/components/TransitionProvider'
+import { CommandMenu } from '@/components/command-menu'
+import { UiEffects } from '@/components/ui-effects'
+import { KeyboardShortcuts } from '@/components/keyboard-shortcuts'
+import { getAllPosts } from '@/data/blog'
 
 const rootCanonicalUrl = buildCanonicalUrl(SITE_INFO.url, '/')
 const rootOgImageUrl = buildOgImageUrl(SITE_INFO.ogImage, DATA.name)
@@ -155,6 +159,9 @@ export default function RootLayout ({
 
                 {children}
                 <Footer />
+                <CommandMenu posts={getAllPosts().map((p) => ({ slug: p.slug, title: p.metadata.title }))} />
+                <UiEffects />
+                <KeyboardShortcuts />
               </Providers>
             </TooltipProvider>
 

@@ -11,23 +11,37 @@ const BLUR_FADE_DELAY = 0.04
 interface SkillBadgeProps {
   name: string;
   icon?: string;
+  iconDark?: string;
+  variant?: 'secondary' | 'outline';
 }
 
-export function SkillBadge ({ name, icon }: SkillBadgeProps) {
+function SkillIcon ({ name, icon, iconDark }: { name: string; icon?: string; iconDark?: string }) {
+  if (!icon) {
+    return (
+      <span aria-hidden='true' className='flex size-3.5 shrink-0 items-center justify-center'>
+        <span className='size-1.5 bg-foreground/60' />
+      </span>
+    )
+  }
+  const img = (src: string, className: string) => (
+    <Image src={`/icons/${src}`} alt={name} width={14} height={14} className={`size-3.5 shrink-0 ${className}`} />
+  )
+  if (!iconDark) return img(icon, '')
+  return (
+    <>
+      {img(icon, 'dark:hidden')}
+      {img(iconDark, 'hidden dark:block')}
+    </>
+  )
+}
+
+export function SkillBadge ({ name, icon, iconDark, variant = 'secondary' }: SkillBadgeProps) {
   return (
     <Badge
-      variant='secondary'
+      variant={variant}
       className='text-xs font-medium py-2.5'
     >
-      {icon && (
-        <Image
-          src={`/icons/${icon}`}
-          alt={name}
-          width={14}
-          height={14}
-          className='flex-shrink-0'
-        />
-      )}
+      <SkillIcon name={name} icon={icon} iconDark={iconDark} />
       {name}
     </Badge>
   )
@@ -35,7 +49,7 @@ export function SkillBadge ({ name, icon }: SkillBadgeProps) {
 
 interface CategorySectionProps {
   title: string;
-  skills: readonly { readonly name: string; readonly icon: string }[];
+  skills: readonly { readonly name: string; readonly icon?: string; readonly iconDark?: string }[];
   delay?: number;
 }
 
@@ -49,23 +63,11 @@ function CategorySection ({ title, skills, delay = 0 }: CategorySectionProps) {
             {title}
           </h3>
           <span className='text-gray-500 text-sm'>{'/>'}</span>
-        </div>{' '}
+        </div>
         <div className='flex flex-wrap gap-2'>
           {skills.map((skill, id) => (
-            <BlurFade key={skill.name} delay={delay + 0.1 + id * 0.05}>
-              <Badge
-                variant='outline'
-                className='text-xs font-medium py-2.5'
-              >
-                <Image
-                  src={`/icons/${skill.icon}`}
-                  alt={skill.name}
-                  width={14}
-                  height={14}
-                  className='flex-shrink-0'
-                />
-                {skill.name}
-              </Badge>
+            <BlurFade key={skill.name} delay={delay + 0.1 + id * 0.05} className='flex'>
+              <SkillBadge name={skill.name} icon={skill.icon} iconDark={skill.iconDark} variant='outline' />
             </BlurFade>
           ))}
         </div>
@@ -93,6 +95,7 @@ export default function SkillsSection () {
                 <SkillBadge
                   name={DATA.skills.mainStack.framework.name}
                   icon={DATA.skills.mainStack.framework.icon}
+                  iconDark={DATA.skills.mainStack.framework.iconDark}
                 />
               </BlurFade>{' '}
               and
@@ -101,6 +104,7 @@ export default function SkillsSection () {
                 <SkillBadge
                   name={DATA.skills.mainStack.framework2.name}
                   icon={DATA.skills.mainStack.framework2.icon}
+                  iconDark={DATA.skills.mainStack.framework2.iconDark}
                 />
               </BlurFade>{' '}
               as a frontend
@@ -161,29 +165,39 @@ export default function SkillsSection () {
           delay={BLUR_FADE_DELAY * 10}
         />
         <CategorySection
-          title='FRAMEWORKS'
-          skills={DATA.skills.frameworks}
-          delay={BLUR_FADE_DELAY * 15}
+          title='FRONTEND'
+          skills={DATA.skills.frontend}
+          delay={BLUR_FADE_DELAY * 14}
+        />
+        <CategorySection
+          title='BACKEND'
+          skills={DATA.skills.backend}
+          delay={BLUR_FADE_DELAY * 18}
+        />
+        <CategorySection
+          title='DATABASE'
+          skills={DATA.skills.database}
+          delay={BLUR_FADE_DELAY * 22}
+        />
+        <CategorySection
+          title='TESTING & DEVOPS'
+          skills={DATA.skills.testingDevOps}
+          delay={BLUR_FADE_DELAY * 26}
+        />
+        <CategorySection
+          title='AI-ASSISTED DEV'
+          skills={DATA.skills.aiTools}
+          delay={BLUR_FADE_DELAY * 30}
         />
         <CategorySection
           title='TOOLS'
           skills={DATA.skills.tools}
-          delay={BLUR_FADE_DELAY * 20}
+          delay={BLUR_FADE_DELAY * 34}
         />
         <CategorySection
           title='PLATFORMS'
           skills={DATA.skills.platforms}
-          delay={BLUR_FADE_DELAY * 25}
-        />
-        <CategorySection
-          title='SOFTWARES'
-          skills={DATA.skills.softwares}
-          delay={BLUR_FADE_DELAY * 30}
-        />
-        <CategorySection
-          title='DEV OPS'
-          skills={DATA.skills.devOps}
-          delay={BLUR_FADE_DELAY * 35}
+          delay={BLUR_FADE_DELAY * 38}
         />
 
         <BlurFadeText
