@@ -5,7 +5,6 @@
   "items": [
     {
       "name": "utils",
-      "type": "registry:lib",
       "dependencies": [
         "clsx",
         "tailwind-merge"
@@ -15,37 +14,73 @@
           "path": "src/lib/utils.ts",
           "type": "registry:lib"
         }
-      ]
+      ],
+      "type": "registry:lib"
     },
     {
       "name": "sticker-animation",
-      "type": "registry:component",
       "files": [
         {
           "path": "src/registry/StickerCop/StickerCop.tsx",
           "type": "registry:component"
         }
-      ]
+      ],
+      "type": "registry:component"
     },
     {
       "name": "navigation-menu",
-      "type": "registry:component",
+      "registryDependencies": [
+        "navigation-menu"
+      ],
       "files": [
         {
           "path": "src/registry/MainNavigation/MainNavigation.tsx",
           "type": "registry:component"
         }
-      ]
+      ],
+      "type": "registry:component"
     },
     {
       "name": "dynamic-color-extraction",
-      "type": "registry:component",
+      "dependencies": [
+        "framer-motion"
+      ],
       "files": [
         {
           "path": "src/registry/DynamicColorExtraction/ProductCardClient.tsx",
           "type": "registry:component"
         }
-      ]
+      ],
+      "type": "registry:component"
+    },
+    {
+      "name": "infinite-select",
+      "description": "Single and multiple selects with cursor-paged infinite scroll, debounced server search and selected-item preloading.",
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "popover",
+        "command",
+        "badge",
+        "button",
+        "skeleton"
+      ],
+      "files": [
+        {
+          "path": "src/registry/InfiniteSelect/select-single-infinite-scroll.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/registry/InfiniteSelect/select-multiple-infinite-scroll.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/registry/InfiniteSelect/use-infinite-options.ts",
+          "type": "registry:component"
+        }
+      ],
+      "type": "registry:component"
     }
   ]
 }

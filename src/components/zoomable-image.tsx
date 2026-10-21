@@ -48,7 +48,7 @@ export function ImageZoom ({
         // eslint-disable-next-line jsx-a11y/alt-text
         <Image
           className={cn(
-            'cursor-zoom-in rounded-md transition-all',
+            'cursor-zoom-in transition-all',
             className
           )}
           sizes='(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 900px'

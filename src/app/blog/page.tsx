@@ -5,12 +5,22 @@ import { BlurFade } from '@/components/magicui/blur-fade'
 import { Icons } from '@/components/icons'
 import { getAllPosts } from '@/data/blog'
 import type { Post } from '@/types/blog'
-import { BLUR_FADE_DELAY } from '@/data/config'
+import { BLUR_FADE_DELAY, SITE_INFO } from '@/data/config'
+import { SEO_PROFILE } from '@/data/seo'
+import { buildPageMetadata } from '@/lib/seo/metadata'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
 import { Back } from '@/app/blog/back'
 import ParticlesClient from './_components/ParticlesClient'
 import { BackgroundHero } from '@/components/landing/background-hero'
+export const metadata = buildPageMetadata({
+  siteUrl: SITE_INFO.url,
+  siteName: SEO_PROFILE.name,
+  path: '/blog',
+  title: 'Blog',
+  description: 'Articles by Tien Dat on frontend engineering, React, Next.js and building with AI coding agents.',
+})
+
 export default function BlogPage () {
   const posts: Post[] = getAllPosts()
   return (

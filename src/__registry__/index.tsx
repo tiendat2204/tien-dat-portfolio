@@ -43,6 +43,21 @@ export const Index: Record<string, any> = {
       type: 'registry:component',
     }],
   },
+  'infinite-select': {
+    name: 'infinite-select',
+    description: 'Single and multiple selects with cursor-paged infinite scroll, debounced server search and selected-item preloading.',
+    type: 'registry:component',
+    files: [{
+      path: 'src/registry/InfiniteSelect/select-single-infinite-scroll.tsx',
+      type: 'registry:component',
+    }, {
+      path: 'src/registry/InfiniteSelect/select-multiple-infinite-scroll.tsx',
+      type: 'registry:component',
+    }, {
+      path: 'src/registry/InfiniteSelect/use-infinite-options.ts',
+      type: 'registry:component',
+    }],
+  },
   'sticker-animation-demo': {
     name: 'sticker-animation-demo',
     description: '',
@@ -72,5 +87,15 @@ export const Index: Record<string, any> = {
       type: 'registry:example',
     }],
     component: React.lazy(() => import('@/registry/examples/dynamic-color-extraction-demo.tsx')),
+  },
+  'infinite-select-demo': {
+    name: 'infinite-select-demo',
+    description: '',
+    type: 'registry:example',
+    files: [{
+      path: 'src/registry/examples/infinite-select-demo.tsx',
+      type: 'registry:example',
+    }],
+    component: React.lazy(() => import('@/registry/examples/infinite-select-demo.tsx')),
   },
 }

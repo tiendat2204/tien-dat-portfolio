@@ -1,0 +1,199 @@
+---
+title: Infinite Select
+description: Single and multiple shadcn/ui selects that page through a server list with infinite scroll, debounced search and selected-item preloading.
+registry: infinite-select
+new: true
+publishedAt: "2026-10-21"
+tags: ["react", "shadcn", "select", "combobox", "infinite-scroll", "ui"]
+---
+
+<ComponentPreview
+  name="infinite-select-demo"
+  openInV0Url="https://tiendat.work/r/infinite-select.json"
+/>
+
+## What is Infinite Select?
+
+A combobox for lists too big to ship to the browser: cities, customers, products. It asks your API for one page at a time, loads the next page as you scroll, searches on the server, and still shows the right label for a value that sits on page 25. It comes in two flavours that share the same data layer:
+
+- `SelectSingleInfiniteScroll` - one value, clearable, with an optional footer action (e.g. "Create new…").
+- `SelectMultipleInfiniteScroll` - many values, with select all (walks every remaining page, cancellable), clear all, selection order and collapsible badges.
+
+## Installation
+
+<CodeTabs className="gap-0">
+  <TabsList>
+    <TabsTriggerShadcnCLI />
+    <TabsTrigger value="manual">Manual</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="cli" className="[&>figure]:mb-0">
+    ```bash
+    npx shadcn@latest add https://tiendat.work/r/infinite-select.json
+    ```
+  </TabsContent>
+
+  <TabsContent value="manual">
+    <Steps>
+            <Step>Install the shadcn/ui primitives it builds on</Step>
+            ```bash
+            npx shadcn@latest add popover command badge button skeleton
+            ```
+            <Step>Copy and paste the following code into your project</Step>
+            <ComponentSource
+                name="infinite-select"
+                src="src/registry/InfiniteSelect/use-infinite-options.ts"
+                title="components/InfiniteSelect/use-infinite-options.ts"
+                showLineNumbers
+            />
+            <ComponentSource
+                name="infinite-select"
+                src="src/registry/InfiniteSelect/select-single-infinite-scroll.tsx"
+                title="components/InfiniteSelect/select-single-infinite-scroll.tsx"
+                showLineNumbers
+            />
+            <ComponentSource
+                name="infinite-select"
+                src="src/registry/InfiniteSelect/select-multiple-infinite-scroll.tsx"
+                title="components/InfiniteSelect/select-multiple-infinite-scroll.tsx"
+                showLineNumbers
+            />
+            <Step>Update the import paths to match your project setup</Step>
+        </Steps>
+  </TabsContent>
+</CodeTabs>
+
+## Usage
+
+Both selects take the same data in one of two ways: a plain `queryFn`, or a `source` you manage yourself. Pass exactly one.
+
+### With a queryFn
+
+The built-in hook handles cursor paging, a 350ms search debounce, a per-search cache, aborting stale requests and retrying after an error. Your function gets the cursor of the page to load (`null` for the first), the search term, the ids to preload, and an `AbortSignal`.
+
+```tsx
+import { SelectSingleInfiniteScroll } from '@/components/InfiniteSelect/select-single-infinite-scroll'
+import { SelectMultipleInfiniteScroll } from '@/components/InfiniteSelect/select-multiple-infinite-scroll'
+import type { QueryFn, SelectItemType } from '@/components/InfiniteSelect/use-infinite-options'
+
+const fetchCities: QueryFn<SelectItemType> = async (cursor, search, selectedIds, signal) => {
+  const params = new URLSearchParams({ search })
+
+  if (cursor) params.set('cursor', cursor)
+  selectedIds?.forEach(id => params.append('selectedIds', id))
+
+  const res = await fetch(`/api/cities?${params}`, { signal })
+
+  // { items: { id, name }[], nextCursor: string | null, selected?: { id, name }[] }
+  return res.json()
+}
+
+export function CityFields () {
+  const [city, setCity] = useState('')
+  const [cities, setCities] = useState<string[]>([])
+
+  return (
+    <>
+      <SelectSingleInfiniteScroll aria-label='City' queryFn={fetchCities} value={city} onChange={setCity} clearable />
+      <SelectMultipleInfiniteScroll aria-label='Cities' queryFn={fetchCities} value={cities} onChange={setCities} />
+    </>
+  )
+}
+```
+
+### With TanStack Query (recommended)
+
+If your app already uses TanStack Query, map `useInfiniteQuery` to a `source`. You get its cache shared across the app, devtools, and invalidation after a mutation. The select still owns the search box and tells you the debounced term through `onSearchChange`.
+
+```tsx
+import { useInfiniteQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import type { InfiniteSource, QueryFn, SelectItemType } from '@/components/InfiniteSelect/use-infinite-options'
+
+export function useInfiniteSelectQuery<T extends SelectItemType> (
+  key: string,
+  queryFn: QueryFn<T>,
+  selectedIds: string[] = []
+): InfiniteSource<T> {
+  const [search, setSearch] = useState('')
+  const query = useInfiniteQuery({
+    queryKey: [key, search],
+    initialPageParam: null as string | null,
+    queryFn: ({ pageParam, signal }) =>
+      queryFn(pageParam, search, !pageParam && selectedIds.length ? selectedIds : undefined, signal),
+    getNextPageParam: last => last.nextCursor,
+  })
+
+  return {
+    items: query.data?.pages.flatMap(page => page.items) ?? [],
+    selected: query.data?.pages[0]?.selected,
+    hasNextPage: query.hasNextPage,
+    fetchNextPage: query.fetchNextPage,
+    isLoading: query.isLoading,
+    isFetching: query.isFetching,
+    isFetchingNextPage: query.isFetchingNextPage,
+    isError: query.isError,
+    error: query.error,
+    retry: query.refetch,
+    onSearchChange: setSearch,
+  }
+}
+
+// const source = useInfiniteSelectQuery('cities', fetchCities, cities)
+// <SelectMultipleInfiniteScroll source={source} value={cities} onChange={setCities} />
+```
+
+## Props
+
+Shared by both selects:
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `queryFn` | `(cursor, search, selectedIds?, signal?) => Promise<{ items, nextCursor, selected? }>` | - | Loads one page. Mutually exclusive with `source`. |
+| `source` | `InfiniteSource<T>` | - | Externally managed list state (e.g. TanStack Query). Mutually exclusive with `queryFn`. |
+| `labels` | `Partial<InfiniteSelectLabels>` | English | Override any text: `placeholder`, `search`, `loading`, `loadingMore`, `end`, `empty`, `noResults`, `error`, `retry`, `clear`, `selectAll`, `clearAll`, `cancel`, `selectedCount(n)`, `more(n)`. |
+| `maxHeight` | `number` | `256` | Max height of the list in px. |
+| `enabled` | `boolean` | `true` | Set `false` to hold off loading, e.g. until a parent field is filled. |
+| `disabled` | `boolean` | `false` | Disables the trigger. |
+| `error` | `boolean` | `false` | Marks the field invalid (`aria-invalid`, destructive border). |
+| `isEqualWidthPopoverContent` | `boolean` | `true` | Match the list width to the trigger. |
+| `aria-label` / `aria-describedby` | `string` | - | Name and describe the field for assistive tech. |
+| `className` | `string` | - | Classes for the trigger. |
+
+`SelectSingleInfiniteScroll`:
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `value` | `string \| null` | - | Selected id. |
+| `onChange` | `(value: string) => void` | - | Called with the id, or `''` when cleared or deselected. |
+| `onChangeItem` | `(item: T \| undefined) => void` | - | Called with the whole item. |
+| `clearable` | `boolean` | `false` | Show an × in the trigger. |
+| `renderItem` | `(item, isSelected) => ReactNode` | - | Custom row. |
+| `footerAction` | `ReactNode` | - | Rendered under the list and in the empty state. |
+| `getErrorMessage` | `(error) => string \| undefined` | - | Map your API errors to a message. |
+| `getEmptyMessage` | `(search) => string` | - | Custom empty state. |
+| `open` / `onOpenChange` | `boolean` / `(open) => void` | - | Control the popover. |
+
+`SelectMultipleInfiniteScroll`:
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `value` | `string[]` | - | Selected ids, in selection order. |
+| `onChange` | `(value: string[]) => void` | - | Called with the new ids. |
+| `renderItem` | `(item, isSelected, order?) => ReactNode` | - | Custom row. |
+| `renderBadge` | `(item) => ReactNode` | - | Custom badge content. |
+| `showSelectAll` | `boolean` | `true` | "Select all" fetches every remaining page, with a cancel button. |
+| `showClearAll` | `boolean` | `true` | Show "Clear all". |
+| `showSelectedCount` | `boolean` | `true` | Show "N selected" above the list. |
+| `showSelectionOrder` | `boolean` | `true` | Number badge on each selected row. |
+| `collapseBadges` | `boolean` | `true` | First badge plus "+N more" instead of one badge each. |
+
+## Notes
+
+### Preloading selected items
+
+A value often points at a row the user has not scrolled to yet: an edit form opens with city `137`, but the first page holds `1-20`. To show its name anyway, the first page request carries `selectedIds` and your API returns those items in `selected`. The select only asks for ids it does not know yet, so a form reset to new ids loads just those, without dropping the pages already scrolled. Until an id resolves, the multiple select shows a skeleton and then falls back to the raw id.
+
+### Aborting with `signal`
+
+Typing "Amb" then "Ambe" fires two searches. The select aborts the older request through the `AbortSignal` passed as the 4th argument, and ignores its response even if your function does not honour the signal. Forward it to `fetch` (or axios) to save the round trip.

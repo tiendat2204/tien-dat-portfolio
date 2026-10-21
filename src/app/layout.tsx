@@ -7,30 +7,31 @@ import { ReactLenis } from 'lenis/react'
 import { Footer } from '@/components/footer'
 import { Providers } from '@/components/Providers'
 import { Header } from '@/components/Header'
-import type { WebSite, WithContext } from 'schema-dts'
+import { buildWebSiteJsonLd } from '@/lib/seo/jsonld'
 import { SITE_INFO, UMAMI_WEBSITE_ID } from '@/data/config'
-import { buildCanonicalUrl, buildOgImageUrl } from '@/lib/seo/metadata'
+import { SEO_PROFILE } from '@/data/seo'
 import Script from 'next/script'
 import Section from '@/components/landing/section'
 import TransitionProvider from '@/components/TransitionProvider'
 import { CommandMenu } from '@/components/command-menu'
 import { UiEffects } from '@/components/ui-effects'
 import { KeyboardShortcuts } from '@/components/keyboard-shortcuts'
-import { getAllPosts } from '@/data/blog'
+import { getAllComponents, getAllPosts } from '@/data/blog'
+import { FloatingGreeting } from '@/components/time-greeting'
+import { Caveat } from 'next/font/google'
 
-const rootCanonicalUrl = buildCanonicalUrl(SITE_INFO.url, '/')
-const rootOgImageUrl = buildOgImageUrl(SITE_INFO.ogImage, DATA.name)
+const caveat = Caveat({ subsets: ['latin'], variable: '--font-caveat', display: 'swap' })
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_INFO.url),
   title: {
-    default: DATA.name,
-    template: `%s | ${DATA.name}`,
+    default: SEO_PROFILE.homeTitle,
+    template: '%s – Tien Dat',
   },
-  description: DATA.description,
-  alternates: {
-    canonical: rootCanonicalUrl,
-  },
+  description: SEO_PROFILE.description,
+  keywords: [...SEO_PROFILE.keywords],
+  authors: [{ name: SEO_PROFILE.name, url: SITE_INFO.url }],
+  creator: SEO_PROFILE.name,
   icons: {
     icon: [
       {
@@ -48,20 +49,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: `${DATA.name}`,
-    description: DATA.description,
-    url: rootCanonicalUrl,
-    siteName: `${DATA.name}`,
+    siteName: SEO_PROFILE.name,
     locale: 'en_US',
     type: 'website',
-    images: [
-      {
-        url: rootOgImageUrl,
-        width: 1200,
-        height: 630,
-        alt: DATA.name
-      }
-    ]
   },
   robots: {
     index: true,
@@ -75,23 +65,21 @@ export const metadata: Metadata = {
     },
   },
   twitter: {
-    title: `${DATA.name}`,
     card: 'summary_large_image',
-    images: [rootOgImageUrl],
-  },
-  verification: {
-    google: '',
-    yandex: '',
   },
 }
-function getWebSiteJsonLd (): WithContext<WebSite> {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: SITE_INFO.name,
-    url: SITE_INFO.url,
-    alternateName: [DATA.name],
-  }
+const SAME_AS_NAMES = ['GitHub', 'LinkedIn', 'Facebook']
+function getWebSiteJsonLd () {
+  return buildWebSiteJsonLd({
+    siteUrl: SITE_INFO.url,
+    name: SEO_PROFILE.name,
+    alternateName: [...SEO_PROFILE.alternateNames],
+    jobTitle: SEO_PROFILE.jobTitle,
+    image: SEO_PROFILE.image,
+    sameAs: Object.values(DATA.contact.social)
+      .filter((social) => SAME_AS_NAMES.includes(social.name))
+      .map((social) => social.url),
+  })
 }
 const darkModeScript = String.raw`
   try {
@@ -118,7 +106,7 @@ export default function RootLayout ({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en' suppressHydrationWarning>
+    <html lang='en' className={caveat.variable} suppressHydrationWarning>
       <head>
         <script
           type='text/javascript'
@@ -159,8 +147,12 @@ export default function RootLayout ({
 
                 {children}
                 <Footer />
-                <CommandMenu posts={getAllPosts().map((p) => ({ slug: p.slug, title: p.metadata.title }))} />
+                <CommandMenu
+                  posts={getAllPosts().map((p) => ({ slug: p.slug, title: p.metadata.title }))}
+                  components={getAllComponents().map((c) => ({ slug: c.slug, title: c.metadata.title }))}
+                />
                 <UiEffects />
+                <FloatingGreeting />
                 <KeyboardShortcuts />
               </Providers>
             </TooltipProvider>

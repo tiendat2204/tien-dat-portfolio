@@ -33,6 +33,8 @@ export function AwardCard ({
   links,
 }: Props) {
   const [isExpanded, setIsExpanded] = useState(false)
+  // A single `image` is a one-photo gallery; it used to be ignored, so those awards showed no photo.
+  const photos = images ?? (image ? [image] : [])
 
   return (
     <motion.li
@@ -94,12 +96,12 @@ export function AwardCard ({
             </span>
           )}
 
-          {images && images.length > 0 && (
+          {photos.length > 0 && (
             <div
-              className='mt-3 pr-4 grid grid-cols-1 sm:grid-cols-2 gap-2'
+              className={`mt-3 pr-4 grid grid-cols-1 gap-2 ${photos.length > 1 ? 'sm:grid-cols-2' : ''}`}
               onClick={(e) => e.stopPropagation()}
             >
-              {images.map((src) => (
+              {photos.map((src) => (
                 <ImageZoom
                   key={src}
                   src={src}
@@ -118,6 +120,8 @@ export function AwardCard ({
                 <Link
                   href={link.href}
                   key={idx}
+                  // Press articles and certificates live on other sites; keep the portfolio open.
+                  {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Badge key={idx} title={link.title} className='flex min-h-8 gap-2 px-2.5 sm:min-h-0'>

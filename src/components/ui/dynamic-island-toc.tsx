@@ -256,7 +256,7 @@ export function DynamicIslandTOC({
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto overscroll-contain px-3 pb-4" data-lenis-prevent="true">
+            <div className="flex-1 overflow-y-auto overscroll-contain scroll-fade no-scrollbar px-3 pb-4" data-lenis-prevent="true">
               <div className="flex flex-col gap-0.5">
                 {headings.map((h) => {
                   const isActive = activeId === h.id;

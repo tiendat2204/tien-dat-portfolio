@@ -16,7 +16,7 @@ import { LoaderIcon } from 'lucide-react'
 import { use, useEffect, useRef } from 'react'
 
 interface GitContributionSectionProps {
-  contributions: Promise<Activity[]>;
+  contributions: Promise<Activity[] | null>;
 }
 
 const GitContributionSection = ({ contributions }: GitContributionSectionProps) => {
@@ -29,10 +29,18 @@ const GitContributionSection = ({ contributions }: GitContributionSectionProps) 
     if (scroller) scroller.scrollLeft = scroller.scrollWidth
   }, [data])
 
+  if (!data) {
+    return (
+      <div className='flex h-[162px] w-full items-center justify-center font-ibm text-sm text-muted-foreground'>
+        GitHub contributions are unavailable right now.
+      </div>
+    )
+  }
+
   return (
     <div ref={ref}>
       <ContributionGraph
-        className='mx-auto p-4'
+        className='mx-auto p-4 scroll-fade-x no-scrollbar'
         data={data}
         blockSize={11}
         blockMargin={4}

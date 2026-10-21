@@ -1,6 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
 @import url('https://fonts.googleapis.com/css2?family=Doto:wght@100..900&display=swap');
 @import "tailwindcss";
+/* shadcn utilities: scroll-fade*, no-scrollbar, data-* variants (https://ui.shadcn.com/docs/utils) */
+@import "shadcn/tailwind.css";
 @custom-variant dark (&:where(.dark, .dark *));
 @plugin "@tailwindcss/typography";
 @utility container {
@@ -209,6 +211,11 @@
   *:focus-visible {
     @apply outline-hidden ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
+
+  /* cmdk search inputs sit inside a field that already shows focus; the offset ring drew over the search icon. */
+  [cmdk-input]:focus-visible {
+    @apply ring-0 ring-offset-0;
+  }
 }
 
 
@@ -263,6 +270,9 @@
   .font-doto {
     font-family: var(--font-doto);
   }
+  .font-caveat {
+    font-family: var(--font-caveat), cursive;
+  }
   .bg-lines-pattern {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800'%3E%3Cg stroke-width='3.5' stroke='hsla(0, 0%25, 100%25, 1.00)' fill='none'%3E%3Cline x1='0' y1='0' x2='400' y2='400'%3E%3C/line%3E%3Cline x1='400' y1='0' x2='800' y2='400'%3E%3C/line%3E%3Cline x1='800' y1='0' x2='1200' y2='400'%3E%3C/line%3E%3Cline x1='0' y1='400' x2='400' y2='800'%3E%3C/line%3E%3Cline x1='400' y1='400' x2='800' y2='800'%3E%3C/line%3E%3Cline x1='800' y1='400' x2='1200' y2='800'%3E%3C/line%3E%3Cline x1='0' y1='800' x2='400' y2='1200'%3E%3C/line%3E%3Cline x1='400' y1='800' x2='800' y2='1200'%3E%3C/line%3E%3Cline x1='800' y1='800' x2='1200' y2='1200'%3E%3C/line%3E%3C/g%3E%3C/svg%3E");
   }
@@ -311,10 +321,10 @@
 }
 @layer components {
   [data-rehype-pretty-code-figure] {
-    @apply relative my-6 rounded-lg bg-muted text-foreground;
+    @apply relative my-6 bg-muted text-foreground;
 
     pre {
-      @apply overflow-x-auto px-4 py-4;
+      @apply overflow-x-auto scroll-fade-x no-scrollbar px-4 py-4;
     }
 
     code {

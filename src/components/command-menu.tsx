@@ -3,6 +3,7 @@
 import { Command } from 'cmdk'
 import {
   ArrowRightIcon,
+  BlocksIcon,
   CopyIcon,
   CpuIcon,
   DownloadIcon,
@@ -33,6 +34,7 @@ const SECTIONS = [
   { id: 'work', label: 'Experience' },
   { id: 'education', label: 'Education' },
   { id: 'projects', label: 'Projects' },
+  { id: 'components', label: 'Components' },
   { id: 'awards', label: 'Awards' },
   { id: 'blog', label: 'Recent articles' },
 ]
@@ -40,7 +42,9 @@ const SECTIONS = [
 const itemClass =
   'flex cursor-pointer items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground aria-selected:bg-muted aria-selected:text-foreground'
 
-export function CommandMenu ({ posts }: { posts: { slug: string; title: string }[] }) {
+type CommandLink = { slug: string; title: string }
+
+export function CommandMenu ({ posts, components }: { posts: CommandLink[]; components: CommandLink[] }) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
   const { resolvedTheme, setTheme } = useTheme()
@@ -94,7 +98,7 @@ export function CommandMenu ({ posts }: { posts: { slug: string; title: string }
               />
               <kbd className='hidden shrink-0 border px-1.5 py-0.5 text-[11px] text-muted-foreground sm:block'>esc</kbd>
             </div>
-            <Command.List data-lenis-prevent className='max-h-[60vh] overflow-y-auto overscroll-contain py-2'>
+            <Command.List data-lenis-prevent className='max-h-[60vh] overflow-y-auto overscroll-contain scroll-fade no-scrollbar py-2'>
               <Command.Empty className='px-3 py-6 text-center text-sm text-muted-foreground'>
                 No results. Try “blog” or “resume”.
               </Command.Empty>
@@ -124,6 +128,22 @@ export function CommandMenu ({ posts }: { posts: { slug: string; title: string }
                     >
                       <FileTextIcon className='size-4 shrink-0' />
                       <span className='truncate'>{p.title}</span>
+                    </Command.Item>
+                  ))}
+                </Command.Group>
+              )}
+
+              {components.length > 0 && (
+                <Command.Group heading='# components' className='[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:text-muted-foreground/70'>
+                  {components.map((c) => (
+                    <Command.Item
+                      key={c.slug}
+                      value={`component ${c.title}`}
+                      onSelect={() => run(() => router.push(`/components/${c.slug}`))}
+                      className={itemClass}
+                    >
+                      <BlocksIcon className='size-4 shrink-0' />
+                      <span className='truncate'>{c.title}</span>
                     </Command.Item>
                   ))}
                 </Command.Group>

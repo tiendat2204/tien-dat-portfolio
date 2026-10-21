@@ -7,6 +7,8 @@ import { indexPostsBySlug, sortPostsNewestFirst } from '@/lib/blog/post-index'
 import type { Post, PostMetadata } from '@/types/blog'
 
 const blogContentDir = path.join(process.cwd(), 'src', 'content', 'blog')
+// Open-source component docs live apart from articles and are served under /components.
+const componentsContentDir = path.join(process.cwd(), 'src', 'content', 'components')
 
 function parseFrontmatter (fileContent: string) {
   const file = matter(fileContent)
@@ -42,14 +44,17 @@ function getMDXData (dir: string) {
   })
 }
 
-const getCachedBlogData = cache(() => {
-  const sorted = sortPostsNewestFirst(getMDXData(blogContentDir))
+function loadCollection (dir: string) {
+  const sorted = sortPostsNewestFirst(getMDXData(dir))
 
   return {
     sorted,
     bySlug: indexPostsBySlug(sorted),
   }
-})
+}
+
+const getCachedBlogData = cache(() => loadCollection(blogContentDir))
+const getCachedComponentData = cache(() => loadCollection(componentsContentDir))
 
 export function getAllPosts () {
   return [...getCachedBlogData().sorted]
@@ -61,6 +66,14 @@ export function getPostBySlug (slug: string) {
 
 export function getPostsByCategory (category: string) {
   return getAllPosts().filter((post) => post.metadata?.category === category)
+}
+
+export function getAllComponents () {
+  return [...getCachedComponentData().sorted]
+}
+
+export function getComponentBySlug (slug: string) {
+  return getCachedComponentData().bySlug.get(slug)
 }
 
 export function findNeighbour (posts: Post[], slug: string) {

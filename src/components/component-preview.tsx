@@ -45,13 +45,13 @@ export function ComponentPreview ({
   return (
     <div className={cn('my-6', className)} {...props}>
       <Tabs defaultValue='preview' className='gap-4'>
-        <TabsList>
-          <TabsTrigger value='preview'>Preview</TabsTrigger>
-          <TabsTrigger value='code'>Code</TabsTrigger>
+        <TabsList variant='line' className='font-ibm'>
+          <TabsTrigger value='preview' className='px-2 text-sm'>Preview</TabsTrigger>
+          <TabsTrigger value='code' className='px-2 text-sm'>Code</TabsTrigger>
         </TabsList>
 
         <TabsContent value='preview'>
-          <div className='rounded-lg border p-4
+          <div className='border border-dashed p-4
   bg-radial-[125%_125%_at_50%_10%]
   from-[rgba(255,255,255,0.8)] from-40% to-[rgba(240,240,240,1)] to-100%
   dark:from-[rgba(34,34,34,0.6)] dark:from-40% dark:to-[rgba(0,0,0,1)] dark:to-100%'
@@ -62,7 +62,6 @@ export function ComponentPreview ({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
-                        className='rounded-md'
                         variant='secondary'
                         size='icon'
                         onClick={() => setReplay((v) => v + 1)}

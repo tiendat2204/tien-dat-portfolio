@@ -3,7 +3,6 @@
 import { Badge } from '@/components/ui/badge'
 import { DATA } from '@/data/resume'
 import { BlurFade } from '@/components/magicui/blur-fade'
-import BlurFadeText from '@/components/magicui/blur-fade-text'
 import Image from 'next/image'
 
 const BLUR_FADE_DELAY = 0.04
@@ -47,6 +46,24 @@ export function SkillBadge ({ name, icon, iconDark, variant = 'secondary' }: Ski
   )
 }
 
+type Skill = { readonly name: string; readonly icon?: string; readonly iconDark?: string }
+
+// Every skill in the grouped lists, so the intro sentence reuses their names and icons.
+const ALL_SKILLS = new Map<string, Skill>(
+  Object.values(DATA.skills).flatMap((group) => (Array.isArray(group) ? group : []) as Skill[]).map((skill) => [skill.name, skill])
+)
+
+// Inline badge sized to the text line so the paragraph keeps an even rhythm.
+function Stack ({ name, label }: { name: string; label?: string }) {
+  const skill = ALL_SKILLS.get(name)
+  return (
+    <Badge variant='secondary' className='align-middle py-0.5 text-xs font-medium'>
+      <SkillIcon name={label ?? name} icon={skill?.icon} iconDark={skill?.iconDark} />
+      {label ?? name}
+    </Badge>
+  )
+}
+
 interface CategorySectionProps {
   title: string;
   skills: readonly { readonly name: string; readonly icon?: string; readonly iconDark?: string }[];
@@ -80,83 +97,16 @@ export default function SkillsSection () {
   return (
     <div className=' p-4  font-ibm'>
       <div className='max-w-4xl mx-auto'>
-        <BlurFadeText
-          delay={BLUR_FADE_DELAY}
-          className='dark:text-gray-400 text-muted-foreground text-sm mb-2'
-          text='Which I use? See below.'
-        />
-
         <BlurFade delay={BLUR_FADE_DELAY * 2}>
-          <div className='mb-4  screen-line-after pb-4'>
-            {' '}
-            <div className='dark:text-gray-300 text-muted-foreground text-sm leading-8 '>
-              My main Tech stack is{' '}
-              <BlurFade delay={BLUR_FADE_DELAY * 3} className='inline-block'>
-                <SkillBadge
-                  name={DATA.skills.mainStack.framework.name}
-                  icon={DATA.skills.mainStack.framework.icon}
-                  iconDark={DATA.skills.mainStack.framework.iconDark}
-                />
-              </BlurFade>{' '}
-              and
-              {' '}
-              <BlurFade delay={BLUR_FADE_DELAY * 4} className='inline-block'>
-                <SkillBadge
-                  name={DATA.skills.mainStack.framework2.name}
-                  icon={DATA.skills.mainStack.framework2.icon}
-                  iconDark={DATA.skills.mainStack.framework2.iconDark}
-                />
-              </BlurFade>{' '}
-              as a frontend
-
-              framework with{' '}
-              <BlurFade delay={BLUR_FADE_DELAY * 4} className='inline-block'>
-                <SkillBadge
-                  name={DATA.skills.mainStack.styling.name}
-                  icon={DATA.skills.mainStack.styling.icon}
-                />
-              </BlurFade>{' '}
-              CSS as a styling library, for the database I use{' '}
-              <BlurFade delay={BLUR_FADE_DELAY * 5} className='inline-block'>
-                <SkillBadge
-                  name={DATA.skills.mainStack.database.name}
-                  icon={DATA.skills.mainStack.database.icon}
-                />
-              </BlurFade>{' '}
-              deployed on{' '}
-              <BlurFade delay={BLUR_FADE_DELAY * 6} className='inline-block'>
-                <SkillBadge
-                  name={DATA.skills.mainStack.deployment.name}
-                  icon={DATA.skills.mainStack.deployment.icon}
-                />
-              </BlurFade>{' '}
-              with{' '}
-              <BlurFade delay={BLUR_FADE_DELAY * 7} className='inline-block'>
-                <SkillBadge
-                  name={DATA.skills.mainStack.orm.name}
-                  icon={DATA.skills.mainStack.orm.icon}
-                />
-              </BlurFade>{' '}
-              as an ORM, for database management I use{' '}
-              <BlurFade delay={BLUR_FADE_DELAY * 8} className='inline-block'>
-                <SkillBadge
-                  name={DATA.skills.mainStack.databaseTool.name}
-                  icon={DATA.skills.mainStack.databaseTool.icon}
-                />
-              </BlurFade>
-            </div>
-            <br />
-            <div className='dark:text-gray-300 text-muted-foreground text-sm'>
-              At last, but not least, I use{' '}
-              <BlurFade delay={BLUR_FADE_DELAY * 9} className='inline-block'>
-                <SkillBadge
-                  name={DATA.skills.mainStack.ide.name}
-                  icon={DATA.skills.mainStack.ide.icon}
-                />
-              </BlurFade>{' '}
-              IDE for creating awesome projects. 🖤
-            </div>
-          </div>
+          <p className='mb-4 screen-line-after pb-4 text-sm leading-8 text-muted-foreground dark:text-gray-300'>
+            I build full-stack with <Stack name='TypeScript' />: <Stack name='Next.js' /> and <Stack name='React' /> on
+            the frontend, styled with <Stack name='Tailwind CSS' /> and <Stack name='shadcn/ui' />, with{' '}
+            <Stack name='TanStack Router · Query · Table' label='TanStack Query' /> for server state. On the backend I
+            use <Stack name='NestJS' /> and <Stack name='Django REST Framework' /> on <Stack name='PostgreSQL' />,
+            through <Stack name='Drizzle' /> or <Stack name='Prisma' />. I ship with <Stack name='Docker' /> and{' '}
+            <Stack name='GitHub Actions' />, test with <Stack name='Playwright' /> and <Stack name='Vitest' />, and write
+            code in <Stack name='WebStorm' /> and <Stack name='VS Code' /> alongside <Stack name='Claude Code' />.
+          </p>
         </BlurFade>
 
         <CategorySection
@@ -198,12 +148,6 @@ export default function SkillsSection () {
           title='PLATFORMS'
           skills={DATA.skills.platforms}
           delay={BLUR_FADE_DELAY * 38}
-        />
-
-        <BlurFadeText
-          delay={BLUR_FADE_DELAY * 40}
-          className='text-gray-500 text-sm mt-4'
-          text='Few more... but secret hehehe :3'
         />
       </div>
     </div>

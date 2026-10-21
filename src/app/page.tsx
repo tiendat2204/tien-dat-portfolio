@@ -10,10 +10,15 @@ import { BlurFade } from '@/components/magicui/blur-fade'
 import SkillsSection from './section/skills-section'
 import WorkSection from '@/app/section/work-section'
 import BlogSection from '@/app/section/blog-section'
+import ComponentsSection from '@/app/section/components-section'
 import { Icon } from '@/components/Icon'
 import { TextLoop } from '@/components/ui/text-loop'
 import { Icons } from '@/components/icons'
-import { BLUR_FADE_DELAY } from '@/data/config'
+import { BLUR_FADE_DELAY, SITE_INFO } from '@/data/config'
+import { SEO_PROFILE } from '@/data/seo'
+import { buildPageMetadata } from '@/lib/seo/metadata'
+import { buildProfilePageJsonLd } from '@/lib/seo/jsonld'
+import { USER } from '@/data/user'
 import { GitHubContributions } from './section/github-contributions'
 import { InsightsSection } from './section/insights-section'
 import { Status, StatusIndicator, StatusLabel } from '@/components/kibo-ui/status'
@@ -21,9 +26,32 @@ import { BackgroundHero } from '@/components/landing/background-hero'
 import { LocalTime } from '@/components/local-time'
 import { HowIBuildSection } from './section/how-i-build-section'
 
+export const metadata = buildPageMetadata({
+  siteUrl: SITE_INFO.url,
+  siteName: SEO_PROFILE.name,
+  path: '/',
+  title: SEO_PROFILE.homeTitle,
+  description: SEO_PROFILE.description,
+  absoluteTitle: true,
+  type: 'profile',
+  image: SEO_PROFILE.image,
+})
+
 export default function Page () {
+  const profileJsonLd = buildProfilePageJsonLd({
+    siteUrl: SITE_INFO.url,
+    dateCreated: USER.dateCreated,
+    dateModified: new Date().toISOString(),
+  })
+
   return (
     <main className='flex flex-col min-h-dvh mx-auto w-full max-w-3xl'>
+      <script
+        type='application/ld+json'
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(profileJsonLd).replace(/</g, '\\u003c'),
+        }}
+      />
 
       <section
         id='background'
@@ -241,9 +269,11 @@ export default function Page () {
           ))}
         </div>
       </section>
+      <ComponentsSection />
       <section
         id='awards'
-        className='relative screen-line-after border-x font-ibm'
+        // Education links jump here; clear the sticky 3.5rem header.
+        className='relative scroll-mt-16 screen-line-after border-x font-ibm'
       >
         <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
@@ -266,7 +296,7 @@ export default function Page () {
                   description={award.description}
                   location={award.location}
                   dates={award.dates}
-                  image={award.image}
+                  image={'image' in award ? award.image : undefined}
                   images={'images' in award ? award.images : undefined}
                   logo={'logo' in award ? award.logo : undefined}
                   links={award.links}

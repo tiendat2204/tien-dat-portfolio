@@ -8,18 +8,17 @@ const nextConfig = {
     return config
   },
   transpilePackages: ["next-mdx-remote"],
-  async rewrites() {
-    return [
-      {
-        source: "/blog/:slug.md",
-        destination: "/blog.md/:slug",
-      },
-    ];
-  },
   trailingSlash: true,
+  // These component docs used to live under /blog; keep old links and rankings working.
+  async redirects() {
+    return ['dynamic-color-extraction', 'navigation-menu-ssr', 'sticker-animation'].map((slug) => ({
+      source: `/blog/${slug}`,
+      destination: `/components/${slug}/`,
+      permanent: true,
+    }))
+  },
   images: {
     domains: [
-      'assets.tiendatdev',
       'github.com',
       'avatars.githubusercontent.com',
       'lh3.googleusercontent.com',

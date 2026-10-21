@@ -47,14 +47,15 @@ const components: MDXRemoteProps['components'] = {
   th: TableHead,
   td: TableCell,
   img: ({ src, alt, className, width, height, ...props }: React.ComponentProps<'img'>) => {
-    if (!src || typeof src !== 'string') return <img {...props} />
+    // src and alt are already destructured, so the old <img {...props} /> fallback rendered an empty image.
+    if (!src || typeof src !== 'string') return null
 
     return (
       <ImageZoom
         src={src}
         alt={alt || ''}
         className={cn(
-          'rounded-lg border shadow-sm transition-all duration-200 hover:shadow-md',
+          'border shadow-sm transition-all duration-200 hover:shadow-md',
           className
         )}
         width={typeof width === 'string' ? parseInt(width) || 800 : width || 800}
@@ -139,12 +140,17 @@ const components: MDXRemoteProps['components'] = {
     <h3 className={cn('step', className)} {...props} />
   ),
   Tabs,
-  TabsList,
-  TabsTrigger,
+  // Same underlined tabs as ComponentPreview's Preview/Code.
+  TabsList: ({ className, ...props }: React.ComponentProps<typeof TabsList>) => (
+    <TabsList variant='line' className={cn('mb-2 font-ibm', className)} {...props} />
+  ),
+  TabsTrigger: ({ className, ...props }: React.ComponentProps<typeof TabsTrigger>) => (
+    <TabsTrigger className={cn('px-2 text-sm', className)} {...props} />
+  ),
   TabsContent,
   TabsTriggerShadcnCLI: () => (
-    <TabsTrigger value='cli'>
-      <Icons.ShadcnUI className='fill-background' />
+    <TabsTrigger value='cli' className='px-2 text-sm'>
+      <Icons.ShadcnUI className='fill-current' />
       shadcn CLI
     </TabsTrigger>
   ),

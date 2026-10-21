@@ -55,6 +55,12 @@ This project is optimized for deployment on Vercel. You can deploy it instantly 
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftiendat2204%2Ftien-dat-portfolio)
 
+## 🔎 Search Console
+
+- Verify `tiendat.work` with a DNS TXT record, or add `verification: { google: '<token>' }` to the `metadata` export in `src/app/layout.tsx`.
+- Submit `https://tiendat.work/sitemap.xml`.
+- Use URL Inspection on `/blog/` and `/uses/` to request re-indexing after the canonical fix.
+
 ## ✅ Quality Checks
 
 ```bash

@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
@@ -10,12 +9,12 @@ import { DynamicIslandTOC } from '@/components/ui/dynamic-island-toc'
 import { Prose } from '@/components/ui/typography'
 import { getAllPosts, getPostBySlug } from '@/data/blog'
 import { BLUR_FADE_DELAY, SITE_INFO } from '@/data/config'
-import { USER } from '@/data/user'
-import { buildBlogPostingJsonLd } from '@/lib/seo/jsonld'
+import { SEO_PROFILE } from '@/data/seo'
+import { parsePublishedAt } from '@/lib/seo/date'
+import { buildBlogPostingJsonLd, buildBreadcrumbJsonLd } from '@/lib/seo/jsonld'
 import {
-  buildCanonicalUrl,
   buildMissingPostMetadata,
-  buildOgImageUrl,
+  buildPageMetadata,
 } from '@/lib/seo/metadata'
 
 import { Back } from './back'
@@ -24,8 +23,7 @@ export const revalidate = 3600
 export const dynamicParams = false
 
 function toIsoDateOrUndefined (value: string) {
-  const parsed = dayjs(value)
-  return parsed.isValid() ? parsed.toISOString() : undefined
+  return parsePublishedAt(value)?.toISOString()
 }
 
 export async function generateStaticParams () {
@@ -49,37 +47,19 @@ export async function generateMetadata ({
 
   const { title, description, image, publishedAt } = post.metadata
 
-  const canonicalUrl = buildCanonicalUrl(SITE_INFO.url, `/blog/${post.slug}`)
-  const ogImage = buildOgImageUrl(image, title)
   const publishedTime = toIsoDateOrUndefined(publishedAt)
 
-  return {
+  return buildPageMetadata({
+    siteUrl: SITE_INFO.url,
+    siteName: SEO_PROFILE.name,
+    path: `/blog/${post.slug}`,
     title,
     description,
-    alternates: {
-      canonical: canonicalUrl,
-    },
-    openGraph: {
-      url: canonicalUrl,
-      type: 'article',
-      ...(publishedTime !== undefined
-        ? {
-            publishedTime,
-            modifiedTime: publishedTime,
-          }
-        : {}),
-      images: {
-        url: ogImage,
-        width: 1200,
-        height: 630,
-        alt: title,
-      },
-    },
-    twitter: {
-      card: 'summary_large_image',
-      images: [ogImage],
-    },
-  }
+    image,
+    type: 'article',
+    publishedTime,
+    authors: [SEO_PROFILE.name],
+  })
 }
 
 export default async function Page ({
@@ -103,12 +83,12 @@ export default async function Page ({
     image: post.metadata.image,
     publishedAt: post.metadata.publishedAt,
     siteUrl: SITE_INFO.url,
-    author: {
-      name: USER.displayName,
-      identifier: USER.username,
-      image: USER.avatar,
-    },
   })
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd(SITE_INFO.url, [
+    { name: 'Home', path: '/' },
+    { name: 'Blog', path: '/blog' },
+    { name: post.metadata.title, path: `/blog/${post.slug}` },
+  ])
   return (
     <div className='relative'>
       <div className='mx-auto w-full max-w-3xl'>
@@ -124,6 +104,12 @@ export default async function Page ({
               __html: JSON.stringify(pageJsonLd).replace(/</g, '\\u003c'),
             }}
           />
+          <script
+            type='application/ld+json'
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c'),
+            }}
+          />
           <div
             className='relative screen-line-after flex items-center justify-between p-2 pl-4 mx-auto max-w-3xl'
           >
@@ -136,7 +122,7 @@ export default async function Page ({
             <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
           </div>
 
-          <DynamicIslandTOC selector='article h2, article h3'>
+          <DynamicIslandTOC selector='article h2:not(.not-prose *), article h3:not(.not-prose *)'>
             <div className='mx-auto max-w-3xl'>
               <Prose className=' max-w-3xl mx-auto' asChild>
                 <article>

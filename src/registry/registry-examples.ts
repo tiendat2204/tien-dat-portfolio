@@ -1,4 +1,4 @@
-import type { Registry } from 'shadcn/registry'
+import type { Registry } from 'shadcn/schema'
 
 export const examples: Registry['items'] = [
   {
@@ -30,6 +30,17 @@ export const examples: Registry['items'] = [
     files: [
       {
         path: 'examples/dynamic-color-extraction-demo.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
+  {
+    name: 'infinite-select-demo',
+    type: 'registry:example',
+    registryDependencies: ['https://tiendat.work/r/infinite-select.json'],
+    files: [
+      {
+        path: 'examples/infinite-select-demo.tsx',
         type: 'registry:example',
       },
     ],
