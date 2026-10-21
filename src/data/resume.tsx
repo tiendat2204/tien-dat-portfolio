@@ -21,16 +21,6 @@ export const DATA = {
   avatarLineArtUrl: '/me-lineart.svg?v=9',
   avatarLineArtDarkUrl: '/me-lineart-dark.svg?v=1',
   skills: {
-    mainStack: {
-      framework: { name: 'Next.js', icon: 'skills/nextjs.svg', iconDark: 'skills/nextjs-dark.svg' },
-      framework2: { name: 'React', icon: 'skills/react.svg', iconDark: 'skills/react-dark.svg' },
-      styling: { name: 'Tailwind', icon: 'skills/tailwindcss.svg' },
-      database: { name: 'PostgreSQL', icon: 'skills/postgresql.svg' },
-      deployment: { name: 'Nginx', icon: 'skills/nginx.svg' },
-      orm: { name: 'Django', icon: 'skills/django.svg' },
-      databaseTool: { name: 'SQL', icon: 'skills/sqlite.svg' },
-      ide: { name: 'VS Code', icon: 'skills/vscode.svg' },
-    },
     // Grouped like the CV. Icons live in /public/icons; `iconDark` is used in dark mode when set.
     languages: [
       { name: 'TypeScript', icon: 'skills/typescript.svg' },
