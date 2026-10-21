@@ -20,3 +20,9 @@ test('buildRssXml omits pubDate for invalid dates', () => {
   const xml = buildRssXml({ ...base, posts: [{ slug: 'c', title: 'C', description: 'x', publishedAt: 'nope' }] })
   assert.doesNotMatch(xml, /<pubDate>/)
 })
+
+test('buildRssXml emits dc:creator per item', () => {
+  const xml = buildRssXml({ ...base, posts: [{ slug: 'a', title: 'A', description: 'x', publishedAt: '2025-07-05' }] })
+  assert.match(xml, /xmlns:dc="http:\/\/purl\.org\/dc\/elements\/1\.1\/"/)
+  assert.match(xml, /<dc:creator>Tien Dat<\/dc:creator>/)
+})

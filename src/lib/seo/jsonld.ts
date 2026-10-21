@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import type {
   BlogPosting,
   BreadcrumbList,
@@ -8,6 +7,7 @@ import type {
   WithContext,
 } from 'schema-dts'
 
+import { parsePublishedAt } from '@/lib/seo/date'
 import { buildCanonicalUrl, buildOgImageUrl } from '@/lib/seo/metadata'
 
 export type PersonInput = {
@@ -26,7 +26,6 @@ type BuildBlogPostingJsonLdInput = {
   image?: string;
   publishedAt: string;
   siteUrl: string;
-  authorName: string;
 }
 
 const FALLBACK_SITE_URL = 'https://example.com'
@@ -52,8 +51,7 @@ function buildAbsoluteUrl (url: string, siteUrl: string, fallbackPath: string) {
 }
 
 function toIsoDateOrUndefined (value: string) {
-  const parsed = dayjs(value)
-  return parsed.isValid() ? parsed.toISOString() : undefined
+  return parsePublishedAt(value)?.toISOString()
 }
 
 export function personId (siteUrl: string) {

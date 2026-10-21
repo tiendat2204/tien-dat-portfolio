@@ -1,3 +1,4 @@
+import { parsePublishedAt } from './date'
 import { buildCanonicalUrl } from './metadata'
 
 type RssPost = { slug: string, title: string, description: string, publishedAt: string }
@@ -6,7 +7,7 @@ type RssInput = {
   siteUrl: string
   title: string
   description: string
-  authorName: string // accepted for API symmetry; RSS <author> requires an email, so unused
+  authorName: string
   posts: RssPost[]
 }
 
@@ -17,26 +18,26 @@ const escapeXml = (value: string) => value
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&apos;')
 
-export function buildRssXml ({ siteUrl, title, description, posts }: RssInput): string {
+export function buildRssXml ({ siteUrl, title, description, authorName, posts }: RssInput): string {
   const origin = new URL(siteUrl).origin
   const items = posts.map(post => {
     const link = escapeXml(buildCanonicalUrl(siteUrl, `/blog/${post.slug}`))
-    // Single parser (not dayjs) so validation and value agree; date-only strings are UTC.
-    const date = new Date(post.publishedAt)
-    const pubDate = Number.isNaN(date.getTime()) ? '' : `\n      <pubDate>${date.toUTCString()}</pubDate>`
+    const date = parsePublishedAt(post.publishedAt)
+    const pubDate = date === undefined ? '' : `\n      <pubDate>${date.toUTCString()}</pubDate>`
     return [
       '    <item>',
       `      <title>${escapeXml(post.title)}</title>`,
       `      <link>${link}</link>`,
       `      <guid isPermaLink="true">${link}</guid>`,
-      `      <description>${escapeXml(post.description)}</description>${pubDate}`,
+      `      <description>${escapeXml(post.description)}</description>`,
+      `      <dc:creator>${escapeXml(authorName)}</dc:creator>${pubDate}`,
       '    </item>',
     ].join('\n')
   })
 
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
-    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">',
     '  <channel>',
     `    <title>${escapeXml(title)}</title>`,
     `    <link>${escapeXml(buildCanonicalUrl(siteUrl, '/'))}</link>`,

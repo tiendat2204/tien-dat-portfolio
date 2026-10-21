@@ -11,7 +11,6 @@ const nextConfig = {
   trailingSlash: true,
   images: {
     domains: [
-      'assets.tiendatdev',
       'github.com',
       'avatars.githubusercontent.com',
       'lh3.googleusercontent.com',

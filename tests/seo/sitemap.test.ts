@@ -12,3 +12,8 @@ test('buildSitemapEntries omits lastModified for invalid dates', () => {
   const r = buildSitemapEntries('https://tiendat.work', [{ slug: 'b', publishedAt: 'nope' }], new Date())
   assert.equal(r[3].lastModified, undefined)
 })
+
+test('buildSitemapEntries omits lastModified for compact dates that Date cannot parse', () => {
+  const r = buildSitemapEntries('https://tiendat.work', [{ slug: 'c', publishedAt: '20250705' }], new Date())
+  assert.equal(r[3].lastModified, undefined)
+})

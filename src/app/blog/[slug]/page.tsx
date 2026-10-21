@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
@@ -11,6 +10,7 @@ import { Prose } from '@/components/ui/typography'
 import { getAllPosts, getPostBySlug } from '@/data/blog'
 import { BLUR_FADE_DELAY, SITE_INFO } from '@/data/config'
 import { SEO_PROFILE } from '@/data/seo'
+import { parsePublishedAt } from '@/lib/seo/date'
 import { buildBlogPostingJsonLd, buildBreadcrumbJsonLd } from '@/lib/seo/jsonld'
 import {
   buildMissingPostMetadata,
@@ -23,8 +23,7 @@ export const revalidate = 3600
 export const dynamicParams = false
 
 function toIsoDateOrUndefined (value: string) {
-  const parsed = dayjs(value)
-  return parsed.isValid() ? parsed.toISOString() : undefined
+  return parsePublishedAt(value)?.toISOString()
 }
 
 export async function generateStaticParams () {
@@ -84,7 +83,6 @@ export default async function Page ({
     image: post.metadata.image,
     publishedAt: post.metadata.publishedAt,
     siteUrl: SITE_INFO.url,
-    authorName: SEO_PROFILE.name,
   })
   const breadcrumbJsonLd = buildBreadcrumbJsonLd(SITE_INFO.url, [
     { name: 'Home', path: '/' },

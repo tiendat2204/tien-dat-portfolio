@@ -37,8 +37,10 @@ test('buildOgImageUrl falls back to generated OG endpoint', () => {
 
 test('buildMissingPostMetadata marks missing slugs as noindex', () => {
   const metadata = buildMissingPostMetadata('missing-slug')
-  assert.equal(metadata.robots?.index, false)
-  assert.equal(metadata.robots?.follow, false)
+  const robots = metadata.robots
+  assert.ok(robots && typeof robots === 'object')
+  assert.equal(robots.index, false)
+  assert.equal(robots.follow, false)
 })
 
 type OgShape = { url?: string, title?: string, type?: string, siteName?: string, locale?: string, images: { url: string, width?: number }[] }

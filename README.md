@@ -57,7 +57,7 @@ This project is optimized for deployment on Vercel. You can deploy it instantly 
 
 ## 🔎 Search Console
 
-- Verify `tiendat.work` with a DNS TXT record, or put the token in `verification.google` in `src/app/layout.tsx`.
+- Verify `tiendat.work` with a DNS TXT record, or add `verification: { google: '<token>' }` to the `metadata` export in `src/app/layout.tsx`.
 - Submit `https://tiendat.work/sitemap.xml`.
 - Use URL Inspection on `/blog/` and `/uses/` to request re-indexing after the canonical fix.
 
