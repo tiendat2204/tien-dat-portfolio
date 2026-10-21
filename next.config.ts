@@ -9,6 +9,14 @@ const nextConfig = {
   },
   transpilePackages: ["next-mdx-remote"],
   trailingSlash: true,
+  // These component docs used to live under /blog; keep old links and rankings working.
+  async redirects() {
+    return ['dynamic-color-extraction', 'navigation-menu-ssr', 'sticker-animation'].map((slug) => ({
+      source: `/blog/${slug}`,
+      destination: `/components/${slug}/`,
+      permanent: true,
+    }))
+  },
   images: {
     domains: [
       'github.com',

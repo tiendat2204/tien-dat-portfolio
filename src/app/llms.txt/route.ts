@@ -1,4 +1,4 @@
-import { getAllPosts } from '@/data/blog'
+import { getAllComponents, getAllPosts } from '@/data/blog'
 import { SITE_INFO } from '@/data/config'
 import { DATA } from '@/data/resume'
 
@@ -22,6 +22,7 @@ export function GET () {
     `- [Home](${base}/): profile, skills, experience, projects and awards`,
     `- [Blog](${base}/blog): articles on frontend work and life as a developer`,
     `- [Uses](${base}/uses): how I build with AI coding agents (Claude Code, Codex, GitHub Copilot) and my tools`,
+    `- [Components](${base}/components): open-source React components, installable with the shadcn CLI`,
     '',
     '## Experience',
     ...DATA.work.flatMap((company) =>
@@ -45,6 +46,9 @@ export function GET () {
     '',
     '## Blog posts',
     ...getAllPosts().map((p) => `- [${p.metadata.title}](${base}/blog/${p.slug}): ${p.metadata.description ?? ''}`.trimEnd()),
+    '',
+    '## Components',
+    ...getAllComponents().map((c) => `- [${c.metadata.title}](${base}/components/${c.slug}): ${c.metadata.description ?? ''}`.trimEnd()),
     '',
     '## Links',
     ...Object.values(DATA.contact.social).map((s) => `- [${s.name}](${s.url})`),

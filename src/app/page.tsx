@@ -10,6 +10,7 @@ import { BlurFade } from '@/components/magicui/blur-fade'
 import SkillsSection from './section/skills-section'
 import WorkSection from '@/app/section/work-section'
 import BlogSection from '@/app/section/blog-section'
+import ComponentsSection from '@/app/section/components-section'
 import { Icon } from '@/components/Icon'
 import { TextLoop } from '@/components/ui/text-loop'
 import { Icons } from '@/components/icons'
@@ -268,6 +269,7 @@ export default function Page () {
           ))}
         </div>
       </section>
+      <ComponentsSection />
       <section
         id='awards'
         className='relative screen-line-after border-x font-ibm'

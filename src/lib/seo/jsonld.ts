@@ -3,6 +3,7 @@ import type {
   BreadcrumbList,
   Person,
   ProfilePage,
+  SoftwareSourceCode,
   WebSite,
   WithContext,
 } from 'schema-dts'
@@ -160,5 +161,41 @@ export function buildBreadcrumbJsonLd (
       name: item.name,
       item: buildCanonicalUrl(safeSiteUrl, item.path),
     })),
+  }
+}
+
+type BuildComponentJsonLdInput = {
+  slug: string;
+  title: string;
+  description: string;
+  image?: string;
+  publishedAt: string;
+  siteUrl: string;
+}
+
+export function buildComponentJsonLd (
+  input: BuildComponentJsonLdInput
+): WithContext<SoftwareSourceCode> {
+  const safeSiteUrl = getSafeSiteUrl(input.siteUrl)
+  const image = buildAbsoluteUrl(
+    buildOgImageUrl(input.image, input.title),
+    safeSiteUrl,
+    buildOgImageUrl(undefined, input.title)
+  )
+  const url = buildCanonicalUrl(safeSiteUrl, `/components/${input.slug}`)
+  const publishedDate = toIsoDateOrUndefined(input.publishedAt)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareSourceCode',
+    '@id': url,
+    name: input.title,
+    description: input.description,
+    image,
+    url,
+    programmingLanguage: 'TypeScript',
+    runtimePlatform: 'React',
+    ...(publishedDate !== undefined ? { datePublished: publishedDate } : {}),
+    author: { '@id': personId(safeSiteUrl) },
   }
 }

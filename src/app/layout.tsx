@@ -16,7 +16,7 @@ import TransitionProvider from '@/components/TransitionProvider'
 import { CommandMenu } from '@/components/command-menu'
 import { UiEffects } from '@/components/ui-effects'
 import { KeyboardShortcuts } from '@/components/keyboard-shortcuts'
-import { getAllPosts } from '@/data/blog'
+import { getAllComponents, getAllPosts } from '@/data/blog'
 import { FloatingGreeting } from '@/components/time-greeting'
 import { Caveat } from 'next/font/google'
 
@@ -147,7 +147,10 @@ export default function RootLayout ({
 
                 {children}
                 <Footer />
-                <CommandMenu posts={getAllPosts().map((p) => ({ slug: p.slug, title: p.metadata.title }))} />
+                <CommandMenu
+                  posts={getAllPosts().map((p) => ({ slug: p.slug, title: p.metadata.title }))}
+                  components={getAllComponents().map((c) => ({ slug: c.slug, title: c.metadata.title }))}
+                />
                 <UiEffects />
                 <FloatingGreeting />
                 <KeyboardShortcuts />

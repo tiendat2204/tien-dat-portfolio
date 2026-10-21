@@ -4,6 +4,7 @@ import test from 'node:test'
 import {
   buildBlogPostingJsonLd,
   buildBreadcrumbJsonLd,
+  buildComponentJsonLd,
   buildProfilePageJsonLd,
   buildWebSiteJsonLd,
 } from '../../src/lib/seo/jsonld'
@@ -145,4 +146,22 @@ test('buildBreadcrumbJsonLd numbers items from 1 with canonical urls', () => {
   const r = buildBreadcrumbJsonLd('https://tiendat.work', [{ name: 'Home', path: '/' }, { name: 'Blog', path: '/blog' }])
   assert.equal((r.itemListElement as any)[1].position, 2)
   assert.equal((r.itemListElement as any)[1].item, 'https://tiendat.work/blog/')
+})
+
+test('buildComponentJsonLd describes a SoftwareSourceCode page under /components', () => {
+  const r = buildComponentJsonLd({
+    slug: 'sticker-animation',
+    title: 'Sticker Animation',
+    description: 'Animated stickers',
+    image: '/blog/sticker-animation.png',
+    publishedAt: '2024-12-06',
+    siteUrl: 'https://tiendat.work/',
+  })
+  assert.equal(r['@type'], 'SoftwareSourceCode')
+  assert.equal(r['@id'], 'https://tiendat.work/components/sticker-animation/')
+  assert.equal(r.url, 'https://tiendat.work/components/sticker-animation/')
+  assert.equal(r.image, 'https://tiendat.work/blog/sticker-animation.png')
+  assert.equal(r.datePublished, '2024-12-06T00:00:00.000Z')
+  assert.deepEqual(r.author, { '@id': 'https://tiendat.work/#person' })
+  assert.equal(r.programmingLanguage, 'TypeScript')
 })
