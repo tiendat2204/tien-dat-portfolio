@@ -120,6 +120,8 @@ export function AwardCard ({
                 <Link
                   href={link.href}
                   key={idx}
+                  // Press articles and certificates live on other sites; keep the portfolio open.
+                  {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Badge key={idx} title={link.title} className='flex min-h-8 gap-2 px-2.5 sm:min-h-0'>

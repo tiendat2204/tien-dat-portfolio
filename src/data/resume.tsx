@@ -261,7 +261,7 @@ export const DATA = {
       school: 'FPT Polytechnic College',
       href: 'https://fpt.edu.vn',
       degree: 'Associate Degree (College Diploma) in Web Development',
-      logoUrl: '/fpt-logo.png',
+      logoUrl: '/fpt-logo.svg',
       start: 'Aug 2022',
       end: 'May 2024',
       isExpanded: true,
@@ -306,7 +306,7 @@ export const DATA = {
       school: 'Nguyen Viet Xuan High School',
       href: '#',
       degree: 'High School',
-      logoUrl: '/fpt-logo.png',
+      logoUrl: '',
       start: '2020',
       end: '2023',
       isExpanded: false,
@@ -367,7 +367,7 @@ export const DATA = {
           icon: <Icons.Github className='size-3' />,
         },
       ],
-      image: '/projects/portfolio.png',
+      image: '/logo.svg',
     },
     {
       title: 'E-booking Healthcare',
@@ -653,6 +653,7 @@ export const DATA = {
       title: '3rd Place in JS Talent Competition',
       dates: '2023',
       location: 'FPT Polytechnic College HCM',
+      logo: '/fpt-logo.svg',
       description:
         'Won 3rd place in the 2023 JS Talent competition organized by FPT Polytechnic College, demonstrating advanced front-end development skills and creating innovative web applications.',
       image: '/js-talent.jpg',
@@ -662,6 +663,7 @@ export const DATA = {
       title: 'Golden Bee Award (6th Edition)',
       dates: 'December, 2023',
       location: 'FPT Polytechnic College HCM',
+      logo: '/fpt-logo.svg',
       description:
         "Received the prestigious Golden Bee Award (6th edition) for academic excellence and active contributions to the college's academic activities and community.",
       image: '/gold-bee.jpg',
@@ -671,6 +673,7 @@ export const DATA = {
       title: 'Distinguished Graduate',
       dates: '2023 - 2024',
       location: 'FPT Polytechnic College HCM',
+      logo: '/fpt-logo.svg',
       description:
         'Graduated with distinction in Web Development with a GPA of 3.61/4.0, recognized for exceptional web development skills and comprehensive knowledge in information technology.',
       links: [],
