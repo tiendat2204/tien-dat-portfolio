@@ -14,6 +14,8 @@ export const components: Registry['items'] = [
   {
     name: 'navigation-menu',
     type: 'registry:component',
+    // Imports @/components/ui/navigation-menu from shadcn/ui.
+    registryDependencies: ['navigation-menu'],
     files: [
       {
         path: 'MainNavigation/MainNavigation.tsx',
@@ -24,6 +26,7 @@ export const components: Registry['items'] = [
   {
     name: 'dynamic-color-extraction',
     type: 'registry:component',
+    dependencies: ['framer-motion'],
     files: [
       {
         path: 'DynamicColorExtraction/ProductCardClient.tsx',

@@ -122,7 +122,7 @@ export default async function Page ({
             <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
           </div>
 
-          <DynamicIslandTOC selector='article h2, article h3'>
+          <DynamicIslandTOC selector='article h2:not(.not-prose *), article h3:not(.not-prose *)'>
             <div className='mx-auto max-w-3xl'>
               <Prose className=' max-w-3xl mx-auto' asChild>
                 <article>

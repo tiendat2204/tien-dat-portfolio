@@ -45,9 +45,9 @@ export function ComponentPreview ({
   return (
     <div className={cn('my-6', className)} {...props}>
       <Tabs defaultValue='preview' className='gap-4'>
-        <TabsList>
-          <TabsTrigger value='preview'>Preview</TabsTrigger>
-          <TabsTrigger value='code'>Code</TabsTrigger>
+        <TabsList variant='line' className='font-ibm'>
+          <TabsTrigger value='preview' className='px-2 text-sm'>Preview</TabsTrigger>
+          <TabsTrigger value='code' className='px-2 text-sm'>Code</TabsTrigger>
         </TabsList>
 
         <TabsContent value='preview'>
