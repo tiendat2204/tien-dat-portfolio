@@ -317,7 +317,7 @@ export function WorkflowExplorer () {
 
       {open && (
         // Phones scroll the diagram sideways instead of shrinking its text.
-        <div key={`${tab}-${run}`} data-lenis-prevent-wheel className='overflow-x-auto border-t px-4 py-6'>
+        <div key={`${tab}-${run}`} data-lenis-prevent-wheel className='overflow-x-auto scroll-fade-x no-scrollbar border-t px-4 py-6'>
           <div className='min-w-[420px]'>
             {tab === 'review' && <VerticalFlow spec={REVIEW} title='Claude Code and Codex review loop' desc='A prompt is snapshotted, Claude Code plans and builds with superpowers, the change is verified, then Codex reviews the diff; high-confidence P0 or P1 findings go back to Claude to fix or reject.' />}
             {tab === 'superpowers' && <VerticalFlow spec={SUPERPOWERS} title='Superpowers development workflow' desc='Brainstorm a design, isolate the work in a git worktree, write a plan, run a fresh subagent per task with test-driven development and a review after each task, verify, then finish the branch.' />}

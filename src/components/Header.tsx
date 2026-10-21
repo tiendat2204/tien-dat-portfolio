@@ -204,7 +204,7 @@ export function Header () {
         <div
           id='mobile-menu'
           data-lenis-prevent
-          className='fixed inset-x-0 top-14 bottom-0 z-50 overflow-y-auto overscroll-contain bg-background px-4 md:hidden'
+          className='fixed inset-x-0 top-14 bottom-0 z-50 overflow-y-auto overscroll-contain no-scrollbar bg-background px-4 md:hidden'
         >
           <div className='mx-auto flex min-h-full max-w-3xl flex-col border-x font-ibm'>
             <button

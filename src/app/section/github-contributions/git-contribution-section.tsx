@@ -32,7 +32,7 @@ const GitContributionSection = ({ contributions }: GitContributionSectionProps) 
   return (
     <div ref={ref}>
       <ContributionGraph
-        className='mx-auto p-4'
+        className='mx-auto p-4 scroll-fade-x no-scrollbar'
         data={data}
         blockSize={11}
         blockMargin={4}

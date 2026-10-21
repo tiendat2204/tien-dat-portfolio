@@ -30,7 +30,7 @@ export function CodeBlockCommand ({
   }, [__pnpm__, __yarn__, __npm__, __bun__])
 
   return (
-    <div className='relative overflow-hidden rounded-lg bg-code'>
+    <div className='relative overflow-hidden bg-code'>
       <Tabs
         className='gap-0'
         value={packageManager}
@@ -62,7 +62,7 @@ export function CodeBlockCommand ({
         {Object.entries(tabs).map(([key, value]) => {
           return (
             <TabsContent key={key} value={key}>
-              <pre>
+              <pre className='overflow-x-auto scroll-fade-x no-scrollbar'>
                 <code
                   data-slot='code-block'
                   data-language='bash'

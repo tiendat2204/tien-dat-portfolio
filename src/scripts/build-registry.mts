@@ -3,8 +3,8 @@ import { promises as fs } from 'node:fs'
 import path from 'node:path'
 
 import { rimraf } from 'rimraf'
-import type { Registry } from 'shadcn/registry'
-import { registrySchema } from 'shadcn/registry'
+import type { Registry } from 'shadcn/schema'
+import { registrySchema } from 'shadcn/schema'
 
 const REGISTRY_PATH = path.join(process.cwd(), 'src/__registry__')
 

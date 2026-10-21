@@ -98,7 +98,7 @@ export function CommandMenu ({ posts, components }: { posts: CommandLink[]; comp
               />
               <kbd className='hidden shrink-0 border px-1.5 py-0.5 text-[11px] text-muted-foreground sm:block'>esc</kbd>
             </div>
-            <Command.List data-lenis-prevent className='max-h-[60vh] overflow-y-auto overscroll-contain py-2'>
+            <Command.List data-lenis-prevent className='max-h-[60vh] overflow-y-auto overscroll-contain scroll-fade no-scrollbar py-2'>
               <Command.Empty className='px-3 py-6 text-center text-sm text-muted-foreground'>
                 No results. Try “blog” or “resume”.
               </Command.Empty>
