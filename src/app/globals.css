@@ -211,6 +211,11 @@
   *:focus-visible {
     @apply outline-hidden ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
+
+  /* cmdk search inputs sit inside a field that already shows focus; the offset ring drew over the search icon. */
+  [cmdk-input]:focus-visible {
+    @apply ring-0 ring-offset-0;
+  }
 }
 
 

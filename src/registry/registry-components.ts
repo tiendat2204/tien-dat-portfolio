@@ -34,4 +34,25 @@ export const components: Registry['items'] = [
       },
     ],
   },
+  {
+    name: 'infinite-select',
+    type: 'registry:component',
+    description: 'Single and multiple selects with cursor-paged infinite scroll, debounced server search and selected-item preloading.',
+    dependencies: ['lucide-react'],
+    registryDependencies: ['popover', 'command', 'badge', 'button', 'skeleton'],
+    files: [
+      {
+        path: 'InfiniteSelect/select-single-infinite-scroll.tsx',
+        type: 'registry:component',
+      },
+      {
+        path: 'InfiniteSelect/select-multiple-infinite-scroll.tsx',
+        type: 'registry:component',
+      },
+      {
+        path: 'InfiniteSelect/use-infinite-options.ts',
+        type: 'registry:component',
+      },
+    ],
+  },
 ]

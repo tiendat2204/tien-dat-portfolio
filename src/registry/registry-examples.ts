@@ -34,4 +34,15 @@ export const examples: Registry['items'] = [
       },
     ],
   },
+  {
+    name: 'infinite-select-demo',
+    type: 'registry:example',
+    registryDependencies: ['https://tiendat.work/r/infinite-select.json'],
+    files: [
+      {
+        path: 'examples/infinite-select-demo.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
 ]
