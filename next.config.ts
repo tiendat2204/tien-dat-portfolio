@@ -8,14 +8,6 @@ const nextConfig = {
     return config
   },
   transpilePackages: ["next-mdx-remote"],
-  async rewrites() {
-    return [
-      {
-        source: "/blog/:slug.md",
-        destination: "/blog.md/:slug",
-      },
-    ];
-  },
   trailingSlash: true,
   images: {
     domains: [
