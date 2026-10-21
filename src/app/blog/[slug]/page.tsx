@@ -10,12 +10,12 @@ import { DynamicIslandTOC } from '@/components/ui/dynamic-island-toc'
 import { Prose } from '@/components/ui/typography'
 import { getAllPosts, getPostBySlug } from '@/data/blog'
 import { BLUR_FADE_DELAY, SITE_INFO } from '@/data/config'
+import { SEO_PROFILE } from '@/data/seo'
 import { USER } from '@/data/user'
 import { buildBlogPostingJsonLd } from '@/lib/seo/jsonld'
 import {
-  buildCanonicalUrl,
   buildMissingPostMetadata,
-  buildOgImageUrl,
+  buildPageMetadata,
 } from '@/lib/seo/metadata'
 
 import { Back } from './back'
@@ -49,37 +49,19 @@ export async function generateMetadata ({
 
   const { title, description, image, publishedAt } = post.metadata
 
-  const canonicalUrl = buildCanonicalUrl(SITE_INFO.url, `/blog/${post.slug}`)
-  const ogImage = buildOgImageUrl(image, title)
   const publishedTime = toIsoDateOrUndefined(publishedAt)
 
-  return {
+  return buildPageMetadata({
+    siteUrl: SITE_INFO.url,
+    siteName: SEO_PROFILE.name,
+    path: `/blog/${post.slug}`,
     title,
     description,
-    alternates: {
-      canonical: canonicalUrl,
-    },
-    openGraph: {
-      url: canonicalUrl,
-      type: 'article',
-      ...(publishedTime !== undefined
-        ? {
-            publishedTime,
-            modifiedTime: publishedTime,
-          }
-        : {}),
-      images: {
-        url: ogImage,
-        width: 1200,
-        height: 630,
-        alt: title,
-      },
-    },
-    twitter: {
-      card: 'summary_large_image',
-      images: [ogImage],
-    },
-  }
+    image,
+    type: 'article',
+    publishedTime,
+    authors: [SEO_PROFILE.name],
+  })
 }
 
 export default async function Page ({

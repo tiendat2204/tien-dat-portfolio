@@ -13,13 +13,26 @@ import BlogSection from '@/app/section/blog-section'
 import { Icon } from '@/components/Icon'
 import { TextLoop } from '@/components/ui/text-loop'
 import { Icons } from '@/components/icons'
-import { BLUR_FADE_DELAY } from '@/data/config'
+import { BLUR_FADE_DELAY, SITE_INFO } from '@/data/config'
+import { SEO_PROFILE } from '@/data/seo'
+import { buildPageMetadata } from '@/lib/seo/metadata'
 import { GitHubContributions } from './section/github-contributions'
 import { InsightsSection } from './section/insights-section'
 import { Status, StatusIndicator, StatusLabel } from '@/components/kibo-ui/status'
 import { BackgroundHero } from '@/components/landing/background-hero'
 import { LocalTime } from '@/components/local-time'
 import { HowIBuildSection } from './section/how-i-build-section'
+
+export const metadata = buildPageMetadata({
+  siteUrl: SITE_INFO.url,
+  siteName: SEO_PROFILE.name,
+  path: '/',
+  title: SEO_PROFILE.homeTitle,
+  description: SEO_PROFILE.description,
+  absoluteTitle: true,
+  type: 'profile',
+  image: SEO_PROFILE.image,
+})
 
 export default function Page () {
   return (

@@ -1,17 +1,21 @@
-import type { Metadata } from 'next'
 import Image from 'next/image'
 import { Suspense } from 'react'
 
 import { Back } from '@/app/blog/back'
 import { Icon } from '@/components/Icon'
 import { BlurFade } from '@/components/magicui/blur-fade'
-import { BLUR_FADE_DELAY } from '@/data/config'
+import { BLUR_FADE_DELAY, SITE_INFO } from '@/data/config'
+import { SEO_PROFILE } from '@/data/seo'
+import { buildPageMetadata } from '@/lib/seo/metadata'
 import { WorkflowExplorer } from './workflow-explorer'
 
-export const metadata: Metadata = {
+export const metadata = buildPageMetadata({
+  siteUrl: SITE_INFO.url,
+  siteName: SEO_PROFILE.name,
+  path: '/uses',
   title: 'Uses',
   description: 'How I build with AI coding agents: Claude Code with a Codex review loop, skills, MCP servers and the rest of my setup.',
-}
+})
 
 // Full class strings so Tailwind can see them; each group gets one accent.
 const ACCENTS = {
