@@ -41,7 +41,6 @@ import {
   EvilBrush,
   useEvilBrush,
   type BrushProps,
-  type EvilBrushRange,
 } from '@/components/evilcharts/ui/recharts-brush'
 import {
   ChartLegend,

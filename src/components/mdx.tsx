@@ -47,7 +47,8 @@ const components: MDXRemoteProps['components'] = {
   th: TableHead,
   td: TableCell,
   img: ({ src, alt, className, width, height, ...props }: React.ComponentProps<'img'>) => {
-    if (!src || typeof src !== 'string') return <img {...props} />
+    // src and alt are already destructured, so the old <img {...props} /> fallback rendered an empty image.
+    if (!src || typeof src !== 'string') return null
 
     return (
       <ImageZoom
