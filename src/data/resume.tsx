@@ -2,7 +2,6 @@ import { Icons } from '@/components/icons'
 import { GitHub } from '@/components/icons/github-icon'
 import { Facebook } from '@/components/icons/facebook-icon'
 import { LinkedIn } from '@/components/icons/linked-icon'
-import { LinkPreview } from '@/components/ui/link-preview'
 import { CpuIcon, NotebookIcon } from 'lucide-react'
 import { Zalo } from '@/components/icons/zalo-icon'
 
@@ -259,46 +258,33 @@ export const DATA = {
   ],
   education: [
     {
-      school: 'FPT College',
+      school: 'FPT Polytechnic College',
       href: 'https://fpt.edu.vn',
-      degree: 'B.S. Web Development',
+      degree: 'Associate Degree (College Diploma) in Web Development',
       logoUrl: '/fpt-logo.png',
       start: 'Aug 2022',
       end: 'May 2024',
       isExpanded: true,
       description: [
-        'Studying modern software development methodologies and practices',
-        <span key='js-talent' title='JS Talent Competition'>
+        'Studied modern software development methodologies and practices',
+        <span key='js-talent'>
           Achieved{' '}
-          <LinkPreview
-            height={50}
-            width={500}
-            url='#'
-            isStatic
-            imageSrc='/js-talent.jpg'
-            className='font-bold underline'
-          >
+          {/* Photos live on the award card below; a hover preview here duplicated them and never opened on touch. */}
+          <a href='#awards' className='font-bold underline'>
             3rd place in JS Talent competition
-          </LinkPreview>{' '}
+          </a>{' '}
           for front-end development skills
         </span>,
-        <span key='golden-bee' title='Golden Bee Award'>
+        <span key='golden-bee'>
           Awarded{' '}
-          <LinkPreview
-            url='#'
-            height={50}
-            width={500}
-            isStatic
-            imageSrc='/gold-bee.jpg'
-            className='font-bold underline'
-          >
+          <a href='#awards' className='font-bold underline'>
             Golden Bee Award (6th edition)
-          </LinkPreview>{' '}
+          </a>{' '}
           for academic excellence
         </span>,
-        'Building applications with React, Next.js and Node.js',
-        'Working on real-world projects with industry partners',
-        'Developing strong fundamentals in algorithms and data structures',
+        'Built applications with React, Next.js and Node.js',
+        'Worked on real-world projects with industry partners',
+        'Developed strong fundamentals in algorithms and data structures',
       ],
       technologies: [
         { name: 'JavaScript', icon: 'javascript-icon.svg' },
@@ -525,7 +511,7 @@ export const DATA = {
           end: 'November 2023',
           isExpanded: false,
           description: [
-            "Developed an interactive memory card matching game for FPT College's Game Development Competition",
+            "Developed an interactive memory card matching game for FPT Polytechnic College's Game Development Competition",
             'Implemented core game mechanics including card flipping, matching logic, and scoring system',
             'Created responsive design with CSS animations for engaging user experience across devices',
             'Built timer functionality and difficulty levels to enhance gameplay challenge',
@@ -626,7 +612,6 @@ export const DATA = {
       location: 'Google for Education',
       description:
     'Earned Gemini Certified Educator qualification for demonstrating the knowledge, skills, and basic competencies needed to use Google AI in education. Certificate valid through January 30, 2029.',
-      image: '/awards/gemini-certified.jpg',
       links: [
         {
           title: 'Certificate',
@@ -641,7 +626,6 @@ export const DATA = {
       location: 'Google for Education',
       description:
     'Completed the Google AI for K12 Educators course with a perfect score of 100. Demonstrated proficiency in using Google AI tools to boost productivity and enhance work as an education professional.',
-      image: '/awards/google-ai-k12.jpg',
       links: [
         {
           title: 'Certificate',
@@ -657,7 +641,6 @@ export const DATA = {
       location: 'Next.js Learn Platform',
       description:
         'Completed the Next.js SEO Fundamentals course, mastering search engine optimization techniques for Next.js applications including meta tags, structured data, performance optimization, and best practices for improving website visibility and ranking.',
-      image: '/awards/nextjs-seo.jpg',
       links: [
         {
           title: 'Certificate',
@@ -669,28 +652,27 @@ export const DATA = {
     {
       title: '3rd Place in JS Talent Competition',
       dates: '2023',
-      location: 'FPT College HCM',
+      location: 'FPT Polytechnic College HCM',
       description:
-        'Won 3rd place in the 2023 JS Talent competition organized by FPT College, demonstrating advanced front-end development skills and creating innovative web applications.',
-      image: '/awards/js-talent.jpg',
+        'Won 3rd place in the 2023 JS Talent competition organized by FPT Polytechnic College, demonstrating advanced front-end development skills and creating innovative web applications.',
+      image: '/js-talent.jpg',
       links: [],
     },
     {
       title: 'Golden Bee Award (6th Edition)',
       dates: 'December, 2023',
-      location: 'FPT College HCM',
+      location: 'FPT Polytechnic College HCM',
       description:
         "Received the prestigious Golden Bee Award (6th edition) for academic excellence and active contributions to the college's academic activities and community.",
-      image: '/awards/gold-bee.jpg',
+      image: '/gold-bee.jpg',
       links: [],
     },
     {
       title: 'Distinguished Graduate',
       dates: '2023 - 2024',
-      location: 'FPT College HCM',
+      location: 'FPT Polytechnic College HCM',
       description:
         'Graduated with distinction in Web Development with a GPA of 3.61/4.0, recognized for exceptional web development skills and comprehensive knowledge in information technology.',
-      image: '/awards/graduation.jpg',
       links: [],
     },
     {
@@ -699,7 +681,6 @@ export const DATA = {
       location: 'Nguyen Viet Xuan High School',
       description:
         'Maintained honor student status throughout three years at Nguyen Viet Xuan High School, with excellent academic performance across all subjects, particularly excelling in Mathematics and Computer Science.',
-      image: '/awards/highschool.jpg',
       links: [],
     },
   ],

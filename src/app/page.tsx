@@ -272,7 +272,8 @@ export default function Page () {
       <ComponentsSection />
       <section
         id='awards'
-        className='relative screen-line-after border-x font-ibm'
+        // Education links jump here; clear the sticky 3.5rem header.
+        className='relative scroll-mt-16 screen-line-after border-x font-ibm'
       >
         <Icon className='absolute z-20 h-6 w-6 -top-3 -left-3 dark:text-white text-black' />
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -left-3 dark:text-white text-black' />
@@ -295,7 +296,7 @@ export default function Page () {
                   description={award.description}
                   location={award.location}
                   dates={award.dates}
-                  image={award.image}
+                  image={'image' in award ? award.image : undefined}
                   images={'images' in award ? award.images : undefined}
                   logo={'logo' in award ? award.logo : undefined}
                   links={award.links}
