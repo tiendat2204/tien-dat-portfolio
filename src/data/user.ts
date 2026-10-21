@@ -29,9 +29,5 @@ export const USER = {
   about: `
 Hello, World! I am Tiến Đạt — Fullstack developer with a strong focus on frontend development and a passion for building scalable, user-centric web applications. I have experience in React, Next.js, Typescript, Node.js, Python, and more. I love to build products that solve real-world problems and help people achieve their goals.
   `,
-  avatar: 'https://assets.tiendatdev/images/avatar.jpeg',
-  ogImage: 'https://assets.tiendatdev/images/og-image-dark.png',
-  keywords:
-        'tiendat2204, tiendat, tien dat, trieutiendat, trieu tien dat, triệu tiến đạt, tiến đạt',
   dateCreated: '2024-06-01', // YYYY-MM-DD
 }

@@ -11,8 +11,7 @@ import { Prose } from '@/components/ui/typography'
 import { getAllPosts, getPostBySlug } from '@/data/blog'
 import { BLUR_FADE_DELAY, SITE_INFO } from '@/data/config'
 import { SEO_PROFILE } from '@/data/seo'
-import { USER } from '@/data/user'
-import { buildBlogPostingJsonLd } from '@/lib/seo/jsonld'
+import { buildBlogPostingJsonLd, buildBreadcrumbJsonLd } from '@/lib/seo/jsonld'
 import {
   buildMissingPostMetadata,
   buildPageMetadata,
@@ -85,12 +84,13 @@ export default async function Page ({
     image: post.metadata.image,
     publishedAt: post.metadata.publishedAt,
     siteUrl: SITE_INFO.url,
-    author: {
-      name: USER.displayName,
-      identifier: USER.username,
-      image: USER.avatar,
-    },
+    authorName: SEO_PROFILE.name,
   })
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd(SITE_INFO.url, [
+    { name: 'Home', path: '/' },
+    { name: 'Blog', path: '/blog' },
+    { name: post.metadata.title, path: `/blog/${post.slug}` },
+  ])
   return (
     <div className='relative'>
       <div className='mx-auto w-full max-w-3xl'>
@@ -104,6 +104,12 @@ export default async function Page ({
             type='application/ld+json'
             dangerouslySetInnerHTML={{
               __html: JSON.stringify(pageJsonLd).replace(/</g, '\\u003c'),
+            }}
+          />
+          <script
+            type='application/ld+json'
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, '\\u003c'),
             }}
           />
           <div

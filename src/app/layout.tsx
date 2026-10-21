@@ -7,7 +7,7 @@ import { ReactLenis } from 'lenis/react'
 import { Footer } from '@/components/footer'
 import { Providers } from '@/components/Providers'
 import { Header } from '@/components/Header'
-import type { WebSite, WithContext } from 'schema-dts'
+import { buildWebSiteJsonLd } from '@/lib/seo/jsonld'
 import { SITE_INFO, UMAMI_WEBSITE_ID } from '@/data/config'
 import { SEO_PROFILE } from '@/data/seo'
 import Script from 'next/script'
@@ -64,14 +64,18 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
   },
 }
-function getWebSiteJsonLd (): WithContext<WebSite> {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: SITE_INFO.name,
-    url: SITE_INFO.url,
-    alternateName: [DATA.name],
-  }
+const SAME_AS_NAMES = ['GitHub', 'LinkedIn', 'Facebook']
+function getWebSiteJsonLd () {
+  return buildWebSiteJsonLd({
+    siteUrl: SITE_INFO.url,
+    name: SEO_PROFILE.name,
+    alternateName: [...SEO_PROFILE.alternateNames],
+    jobTitle: SEO_PROFILE.jobTitle,
+    image: SEO_PROFILE.image,
+    sameAs: Object.values(DATA.contact.social)
+      .filter((social) => SAME_AS_NAMES.includes(social.name))
+      .map((social) => social.url),
+  })
 }
 const darkModeScript = String.raw`
   try {

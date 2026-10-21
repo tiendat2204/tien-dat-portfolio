@@ -16,6 +16,8 @@ import { Icons } from '@/components/icons'
 import { BLUR_FADE_DELAY, SITE_INFO } from '@/data/config'
 import { SEO_PROFILE } from '@/data/seo'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { buildProfilePageJsonLd } from '@/lib/seo/jsonld'
+import { USER } from '@/data/user'
 import { GitHubContributions } from './section/github-contributions'
 import { InsightsSection } from './section/insights-section'
 import { Status, StatusIndicator, StatusLabel } from '@/components/kibo-ui/status'
@@ -35,8 +37,20 @@ export const metadata = buildPageMetadata({
 })
 
 export default function Page () {
+  const profileJsonLd = buildProfilePageJsonLd({
+    siteUrl: SITE_INFO.url,
+    dateCreated: USER.dateCreated,
+    dateModified: new Date().toISOString(),
+  })
+
   return (
     <main className='flex flex-col min-h-dvh mx-auto w-full max-w-3xl'>
+      <script
+        type='application/ld+json'
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(profileJsonLd).replace(/</g, '\\u003c'),
+        }}
+      />
 
       <section
         id='background'
