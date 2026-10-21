@@ -16,6 +16,7 @@ import { Icon } from './Icon'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
 import { useLenis } from 'lenis/react'
 import { openCommandMenu } from './command-menu'
+import { HeaderGreeting } from './time-greeting'
 
 const MENU_SECTIONS = [
   { id: 'about', label: 'about' },
@@ -101,6 +102,7 @@ export function Header () {
 
         {/* Right Side - Desktop */}
         <div className='hidden md:flex items-center gap-2'>
+          <HeaderGreeting className='min-[1440px]:hidden' />
           {DATA.navbar.map((item) => (
             <Link
               key={item.href}
@@ -181,6 +183,7 @@ export function Header () {
 
         </Link>
         <div className='flex items-center gap-4 justify-center md:hidden'>
+          <HeaderGreeting />
           <ModeToggle />
 
           <Button

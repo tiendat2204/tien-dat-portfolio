@@ -17,6 +17,10 @@ import { CommandMenu } from '@/components/command-menu'
 import { UiEffects } from '@/components/ui-effects'
 import { KeyboardShortcuts } from '@/components/keyboard-shortcuts'
 import { getAllPosts } from '@/data/blog'
+import { FloatingGreeting } from '@/components/time-greeting'
+import { Caveat } from 'next/font/google'
+
+const caveat = Caveat({ subsets: ['latin'], variable: '--font-caveat', display: 'swap' })
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_INFO.url),
@@ -102,7 +106,7 @@ export default function RootLayout ({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en' suppressHydrationWarning>
+    <html lang='en' className={caveat.variable} suppressHydrationWarning>
       <head>
         <script
           type='text/javascript'
@@ -145,6 +149,7 @@ export default function RootLayout ({
                 <Footer />
                 <CommandMenu posts={getAllPosts().map((p) => ({ slug: p.slug, title: p.metadata.title }))} />
                 <UiEffects />
+                <FloatingGreeting />
                 <KeyboardShortcuts />
               </Providers>
             </TooltipProvider>
