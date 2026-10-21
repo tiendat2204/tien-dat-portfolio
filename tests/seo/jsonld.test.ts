@@ -18,7 +18,7 @@ test('buildBlogPostingJsonLd uses absolute image URL when image is omitted', () 
     },
   })
 
-  assert.equal(result.image, 'https://tiendatdev.me/og/simple?title=Hello%20World')
+  assert.equal(result.image, 'https://tiendatdev.me/og/simple/?title=Hello%20World')
 })
 
 test('buildBlogPostingJsonLd normalizes trailing slash in site URL', () => {
@@ -35,7 +35,7 @@ test('buildBlogPostingJsonLd normalizes trailing slash in site URL', () => {
     },
   })
 
-  assert.equal(result.image, 'https://tiendatdev.me/og/simple?title=Hello%20World')
+  assert.equal(result.image, 'https://tiendatdev.me/og/simple/?title=Hello%20World')
 })
 
 test('buildBlogPostingJsonLd keeps explicit absolute image input', () => {
@@ -92,8 +92,8 @@ test('buildBlogPostingJsonLd builds schema.org BlogPosting payload', () => {
   assert.equal(result['@type'], 'BlogPosting')
   assert.equal(result.headline, 'Hello World')
   assert.equal(result.description, 'My first blog post')
-  assert.equal(result.image, 'https://tiendatdev.me/og/simple?title=Hello%20World')
-  assert.equal(result.url, 'https://tiendatdev.me/blog/hello-world')
+  assert.equal(result.image, 'https://tiendatdev.me/og/simple/?title=Hello%20World')
+  assert.equal(result.url, 'https://tiendatdev.me/blog/hello-world/')
   assert.equal(result.datePublished, dayjs('2024-06-01').toISOString())
   assert.equal(result.dateModified, dayjs('2024-06-01').toISOString())
   assert.deepEqual(result.author, {
@@ -146,5 +146,5 @@ test('buildBlogPostingJsonLd falls back to safe URLs when siteUrl is malformed',
   })
 
   assert.equal(result?.image, 'https://example.com/images/hello-world.webp')
-  assert.equal(result?.url, 'https://example.com/blog/hello-world')
+  assert.equal(result?.url, 'https://example.com/blog/hello-world/')
 })

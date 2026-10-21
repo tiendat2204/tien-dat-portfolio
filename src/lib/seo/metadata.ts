@@ -7,12 +7,16 @@ function trimTrailingSlash (value: string) {
 export function buildCanonicalUrl (baseUrl: string, path: string) {
   const base = trimTrailingSlash(baseUrl)
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
-  return `${base}${normalizedPath}`
+  const hasQueryOrHash = normalizedPath.includes('?') || normalizedPath.includes('#')
+  const withTrailingSlash = hasQueryOrHash || normalizedPath.endsWith('/')
+    ? normalizedPath
+    : `${normalizedPath}/`
+  return `${base}${withTrailingSlash}`
 }
 
 export function buildOgImageUrl (image: string | undefined, title: string) {
   if (image != null && image.length > 0) return image
-  return `/og/simple?title=${encodeURIComponent(title)}`
+  return `/og/simple/?title=${encodeURIComponent(title)}`
 }
 
 export function buildMissingPostMetadata (slug: string): Metadata {
