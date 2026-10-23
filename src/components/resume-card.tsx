@@ -17,7 +17,8 @@ const BLUR_FADE_DELAY = 0.1
 
 interface TechnologyType {
   name: string;
-  icon: string;
+  icon?: string;
+  iconDark?: string;
 }
 
 interface ResumeCardProps {
@@ -65,7 +66,7 @@ export const ResumeCard = ({
         <div className='flex items-center gap-1 justify-start bg-accent '>
           <Icon
             className={cn(
-              'h-5 w-5 sm:h-6 sm:w-6 text-gray-300 transition-transform duration-300',
+              'h-5 w-5 sm:h-6 sm:w-6 text-muted-foreground transition-transform duration-300',
               isExpanded ? 'rotate-90' : 'rotate-0'
             )}
           />
@@ -154,6 +155,7 @@ export const ResumeCard = ({
                       <SkillBadge
                         name={tech.name}
                         icon={tech.icon}
+                        iconDark={tech.iconDark}
                       />
                     </BlurFade>
                   ))}

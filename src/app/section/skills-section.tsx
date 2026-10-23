@@ -18,7 +18,7 @@ function SkillIcon ({ name, icon, iconDark }: { name: string; icon?: string; ico
   if (!icon) {
     return (
       <span aria-hidden='true' className='flex size-3.5 shrink-0 items-center justify-center'>
-        <span className='size-1.5 bg-foreground/60' />
+        <span className='size-1.5 bg-foreground' />
       </span>
     )
   }
@@ -75,11 +75,11 @@ function CategorySection ({ title, skills, delay = 0 }: CategorySectionProps) {
     <BlurFade delay={delay}>
       <div className='mb-4'>
         <div className='flex items-center gap-2 mb-3'>
-          <span className='text-gray-500 text-sm'>{'<'}</span>
-          <h3 className='text-gray-400 text-sm font-medium uppercase tracking-wider'>
+          <span className='text-muted-foreground/70 text-sm'>{'<'}</span>
+          <h3 className='text-muted-foreground text-sm font-medium uppercase tracking-wider'>
             {title}
           </h3>
-          <span className='text-gray-500 text-sm'>{'/>'}</span>
+          <span className='text-muted-foreground/70 text-sm'>{'/>'}</span>
         </div>
         <div className='flex flex-wrap gap-2'>
           {skills.map((skill, id) => (

@@ -11,6 +11,7 @@ import {
 } from '@/components/kibo-ui/contribution-graph'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { GITHUB_USERNAME } from '@/data/config'
+import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { LoaderIcon } from 'lucide-react'
 import { use, useEffect, useRef } from 'react'
@@ -57,16 +58,14 @@ const GitContributionSection = ({ contributions }: GitContributionSectionProps) 
                   <ContributionGraphBlock
                     activity={activity}
                     className={
-            activity.level > 3
-              ? 'animate-pulse stroke-1 stroke-primary dark:stroke-primary'
-              : activity.level === 0
-                ? 'opacity-50'
-                : ''
+            cn(
+              // Brightening only helps on the dark background; on white it washes the busy days out.
+              activity.level > 2 && 'dark:brightness-120',
+              activity.level > 3 && 'animate-pulse stroke-1 stroke-primary',
+              activity.level === 0 && 'opacity-50'
+            )
           }
                     dayIndex={dayIndex}
-                    style={{
-                      filter: activity.level > 2 ? 'brightness(1.2)' : undefined,
-                    }}
                     weekIndex={weekIndex}
                   />
                 </g>
