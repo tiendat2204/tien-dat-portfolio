@@ -64,6 +64,18 @@ const components: MDXRemoteProps['components'] = {
       />
     )
   },
+  // Used as <Video> in MDX: a lowercase <video> there is raw JSX and skips this map.
+  // width/height only set the aspect ratio, so the box is reserved before the poster arrives.
+  // preload='none' keeps the file off the wire until the reader presses play.
+  Video: ({ className, width, height, style, ...props }: React.ComponentProps<'video'>) => (
+    <video
+      preload='none'
+      playsInline
+      className={cn('mx-auto w-full max-w-sm border bg-muted object-cover', className)}
+      style={{ aspectRatio: width && height ? `${width} / ${height}` : undefined, ...style }}
+      {...props}
+    />
+  ),
   figure ({ className, ...props }: React.ComponentProps<'figure'>) {
     const hasPrettyCode = 'data-rehype-pretty-code-figure' in props
 

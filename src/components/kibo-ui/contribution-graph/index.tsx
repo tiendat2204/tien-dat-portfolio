@@ -329,10 +329,11 @@ export const ContributionGraphBlock = ({
     <rect
       className={cn(
         'data-[level="0"]:fill-muted',
-        'data-[level="1"]:fill-muted-foreground/20',
-        'data-[level="2"]:fill-muted-foreground/40',
-        'data-[level="3"]:fill-muted-foreground/60',
-        'data-[level="4"]:fill-muted-foreground/80',
+        // Light mode climbs from the text colour so low levels still read on white.
+        'data-[level="1"]:fill-foreground/20 dark:data-[level="1"]:fill-muted-foreground/20',
+        'data-[level="2"]:fill-foreground/40 dark:data-[level="2"]:fill-muted-foreground/40',
+        'data-[level="3"]:fill-foreground/60 dark:data-[level="3"]:fill-muted-foreground/60',
+        'data-[level="4"]:fill-foreground/85 dark:data-[level="4"]:fill-muted-foreground/80',
         className
       )}
       data-count={activity.count}
@@ -497,10 +498,11 @@ export const ContributionGraphLegend = ({
                 className={cn(
                   'stroke-[1px] stroke-border',
                   'data-[level="0"]:fill-muted',
-                  'data-[level="1"]:fill-muted-foreground/20',
-                  'data-[level="2"]:fill-muted-foreground/40',
-                  'data-[level="3"]:fill-muted-foreground/60',
-                  'data-[level="4"]:fill-muted-foreground/80'
+                  // Light mode climbs from the text colour so low levels still read on white.
+                  'data-[level="1"]:fill-foreground/20 dark:data-[level="1"]:fill-muted-foreground/20',
+                  'data-[level="2"]:fill-foreground/40 dark:data-[level="2"]:fill-muted-foreground/40',
+                  'data-[level="3"]:fill-foreground/60 dark:data-[level="3"]:fill-muted-foreground/60',
+                  'data-[level="4"]:fill-foreground/85 dark:data-[level="4"]:fill-muted-foreground/80'
                 )}
                 data-level={level}
                 height={blockSize}

@@ -14,7 +14,8 @@ const BLUR_FADE_DELAY = 0.1
 
 interface Technology {
   name: string;
-  icon: string;
+  icon?: string;
+  iconDark?: string;
 }
 
 interface Position {
@@ -38,6 +39,8 @@ interface ProjectCardProps {
     href: string;
   }[];
   image?: string;
+  // White-only logo (e.g. the site mark): darken it on the light background.
+  invertInLight?: boolean;
   className?: string;
 }
 
@@ -46,6 +49,7 @@ export function ProjectCard ({
   positions,
   links,
   image,
+  invertInLight,
 }: ProjectCardProps) {
   const initialIsExpanded :boolean = positions[0]?.isExpanded || false
   const [isExpanded, setIsExpanded] = React.useState(initialIsExpanded)
@@ -64,7 +68,7 @@ export function ProjectCard ({
               isExpanded ? 'ring-2 ring-primary/80 ring-offset-1' : 'ring-0'
             )}
           >
-            <AvatarImage src={image} alt={`${title} logo`} />
+            <AvatarImage src={image} alt={`${title} logo`} className={cn(invertInLight && 'invert dark:invert-0')} />
             <AvatarFallback>{title.charAt(0)}</AvatarFallback>
           </Avatar>
         </div>
@@ -147,6 +151,7 @@ export function ProjectCard ({
                       <SkillBadge
                         name={tech.name}
                         icon={tech.icon}
+                        iconDark={tech.iconDark}
                       />
                     </BlurFade>
                   ))}
