@@ -24,6 +24,7 @@ import { InsightsSection } from './section/insights-section'
 import { Status, StatusIndicator, StatusLabel } from '@/components/kibo-ui/status'
 import { BackgroundHero } from '@/components/landing/background-hero'
 import { LocalTime } from '@/components/local-time'
+import { HeroGreeting } from '@/components/time-greeting'
 import { HowIBuildSection } from './section/how-i-build-section'
 
 export const metadata = buildPageMetadata({
@@ -100,16 +101,17 @@ export default function Page () {
               </Avatar>
             </div>
 
-            <div className='flex min-w-0 flex-1 flex-col justify-between h-full min-h-[140px] sm:min-h-[172px] border-l'>
+            <div className='relative flex min-w-0 flex-1 flex-col justify-between h-full min-h-[140px] sm:min-h-[172px] border-l'>
               <div className='flex-1 flex items-end pb-1'>
-                <div className='absolute top-4 right-4 '>
+                <HeroGreeting className='px-3 sm:px-4' />
+                <div className='absolute top-3 right-3 left-3 flex justify-end sm:top-4 sm:right-4'>
                   <Status
-                    className=''
+                    className='max-w-full max-sm:gap-1.5 max-sm:px-1.5 max-sm:text-[11px]'
                     status='online'
                   >
                     <StatusIndicator />
-                    <StatusLabel className='font-mono'>
-                      HCMC <LocalTime /> <span className='text-muted-foreground'>·</span> open to work
+                    <StatusLabel className='truncate font-mono'>
+                      <span className='max-sm:hidden'>HCMC <LocalTime /> <span className='text-muted-foreground'>·</span> </span>open to work
                     </StatusLabel>
                   </Status>
                 </div>
@@ -263,6 +265,7 @@ export default function Page () {
                 logoUrl={project.logoUrl}
                 positions={project.positions}
                 image={project.image}
+                invertInLight={'invertInLight' in project ? project.invertInLight : undefined}
                 links={project.links}
               />
             </BlurFade>

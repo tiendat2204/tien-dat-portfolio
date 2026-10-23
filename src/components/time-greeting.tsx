@@ -3,7 +3,6 @@
 import { motion, useReducedMotion } from 'motion/react'
 import { useEffect, useId, useState } from 'react'
 
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
 type Period = 'morning' | 'afternoon' | 'evening' | 'night'
@@ -180,56 +179,26 @@ function useGreetingPeriod () {
   return period
 }
 
-// Wide screens (≥1440px, where the gutter clears the side stripes): pinned beside the header.
-export function FloatingGreeting () {
+// Sits in the hero's empty corner, just above the name.
+export function HeroGreeting ({ className }: { className?: string }) {
   const period = useGreetingPeriod()
   const still = useReducedMotion() ?? false
-  if (!period) return null
+  // Hold the row's height until mounted so the hero doesn't shift.
+  if (!period) return <div aria-hidden className={cn('h-8', className)} />
   const Icon = ICONS[period]
 
   return (
-    <div
-      aria-hidden
-      // Just right of the 48rem column, vertically centred on the 3.5rem header row.
-      className='pointer-events-none fixed top-0 left-[calc(50%+24rem+1.5rem)] z-30 hidden h-14 items-center gap-2 min-[1440px]:flex'
-    >
+    <div aria-hidden className={cn('flex h-8 items-center gap-1.5', className)}>
       <motion.span
         key={period}
-        className='font-caveat text-3xl leading-none text-foreground'
+        className='whitespace-nowrap font-caveat text-xl leading-none text-foreground sm:text-2xl'
         initial={still ? false : { clipPath: 'inset(0 100% 0 0)', opacity: 0.4 }}
         animate={{ clipPath: 'inset(0 0% 0 0)', opacity: 1 }}
         transition={{ delay: 0.4, duration: 1.1, ease: [0.65, 0, 0.35, 1] }}
       >
         {GREETINGS[period]}
       </motion.span>
-      <Icon key={`${period}-icon`} play still={still} className='size-9' />
+      <Icon key={`${period}-icon`} play still={still} className='size-6 sm:size-7' />
     </div>
-  )
-}
-
-// Narrower screens have no gutter: icon in the header, greeting in a tooltip (tap toggles it on touch).
-export function HeaderGreeting ({ className }: { className?: string }) {
-  const period = useGreetingPeriod()
-  const still = useReducedMotion() ?? false
-  const [open, setOpen] = useState(false)
-  if (!period) return <span className={cn('size-10', className)} />
-  const Icon = ICONS[period]
-
-  return (
-    <Tooltip open={open} onOpenChange={setOpen}>
-      <TooltipTrigger asChild>
-        <button
-          type='button'
-          aria-label={GREETINGS[period]}
-          onClick={() => setOpen((v) => !v)}
-          className={cn('flex size-10 items-center justify-center', className)}
-        >
-          <Icon key={period} play still={still} className='size-7' />
-        </button>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p className='font-caveat text-lg leading-none'>{GREETINGS[period]}</p>
-      </TooltipContent>
-    </Tooltip>
   )
 }

@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { ModeToggle } from '@/components/mode-toggle'
 import { DATA } from '@/data/resume'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { ArrowRightIcon, DownloadIcon, SearchIcon } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { useScroll } from '@/hooks/use-scroll'
@@ -13,10 +14,9 @@ import { MenuToggleIcon } from './ui/menu-toggle-icon'
 import BlurFadeText from './magicui/blur-fade-text'
 import { BLUR_FADE_DELAY } from '@/data/config'
 import { Icon } from './Icon'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
 import { useLenis } from 'lenis/react'
 import { openCommandMenu } from './command-menu'
-import { HeaderGreeting } from './time-greeting'
+import { GitHubStars } from './github-stars'
 
 const MENU_SECTIONS = [
   { id: 'about', label: 'about' },
@@ -27,8 +27,9 @@ const MENU_SECTIONS = [
   { id: 'blog', label: 'articles' },
 ]
 
-export function Header () {
+export function Header ({ stars }: { stars: number | null }) {
   const [open, setOpen] = React.useState(false)
+  const pathname = usePathname()
   const scrolled = useScroll(10)
   const lenis = useLenis()
   React.useEffect(() => {
@@ -102,56 +103,18 @@ export function Header () {
 
         {/* Right Side - Desktop */}
         <div className='hidden md:flex items-center gap-2'>
-          <HeaderGreeting className='min-[1440px]:hidden' />
-          {DATA.navbar.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                buttonVariants({ variant: 'ghost', size: 'icon' }),
-                'size-10'
-              )}
-            >
-              <item.icon className='size-4' />
-            </Link>
-          ))}
-          <Link
-            href='/TrieuTienDatCV.pdf'
-            target='_blank'
-            rel='noopener noreferrer'
-            className={cn(
-              buttonVariants({ variant: 'ghost', size: 'icon' }),
-              'size-10'
-            )}
-            download
-          >
-            <DownloadIcon className='size-4' />
-          </Link>
-          <Separator orientation='vertical' className='h-10' />
-          {Object.entries(DATA.contact.social)
-            .filter(([_, social]) => social.navbar)
-            .map(([name, social]) => (
-              <TooltipProvider key={name}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href={social.url}
-                      className={cn(
-                        buttonVariants({ variant: 'ghost', size: 'icon' }),
-                        'size-10'
-                      )}
-                    >
-                      {social.icon && (
-                        <social.icon className='size-4' />
-                      )}
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{name}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+          <div className='flex items-center gap-4 px-2'>
+            {DATA.navbar.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={pathname.startsWith(item.href) ? 'page' : undefined}
+                className='text-sm font-medium text-muted-foreground transition-colors hover:text-foreground aria-[current=page]:text-foreground'
+              >
+                {item.label.toLowerCase()}
+              </Link>
             ))}
+          </div>
           <Separator orientation='vertical' className='h-10' />
           <button
             type='button'
@@ -162,6 +125,9 @@ export function Header () {
             <SearchIcon className='size-3.5' />
             <kbd className='font-ibm'>⌘K</kbd>
           </button>
+          <Separator orientation='vertical' className='h-10' />
+          <GitHubStars stars={stars} />
+          <Separator orientation='vertical' className='h-10' />
           <ModeToggle />
         </div>
 
@@ -182,8 +148,8 @@ export function Header () {
           />
 
         </Link>
-        <div className='flex items-center gap-4 justify-center md:hidden'>
-          <HeaderGreeting />
+        <div className='flex items-center gap-2 justify-center md:hidden'>
+          <GitHubStars stars={stars} />
           <ModeToggle />
 
           <Button

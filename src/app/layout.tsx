@@ -17,7 +17,7 @@ import { CommandMenu } from '@/components/command-menu'
 import { UiEffects } from '@/components/ui-effects'
 import { KeyboardShortcuts } from '@/components/keyboard-shortcuts'
 import { getAllComponents, getAllPosts } from '@/data/blog'
-import { FloatingGreeting } from '@/components/time-greeting'
+import { getGitHubStars } from '@/data/github-stars'
 import { Caveat } from 'next/font/google'
 
 const caveat = Caveat({ subsets: ['latin'], variable: '--font-caveat', display: 'swap' })
@@ -100,11 +100,13 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
   themeColor: META_THEME_COLORS.light,
 }
-export default function RootLayout ({
+export default async function RootLayout ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const stars = await getGitHubStars()
+
   return (
     <html lang='en' className={caveat.variable} suppressHydrationWarning>
       <head>
@@ -143,7 +145,7 @@ export default function RootLayout ({
             <TooltipProvider delayDuration={0}>
 
               <Providers>
-                <Header />
+                <Header stars={stars} />
 
                 {children}
                 <Footer />
@@ -152,7 +154,6 @@ export default function RootLayout ({
                   components={getAllComponents().map((c) => ({ slug: c.slug, title: c.metadata.title }))}
                 />
                 <UiEffects />
-                <FloatingGreeting />
                 <KeyboardShortcuts />
               </Providers>
             </TooltipProvider>
