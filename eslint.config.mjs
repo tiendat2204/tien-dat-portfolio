@@ -20,6 +20,7 @@ export default [
       '**/eslint.config.mjs',
       '**/node_modules/**',
       '**/src/components/ui/**',
+      '**/src/components/iso/kit/**',
       '**/.next/**'
     ],
     ts: true

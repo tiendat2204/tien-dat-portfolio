@@ -1,0 +1,42 @@
+/*
+  Site theme -> kit theme (see figure-frame.tsx). The kit's `.iso` tokens are the dark theme; next-themes puts `.dark`
+  on <html>, so the light tokens apply whenever <html> lacks it. Values copied verbatim from the kit's
+  `.iso[data-theme="light"]` block in kit/iso.css; keep them in step when the kit is updated.
+*/
+html:not(.dark) .iso {
+  --anatomy-page:#f2f2ef;--anatomy-card:#fbfbfa;--anatomy-text:#57575a;--anatomy-strong:#18181a;--anatomy-muted:#8c8c90;
+  --anatomy-paper:#fbfbfa;--anatomy-face:#ffffff;--anatomy-top:#ffffff;
+  --anatomy-shade-0:#dcdcd9;--anatomy-shade-1:#e5e5e2;--anatomy-shade-2:#ededea;--anatomy-shade-3:#f4f4f1;
+  --anatomy-lit-top:#ffffff;--anatomy-lit-shade:#eeeeeb;
+  --anatomy-hi:#26262a;--anatomy-mid:#8a8a8f;--anatomy-lo:#b4b4b8;--anatomy-faint:#d4d4d6;--anatomy-lit:#000000;
+  --anatomy-halo:#8a8a80;--anatomy-halo-opacity:.32;--anatomy-dot:#3a3a3e;
+  --anatomy-red:#e5484d;--anatomy-green:#30a46c;--anatomy-blue:#3e63dd;
+  --anatomy-lift:inset 0 1px 0 0 #ffffff,0 0 0 1px #0000000f,0 1px 1px -.5px #0000000a,0 3px 3px -1.5px #0000000a,0 6px 6px -3px #0000000a,0 12px 12px -6px #0000000a;
+}
+
+/* One frame size for every figure: the card fills the slot's 4:3 box and the drawing is centred inside it. */
+.figure-frame,
+.figure-frame .iso-figure,
+.figure-frame .iso-plate {
+  height: 100%;
+}
+
+.figure-frame .iso-figure {
+  margin: 0;
+}
+
+.figure-frame .iso-plate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.figure-frame .iso-plate > :not(.iso-plate-corners) {
+  width: 100%;
+  max-height: 100%;
+}
+
+.figure-frame .iso-svg {
+  max-height: 100%;
+}
