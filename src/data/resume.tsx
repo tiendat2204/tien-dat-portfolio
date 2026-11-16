@@ -2,7 +2,7 @@ import { Icons } from '@/components/icons'
 import { GitHub } from '@/components/icons/github-icon'
 import { Facebook } from '@/components/icons/facebook-icon'
 import { LinkedIn } from '@/components/icons/linked-icon'
-import { CpuIcon, NotebookIcon } from 'lucide-react'
+import { CpuIcon, FolderIcon, NotebookIcon } from 'lucide-react'
 import { Zalo } from '@/components/icons/zalo-icon'
 
 export const DATA = {
@@ -88,6 +88,7 @@ export const DATA = {
   },
   navbar: [
     // { href: '/', icon: HomeIcon, label: 'Home' },
+    { href: '/projects', icon: FolderIcon, label: 'Projects' },
     { href: '/blog', icon: NotebookIcon, label: 'Blog' },
     { href: '/uses', icon: CpuIcon, label: 'Uses' },
   ],

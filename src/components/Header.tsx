@@ -23,7 +23,6 @@ const MENU_SECTIONS = [
   { id: 'about', label: 'about' },
   { id: 'skills', label: 'skills' },
   { id: 'work', label: 'experience' },
-  { id: 'projects', label: 'projects' },
   { id: 'awards', label: 'awards' },
   { id: 'blog', label: 'articles' },
 ]
