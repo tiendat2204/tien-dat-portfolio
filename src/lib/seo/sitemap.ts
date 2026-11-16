@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 import { parsePublishedAt } from './date'
 import { buildCanonicalUrl } from './metadata'
 
-const STATIC_PATHS = ['/', '/blog', '/uses', '/components']
+const STATIC_PATHS = ['/', '/blog', '/projects', '/uses', '/components']
 
 type DatedEntry = { slug: string, publishedAt: string }
 

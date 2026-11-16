@@ -17,6 +17,7 @@ import { Icon } from './Icon'
 import { useLenis } from 'lenis/react'
 import { openCommandMenu } from './command-menu'
 import { GitHubStars } from './github-stars'
+import { sectionHref } from '@/lib/nav'
 
 const MENU_SECTIONS = [
   { id: 'about', label: 'about' },
@@ -189,7 +190,7 @@ export function Header ({ stars }: { stars: number | null }) {
               {MENU_SECTIONS.map((item, i) => (
                 <li key={item.id} className='menu-row border-b border-dashed last:border-b-0' style={{ '--i': i + 1 } as React.CSSProperties}>
                   <Link
-                    href={`/#${item.id}`}
+                    href={sectionHref(item.id)}
                     onClick={() => setOpen(false)}
                     className='group flex min-h-12 items-center gap-4 px-4 text-base active:bg-muted'
                   >
