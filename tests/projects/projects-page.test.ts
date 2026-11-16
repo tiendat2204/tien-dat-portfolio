@@ -9,7 +9,7 @@ test('buildProjectSections returns the page list in order with figures', () => {
   assert.deepEqual(sections.map(s => s.figureId), ['portfolio', 'agrita', 'eoffice', 'library', 'ta-mobile', undefined, undefined, 'betatruyen'])
   assert.ok(sections.every(s => s.company.length > 0 && s.summary.length > 0))
   assert.equal(sections[7].company, 'VietDev Studio')
-  assert.equal(sections[7].period, 'Sep 2024 - Jun 2025')
+  assert.deepEqual(sections.map(s => s.period), ['June 2024 - Present', 'Jun 2025 - Present', 'Jun 2025 - Present', 'Jun 2025 - Present', undefined, undefined, undefined, 'Sep 2024 - Jun 2025'])
 })
 
 test('toSection tolerates an entry without a figure', () => {

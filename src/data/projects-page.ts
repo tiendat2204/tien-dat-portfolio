@@ -6,7 +6,7 @@ export type ProjectSection = {
   title: string
   role: string
   company: string
-  period: string
+  period?: string
   summary: string[]
   technologies: { name: string, icon?: string, iconDark?: string }[]
   links: { type: string, href: string }[]
@@ -125,7 +125,6 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
     title: 'TA Mobile',
     role: 'Developer',
     company: 'T.A Consultant',
-    period: 'Jun 2025 - Present',
     summary: [
       'Flutter mobile app for the TA Platform HR and attendance system, connected to its Identity and HR APIs',
       'Check-in and check-out using location, Wi-Fi and face verification according to HR policy, with attendance history',
@@ -147,9 +146,8 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
     title: 'TangNi Web',
     role: 'Frontend Developer',
     company: 'T.A Consultant',
-    period: 'Jun 2025 - Present',
     summary: [
-      'Frontend for the TangNi MVP, a management app for a Dharma institute',
+      'TangNi MVP frontend',
       'Built with Vite, React, TypeScript, TanStack Router and TanStack Query',
     ],
     technologies: [VITE, REACT, TS, { name: 'TanStack Router/Query', icon: 'skills/tanstack.svg', iconDark: 'skills/tanstack-dark.svg' }, ZOD],
@@ -160,7 +158,6 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
     title: 'XN2 Admin Console',
     role: 'Frontend Developer',
     company: 'T.A Consultant',
-    period: 'Jul 2025 - Aug 2025',
     summary: [
       'Admin console frontend with modules for accounts, authentication, cities and wards, companies, investors, roles and work items, plus a dashboard',
       'Built with Vite, React, TypeScript, Redux and Zod',

@@ -25,7 +25,7 @@ export default function ProjectsPage () {
           <section key={section.id} id={section.id} className='mt-16 scroll-mt-24'>
             <p className='text-xs tabular-nums text-muted-foreground'>{String(section.index).padStart(2, '0')}</p>
             <h2 className='font-doto text-2xl font-extrabold'>{section.title}</h2>
-            <p className='text-sm text-muted-foreground'>{section.role} · {section.company} · {section.period}</p>
+            <p className='text-sm text-muted-foreground'>{[section.role, section.company, section.period].filter(Boolean).join(' · ')}</p>
             <FigureSlot figureId={section.figureId} />
             <ul className='mt-4 list-disc space-y-1 pl-5 text-sm'>
               {section.summary.map(line => <li key={line}>{line}</li>)}
