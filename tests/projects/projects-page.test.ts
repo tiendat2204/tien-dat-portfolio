@@ -12,6 +12,21 @@ test('buildProjectSections returns the page list in order with figures', () => {
   assert.deepEqual(sections.map(s => s.period), ['June 2024 - Present', 'Jun 2025 - Present', 'Jun 2025 - Present', 'Jun 2025 - Present', undefined, undefined, undefined, 'Sep 2024 - Jun 2025'])
 })
 
+test('ta-mobile is AgriTA Mobile and betatruyen leads with the owner statement', () => {
+  const sections = buildProjectSections()
+  const mobile = sections.find(s => s.id === 'ta-mobile')
+  assert.equal(mobile?.title, 'AgriTA Mobile')
+  assert.equal(mobile?.role, 'Mobile Developer')
+  assert.equal(mobile?.period, undefined)
+  assert.ok(mobile?.summary.some(l => l.includes('field workers')))
+  assert.ok(!mobile?.summary.some(l => /attendance|HR|face/i.test(l)))
+  assert.deepEqual(mobile?.links, [])
+  const beta = sections.find(s => s.id === 'betatruyen')
+  assert.equal(beta?.summary[0], 'Built and maintained a story community forum with over 10,000 users, supporting reading, community interaction and content sharing')
+  assert.ok(beta?.technologies.some(t => t.name === 'Celery'))
+  assert.ok(beta?.technologies.some(t => t.name === 'RabbitMQ'))
+})
+
 test('toSection tolerates an entry without a figure', () => {
   const [entry] = PROJECT_PAGE_ENTRIES
   const section = toSection({ ...entry, id: 'unknown-thing', figureId: undefined }, 1)
