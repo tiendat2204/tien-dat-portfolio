@@ -28,7 +28,12 @@ export function ProjectsScroller ({ children }: { children: ReactNode }) {
     const mm = gsap.matchMedia()
 
     mm.add(
-      { wide: `(min-width: ${PIN_MIN_WIDTH}px)`, reduce: '(prefers-reduced-motion: reduce)' },
+      // matchMedia only runs the callback when a condition matches, so `narrow` keeps the stacked mode reachable.
+      {
+        wide: `(min-width: ${PIN_MIN_WIDTH}px)`,
+        narrow: `(max-width: ${PIN_MIN_WIDTH - 1}px)`,
+        reduce: '(prefers-reduced-motion: reduce)',
+      },
       (context) => {
         const reduce = context.conditions?.reduce === true
         const mode = scrollPlan(window.innerWidth, reduce)
