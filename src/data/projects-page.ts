@@ -129,7 +129,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
     summary: [
       'Flutter mobile app for the TA Platform HR and attendance system, connected to its Identity and HR APIs',
       'Check-in and check-out using location, Wi-Fi and face verification according to HR policy, with attendance history',
-      'Leave-style requests (attendance adjustment and overtime) with an approval inbox for managers',
+      'Attendance-adjustment and overtime requests with an approval inbox for managers',
       'Admin tools for employees and work locations, plus secure token storage and biometric sign-in',
     ],
     technologies: [
