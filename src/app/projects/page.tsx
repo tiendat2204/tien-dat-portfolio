@@ -4,7 +4,6 @@ import { FigureSlot } from '@/components/iso/figure-slot'
 import { ProjectsScroller } from '@/components/projects/projects-scroller'
 import { SITE_INFO } from '@/data/config'
 import { buildProjectSections } from '@/data/projects-page'
-import { DATA } from '@/data/resume'
 import { SEO_PROFILE } from '@/data/seo'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
@@ -17,7 +16,7 @@ export const metadata = buildPageMetadata({
 })
 
 export default function ProjectsPage () {
-  const sections = buildProjectSections(DATA.projects)
+  const sections = buildProjectSections()
   return (
     <main className='mx-auto w-full max-w-3xl px-4 py-24'>
       <h1 className='font-doto text-4xl font-extrabold'>projects</h1>
@@ -26,7 +25,7 @@ export default function ProjectsPage () {
           <section key={section.id} id={section.id} className='mt-16 scroll-mt-24'>
             <p className='text-xs tabular-nums text-muted-foreground'>{String(section.index).padStart(2, '0')}</p>
             <h2 className='font-doto text-2xl font-extrabold'>{section.title}</h2>
-            <p className='text-sm text-muted-foreground'>{section.role} · {section.period}</p>
+            <p className='text-sm text-muted-foreground'>{section.role} · {section.company} · {section.period}</p>
             <FigureSlot figureId={section.figureId} />
             <ul className='mt-4 list-disc space-y-1 pl-5 text-sm'>
               {section.summary.map(line => <li key={line}>{line}</li>)}

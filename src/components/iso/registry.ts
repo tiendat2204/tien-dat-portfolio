@@ -1,16 +1,16 @@
 import type { FigureModule } from '@/components/iso/figure-contract'
 import type { FigureId } from '@/data/projects-page'
 
-export const FIGURE_IDS: readonly FigureId[] = ['portfolio', 'ebooking', 'weui', 'coi-shop', 'memory-game', 'sticker']
+export const FIGURE_IDS: readonly FigureId[] = ['portfolio', 'agrita', 'eoffice', 'library', 'ta-mobile', 'betatruyen']
 
 // One dynamic import per figure, so the route ships no figure code up front.
 export const FIGURE_LOADERS: Record<FigureId, () => Promise<{ default: FigureModule }>> = {
   portfolio: () => import('@/components/iso/figures/portfolio'),
-  ebooking: () => import('@/components/iso/figures/ebooking'),
-  weui: () => import('@/components/iso/figures/weui'),
-  'coi-shop': () => import('@/components/iso/figures/coi-shop'),
-  'memory-game': () => import('@/components/iso/figures/memory-game'),
-  sticker: () => import('@/components/iso/figures/sticker'),
+  agrita: () => import('@/components/iso/figures/agrita'),
+  eoffice: () => import('@/components/iso/figures/eoffice'),
+  library: () => import('@/components/iso/figures/library'),
+  'ta-mobile': () => import('@/components/iso/figures/ta-mobile'),
+  betatruyen: () => import('@/components/iso/figures/betatruyen'),
 }
 
 export async function loadFigure (id: FigureId): Promise<FigureModule> {
