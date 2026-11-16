@@ -1,3 +1,14 @@
-import { placeholderFigure } from '@/components/iso/figures/placeholder'
+import type { FigureModule } from '@/components/iso/figure-contract'
+import { PortfolioLive, PortfolioStill } from '@/components/iso/figures/portfolio/live'
 
-export default placeholderFigure({ id: 'portfolio', fig: 1, title: 'Drafting plotter', hint: 'not built' })
+// Fig 1: a drafting plotter that drafts this site's page layout as the section scrolls.
+const portfolioFigure: FigureModule = {
+  id: 'portfolio',
+  fig: 1,
+  title: 'Drafting plotter',
+  hint: 'scroll to draft the layout',
+  Static: PortfolioStill,
+  Live: PortfolioLive,
+}
+
+export default portfolioFigure
