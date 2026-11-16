@@ -155,14 +155,15 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
   },
   {
     id: 'xn2-admin',
-    title: 'XN2 Admin Console',
+    title: 'XN2 Bridge & Ferry Management',
     role: 'Frontend Developer',
     company: 'T.A Consultant',
     summary: [
-      'Admin console frontend with modules for accounts, authentication, cities and wards, companies, investors, roles and work items, plus a dashboard',
-      'Built with Vite, React, TypeScript, Redux and Zod',
+      'Admin console for a bridge and ferry company, covering bridges, roads, ferries, records and contracts',
+      'Modules for accounts, roles, companies, investors, work items, city and ward lookups and a dashboard, plus a form-template editor with rich text and Excalidraw drawing',
+      'Data tables with filter operators such as between and empty',
     ],
-    technologies: [VITE, REACT, TS, REDUX, ZOD, TAILWIND],
+    technologies: [VITE, REACT, TS, { name: 'Redux Toolkit', icon: 'skills/redux.svg' }, ZOD, TAILWIND, { name: 'dnd-kit' }, { name: 'Excalidraw' }],
     links: [],
   },
   {
