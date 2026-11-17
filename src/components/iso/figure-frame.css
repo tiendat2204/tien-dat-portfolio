@@ -68,7 +68,7 @@ html:not(.dark) .iso {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
+  padding: 8px;
   background-size: 36px 36px;
 }
 

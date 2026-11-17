@@ -16,7 +16,7 @@ const LEAD_SPREAD = 0.25
 const LEAD_SPAN = 0.2
 const FACE_SPAN = 0.1
 // More parts than this and the parts list switches to one-line rows (stack.css) so every row stays on the sheet.
-const DENSE_ROWS = 6
+const DENSE_ROWS = 9
 // The side modules' rows fill once every balloon has drawn.
 export const SIDE_ROWS_AT = LEAD_FROM + LEAD_SPREAD + LEAD_SPAN + FACE_SPAN
 
@@ -91,12 +91,16 @@ function useDrawingScale (art: StackArt, target: { current: HTMLDivElement | nul
   }, [art, target])
 }
 
+// A wrapped spec breaks after a ` · `, never before it, so no line starts with the separator.
+const keepSeparators = (tech: string) => tech.replaceAll(' · ', '\u00a0· ')
+
 function BomRow ({ n, label, tech, attrs }: { n: string, label: string, tech: string, attrs: Record<string, string | undefined> }) {
   return (
     <li {...attrs}>
       <span className='sheet-bom-n'>{n}</span>
-      <span className='sheet-bom-part'>{label}</span>
-      <span className='sheet-bom-spec' title={tech}>{tech}</span>
+      <span className='sheet-bom-text' title={tech}>
+        <span className='sheet-bom-part'>{label}</span> <span className='sheet-bom-spec'>{keepSeparators(tech)}</span>
+      </span>
     </li>
   )
 }
@@ -113,8 +117,7 @@ function Bom ({ config, moment, bomRef }: { config: StackConfig, moment: SheetMo
       <div className='sheet-bom-table'>
         <div className='sheet-bom-head' aria-hidden='true'>
           <span>no</span>
-          <span>part</span>
-          <span>spec</span>
+          <span>part · spec</span>
         </div>
         <ol ref={bomRef} className='sheet-bom-list' aria-label='Parts, top to bottom'>
           {bomRows(config).map((row, k) => (

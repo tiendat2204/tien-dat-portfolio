@@ -16,7 +16,7 @@
 .sheet {
   container-type: size;
   display: grid;
-  grid-template-columns: minmax(0, 64fr) minmax(0, 36fr);
+  grid-template-columns: minmax(0, 60fr) minmax(0, 40fr);
   grid-template-rows: minmax(0, 1fr) auto;
   grid-template-areas:
     "draw parts"
@@ -205,24 +205,17 @@
   overflow: hidden;
 }
 
-/* One grid for the head and every row (subgrid), so the columns line up down the list. */
-.sheet-bom-table {
-  display: grid;
-  grid-template-columns: 26px minmax(0, 1fr);
-  column-gap: 4px;
-}
-
-.sheet-bom-head,
-.sheet-bom-list,
-.sheet-bom-list > li {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: subgrid;
-}
-
+/*
+  Each row: the number, then the part as a run-in label followed by its spec. The text may wrap onto a second line
+  (never a third) so every tech name stays readable, and every row reserves those two lines, so nothing reflows while
+  the packet moves. The full spec is also in the text's `title`.
+*/
 .sheet-bom-head,
 .sheet-bom-list > li {
-  padding: 0 8px;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  column-gap: 6px;
+  padding: 0 6px;
   border-bottom: 1px solid hsl(var(--border));
 }
 
@@ -235,99 +228,77 @@
   color: hsl(var(--muted-foreground));
 }
 
-/* Two-line rows (part, then its spec under it) while the sheet is tall; one line with an ellipsis when it is not. */
-.sheet-bom-head > span:last-child {
-  display: none;
-}
-
 .sheet-bom-list {
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 10.5px;
-  line-height: 14px;
+  font-size: 10px;
+  line-height: 12px;
 }
 
 .sheet-bom-list > li {
   box-sizing: border-box;
-  /* Every row reserves exactly its two lines (part, spec), so nothing reflows while the packet moves. */
-  height: calc(2 * 14px + 9px);
-  padding-block: 4px;
+  align-items: start;
+  height: calc(2 * 12px + 7px);
+  padding-block: 3px 4px;
   transition: color 160ms, background-color 160ms;
 }
 
 .sheet-bom-n {
-  grid-row: span 2;
   font-variant-numeric: tabular-nums;
   color: hsl(var(--muted-foreground));
 }
 
-.sheet-bom-part {
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.sheet-bom-part,
-.sheet-bom-spec {
+.sheet-bom-text {
+  display: -webkit-box;
   min-width: 0;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.sheet-bom-part {
+  margin-right: 2px;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .sheet-bom-spec {
   color: hsl(var(--muted-foreground));
 }
 
-/* The spec is a hair smaller than the part, so a three-tech spec still fits its one line at the desktop card. */
-.sheet-bom-list > li > .sheet-bom-spec {
-  font-size: 10px;
-}
-
-/* One-line rows on a short sheet. */
+/* One-line rows (the text ends in an ellipsis) on a short sheet, where two-line rows would not all fit. */
 @container (height < 400px) {
-  .sheet-bom-table {
-    grid-template-columns: 22px max-content minmax(0, 1fr);
-    column-gap: 8px;
-  }
-
-  .sheet-bom-head > span:last-child {
-    display: inline;
-  }
-
-  .sheet-bom-n {
-    grid-row: auto;
-  }
-
   .sheet-bom-list > li {
     height: auto;
     padding-block: 3px;
+  }
+
+  .sheet-bom-text {
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
 
 /* The same one-line rows when the stack has more parts than two-line rows can hold. */
 @media (width >= 640px) {
-  .sheet[data-dense] .sheet-bom-table {
-    grid-template-columns: 22px max-content minmax(0, 1fr);
-    column-gap: 8px;
-  }
-
-  .sheet[data-dense] .sheet-bom-head > span:last-child {
-    display: inline;
-  }
-
-  .sheet[data-dense] .sheet-bom-n {
-    grid-row: auto;
-  }
-
   .sheet[data-dense] .sheet-bom-list > li {
     height: auto;
     padding-block: 3px;
   }
+
+  .sheet[data-dense] .sheet-bom-text {
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 }
 
 /* A blank form until the balloon draws: the rules show, the text does not. */
-.sheet-bom-list > li:not([data-shown]) > span {
+.sheet-bom-list > li:not([data-shown]) span {
   color: transparent;
 }
 
@@ -335,7 +306,7 @@
   background: hsl(var(--foreground));
 }
 
-.sheet-bom-list > li[data-active] > span {
+.sheet-bom-list > li[data-active] span {
   color: hsl(var(--background));
 }
 
@@ -352,7 +323,7 @@
   flex-direction: column-reverse;
   height: calc(5 * 16px + 10px);
   overflow: hidden;
-  padding: 5px 10px;
+  padding: 5px 7px;
   /* Older lines scroll off under a short fade instead of a hard cut through a row. */
   mask-image: linear-gradient(to bottom, transparent 0, #000 14px);
   font-size: 10.5px;
@@ -466,13 +437,28 @@
     aspect-ratio: calc(var(--art-ratio) * 0.92);
   }
 
+  /* Phone: a list, the part over its spec, which wraps freely. */
+  .sheet-bom-head,
+  .sheet-bom-list > li {
+    grid-template-columns: 22px minmax(0, 1fr);
+    padding-inline: 8px;
+  }
+
+  .sheet-bom-list {
+    line-height: 14px;
+  }
+
   .sheet-bom-list > li {
     height: auto;
     padding-block: 5px;
   }
 
-  .sheet-bom-list > li > .sheet-bom-spec {
-    white-space: normal;
+  .sheet-bom-text {
+    display: block;
+  }
+
+  .sheet-bom-part {
+    display: block;
   }
 
   /* One line of fields, each wrapping as a unit behind its own 16px `·` slot. The list starts 16px left of the
