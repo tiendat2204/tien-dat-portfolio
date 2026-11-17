@@ -145,7 +145,7 @@ test('step is active + 1 during the travel and 0 at rest', () => {
       const pose = sheetPose(p, n)
       if (p >= 0.38 && p < 0.95) assert.equal(pose.step, pose.active + 1, `step at ${p} for ${n}`)
       if (p >= 0.95) assert.equal(pose.step, 0)
-      if (p < 0.3) assert.equal(pose.step, 0)
+      if (p < 0.38) assert.equal(pose.step, 0, `step at ${p} for ${n}`)
     }
   }
 })
@@ -298,6 +298,9 @@ test('readoutAt walks the sheet, the scan, the steps and rest', () => {
   assert.equal(readoutAt({ ...CONFIG, skin: 'forum' }, 0.05), 'sheet · forum')
   assert.equal(readoutAt(CONFIG, 0.1), 'x-ray · scanning')
   assert.equal(readoutAt(CONFIG, 0.2), 'x-ray · scanning')
+  assert.equal(readoutAt(CONFIG, 0.3), 'assembly · exploding')
+  assert.equal(readoutAt(CONFIG, 0.34), 'assembly · exploding')
+  assert.equal(readoutAt(CONFIG, 0.38), 'STEP 1/5 · ui · React')
   assert.equal(readoutAt(CONFIG, mid(4, 5)), 'STEP 5/5 · cache')
   assert.equal(readoutAt(CONFIG, 0.95), 'ready')
   assert.equal(readoutAt(CONFIG, 0.97), 'ready')

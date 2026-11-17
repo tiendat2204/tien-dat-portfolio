@@ -68,15 +68,15 @@ function packetAt (p: number): { packetY: number, direction: 'down' | 'up' } {
   return { packetY: 0, direction: 'up' }
 }
 
-// `step` is the 1-based layer the packet is in while the assembly is shown and not at rest, else 0;
-// the readout's `STEP k/n`, the BOM row and the balloon all read it.
+// `step` is the 1-based layer the packet is in while it travels (down or up), else 0 (skin, scan,
+// explode, rest); the readout's `STEP k/n`, the BOM row and the balloon all read it.
 export function sheetPose (progress: number, layerCount: number): SheetPose {
   const p = clamp01(progress)
   const count = layersOf(layerCount)
   const { packetY, direction } = packetAt(p)
   const active = p < PHASES.rest[0] ? layerAt(packetY, count) : 0
   const view = p < PHASES.explode[0] ? 'skin' : 'assembly'
-  const step = view === 'assembly' && p < PHASES.rest[0] ? active + 1 : 0
+  const step = p >= PHASES.down[0] && p < PHASES.rest[0] ? active + 1 : 0
   return {
     skin: within(p, PHASES.skin),
     scan: within(p, PHASES.scan),
@@ -137,12 +137,13 @@ export function terminalAt (config: StackConfig, progress: number): TerminalStat
   return { blocks, cursor }
 }
 
-// `sheet · <skin>` while the skin draws, `x-ray · scanning` during the scan, `STEP k/n · <label> · <tech>`
-// for the layer the packet is in (explode, down and up), `ready` at rest.
+// `sheet · <skin>` while the skin draws, `x-ray · scanning` during the scan, `assembly · exploding` during
+// the explode, `STEP k/n · <label> · <tech>` for the layer the packet is in (down and up), `ready` at rest.
 export function readoutAt (config: StackConfig, progress: number): string {
   const p = clamp01(progress)
   if (p < PHASES.skin[1]) return `sheet · ${config.skin}`
   if (p < PHASES.scan[1]) return 'x-ray · scanning'
+  if (p < PHASES.explode[1]) return 'assembly · exploding'
   const count = config.layers.length
   const { step } = sheetPose(p, count)
   if (step === 0 || count === 0) return 'ready'
