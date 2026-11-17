@@ -18,11 +18,11 @@ export const metadata = buildPageMetadata({
 export default function ProjectsPage () {
   const sections = buildProjectSections()
   return (
-    <main className='mx-auto w-full max-w-3xl lg:max-w-6xl px-4 py-24'>
+    <main className='mx-auto w-full max-w-3xl lg:max-w-7xl px-4 py-24'>
       <h1 className='font-doto text-4xl font-extrabold'>projects</h1>
       <ProjectsScroller>
         {sections.map(section => (
-          <section key={section.id} id={section.id} className='mt-16 grid scroll-mt-24 gap-6 lg:min-h-[calc(100svh-6rem)] lg:grid-cols-2 lg:items-center lg:gap-10'>
+          <section key={section.id} id={section.id} className='mt-16 grid scroll-mt-24 gap-6 lg:min-h-[calc(100svh-6rem)] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-12'>
             <div>
               <p className='text-xs tabular-nums text-muted-foreground'>{String(section.index).padStart(2, '0')}</p>
               <h2 className='font-doto text-2xl font-extrabold'>{section.title}</h2>
@@ -47,7 +47,9 @@ export default function ProjectsPage () {
                 ))}
               </ul>
             </div>
-            <FigureSlot figureId={section.figureId} />
+            <div className='min-w-0 lg:max-h-[calc(100svh-8rem)]'>
+              <FigureSlot figureId={section.figureId} />
+            </div>
           </section>
         ))}
       </ProjectsScroller>
