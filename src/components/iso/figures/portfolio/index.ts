@@ -1,3 +1,4 @@
-import { stubFigure } from '@/components/iso/figures/stub'
+import { makeStackFigure } from '@/components/iso/stack/make-stack-figure'
+import { portfolioConfig } from '@/components/iso/figures/portfolio/config'
 
-export default stubFigure({ id: 'portfolio', fig: 1, title: 'Tien Dat Portfolio', hint: 'stack anatomy coming soon' })
+export default makeStackFigure(portfolioConfig)
