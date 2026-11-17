@@ -1,0 +1,30 @@
+/* Forum desk: figure-scoped styles, coloured only through the kit's tokens so both themes follow. */
+
+/* Fill the frame's box and fit the drawing inside it, so a short card scales the drawing instead of cropping it.
+   Focus uses the site's global ring. */
+.forum-desk {
+  height: 100%;
+  border-radius: 10px;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.forum-desk .iso-stage,
+.forum-desk .iso-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* On a phone the card is small: let the drawing run past its padding a little, clipped by the plate. */
+@media (max-width: 640px) {
+  .figure-frame .iso-plate:has(.forum-desk) {
+    overflow: hidden;
+  }
+
+  .figure-frame .forum-desk .iso-svg {
+    width: 150%;
+    height: 150%;
+    max-height: none;
+    margin: -9.5% -25%;
+  }
+}
