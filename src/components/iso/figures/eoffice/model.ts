@@ -7,7 +7,7 @@ import type { FigureInput, FigureModel } from '@/components/iso/figure-contract'
 // Station centres along the belt (world x), in routing order: draft, review, approved.
 export const STATIONS = [-50, 10, 70] as const
 // Each station's gate stands this far downstream of it.
-export const GATE_AFTER = 28
+const GATE_AFTER = 28
 // The stamp lands this far ahead of the sheet's centre, so the sheet waits that much short of the station.
 export const MARK_AHEAD = 6
 // The sheet's centre where it is fed onto the belt and where it rests in the out-tray.
@@ -15,7 +15,7 @@ export const FEED_X = -90
 export const OUT_X = 136
 // How far a press carriage rides up off the sheet, and how far a hover or an arrow key taps it down.
 export const STROKE = 6
-export const TAP = 1.6
+const TAP = 1.6
 
 export const GATES = STATIONS.map(x => x + GATE_AFTER)
 
@@ -55,7 +55,7 @@ const LEGS: Leg[] = (() => {
 
 const TOTAL = LEGS.reduce((sum, leg) => sum + leg.weight, 0)
 
-export type RoutePose = {
+type RoutePose = {
   // The sheet's centre along the belt.
   x: number
   // Each station's press, 0 lifted to 1 on the sheet.
@@ -69,7 +69,7 @@ export type RoutePose = {
 }
 
 // Where everything is after `travel` (0..1) of the run.
-export function routeAt (travel: number): RoutePose {
+function routeAt (travel: number): RoutePose {
   let along = clamp(travel, 0, 1) * TOTAL
   let x = FEED_X
   const dwell = STATIONS.map(() => 0)
