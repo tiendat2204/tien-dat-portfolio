@@ -1,3 +1,4 @@
-import { stubFigure } from '@/components/iso/figures/stub'
+import { libraryConfig } from '@/components/iso/figures/library/config'
+import { makeStackFigure } from '@/components/iso/stack/make-stack-figure'
 
-export default stubFigure({ id: 'library', fig: 4, title: 'Digital Library for a Pagoda', hint: 'stack anatomy coming soon' })
+export default makeStackFigure(libraryConfig)
