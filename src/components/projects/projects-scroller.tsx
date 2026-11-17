@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useLenis } from 'lenis/react'
 import { useEffect, useRef, type ReactNode } from 'react'
 
+import { createFrameThrottle } from '@/lib/projects/frame-throttle'
 import { PIN_MIN_WIDTH, PIN_TOP_OFFSET, PIN_VIEWPORTS, scrollPlan } from '@/lib/projects/scroll-plan'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -26,6 +27,15 @@ export function ProjectsScroller ({ children }: { children: ReactNode }) {
     if (!root) return
     const sections = gsap.utils.toArray<HTMLElement>('section', root)
     const mm = gsap.matchMedia()
+    // Lazy figures and fonts change heights after mount, so triggers must be re-measured (never in static mode).
+    let hasTriggers = false
+    const throttle = createFrameThrottle(
+      () => { if (hasTriggers) ScrollTrigger.refresh() },
+      cb => requestAnimationFrame(cb),
+      id => cancelAnimationFrame(id)
+    )
+    const observer = new ResizeObserver(() => throttle.request())
+    observer.observe(root)
 
     mm.add(
       // matchMedia only runs the callback when a condition matches, so `narrow` keeps the stacked mode reachable.
@@ -38,6 +48,7 @@ export function ProjectsScroller ({ children }: { children: ReactNode }) {
         const reduce = context.conditions?.reduce === true
         const mode = scrollPlan(context.conditions?.narrow === true ? PIN_MIN_WIDTH - 1 : PIN_MIN_WIDTH, reduce)
 
+        hasTriggers = mode !== 'static'
         if (mode === 'static') {
           sections.forEach(section => writeProgress(section, 1))
           return
@@ -74,7 +85,11 @@ export function ProjectsScroller ({ children }: { children: ReactNode }) {
       }
     )
 
-    return () => mm.revert()
+    return () => {
+      observer.disconnect()
+      throttle.cancel()
+      mm.revert()
+    }
   }, [])
 
   return <div ref={rootRef}>{children}</div>
