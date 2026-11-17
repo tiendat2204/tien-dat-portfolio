@@ -1,3 +1,4 @@
-import { stubFigure } from '@/components/iso/figures/stub'
+import { betatruyenConfig } from '@/components/iso/figures/betatruyen/config'
+import { makeStackFigure } from '@/components/iso/stack/make-stack-figure'
 
-export default stubFigure({ id: 'betatruyen', fig: 8, title: 'BetaTruyen Story Forum', hint: 'stack anatomy coming soon' })
+export default makeStackFigure(betatruyenConfig)
