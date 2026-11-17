@@ -6,13 +6,13 @@ import type { FigureInput, FigureModel } from '@/components/iso/figure-contract'
 // Geometry, the live loop and the readout all read these numbers.
 
 // Crate centre along the belt (world x): where the lot starts, where it is recorded, where it docks under the stamp.
-export const X_START = -106
-export const SCAN_X = -40
-export const X_END = 108
+export const X_START = -90
+export const SCAN_X = -30
+export const X_END = 92
 // How far a hover or an arrow key jogs the crate along the belt, at most.
 export const JOG = 5
 // How far the stamp pad travels down onto the lid.
-export const STROKE = 8
+export const STROKE = 6
 
 // Shares of the section's scroll: the crate travels until CARRY_END, the stamp runs from PRINT_START to PRINT_POINT.
 const CARRY_END = 0.72
@@ -42,7 +42,7 @@ export type AgritaState = {
   jog: number
 }
 
-export type LinePose = {
+type LinePose = {
   // Crate centre along the belt.
   x: number
   // The crate has passed the recording arch.
