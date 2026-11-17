@@ -7,6 +7,7 @@ export const agritaConfig: StackConfig = {
   fig: 2,
   title: 'AgriTA stack',
   hint: 'scroll to trace a harvest lot',
+  skin: 'dashboard',
   layers: [
     { id: 'ui', label: 'ui', tech: ['React 19', 'Next.js', 'shadcn/ui'], icon: 'react.svg' },
     { id: 'data', label: 'data', tech: ['TanStack Query', 'Router', 'Table'], icon: 'tanstack.svg' },

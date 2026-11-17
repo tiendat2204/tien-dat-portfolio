@@ -8,11 +8,15 @@ export type StackLayer = { id: string, label: string, tech: string[], icon?: str
 // `lines` are typed after it and `result` is the single output line.
 export type TerminalStep = { layer: number, prompt: string, lines: string[], result: string }
 
+// Generic line-art skin drawn before the X-ray scan reveals the stack (no client UI).
+export type SkinKind = 'web' | 'dashboard' | 'phone' | 'editor' | 'forum'
+
 export type StackConfig = {
   id: FigureId
   fig: number
   title: string
   hint: string
+  skin: SkinKind
   layers: StackLayer[]
   side: StackLayer[]
   steps: TerminalStep[]

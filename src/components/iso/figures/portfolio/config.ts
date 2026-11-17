@@ -6,6 +6,7 @@ export const portfolioConfig: StackConfig = {
   fig: 1,
   title: 'Portfolio stack',
   hint: 'scroll to ship a page',
+  skin: 'web',
   layers: [
     { id: 'ui', label: 'ui', tech: ['shadcn/ui', 'Tailwind CSS'], icon: 'shadcn.svg' },
     { id: 'content', label: 'content', tech: ['MDX', 'Fumadocs'] },

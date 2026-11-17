@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
-import type { StackConfig } from '../../src/components/iso/stack/types'
+import type { SkinKind, StackConfig } from '../../src/components/iso/stack/types'
 
 const ICON_DIR = join(process.cwd(), 'public', 'icons', 'skills')
 const MAX_LINE = 60
@@ -14,6 +14,7 @@ export const TERMINAL_ROWS = 5
 export function stepRows (step: StackConfig['steps'][number]): number {
   return 1 + step.lines.length + 1 + 1
 }
+const SKINS: readonly SkinKind[] = ['web', 'dashboard', 'phone', 'editor', 'forum']
 const BANNED = ['http', '://', 'localhost', 'bearer ', 'sk-', 'password', 'secret', 'token=', 't.a consultant', 'diamond', 'vietdev']
 const IPV4 = /\d+\.\d+\.\d+\.\d+/
 
@@ -26,6 +27,7 @@ function fail (config: StackConfig, message: string): never {
 export function assertSafeConfig (config: StackConfig): void {
   if (typeof config.id !== 'string' || config.id.length === 0) fail(config, 'empty id')
   if (!Number.isInteger(config.fig) || config.fig < 1) fail(config, `fig ${config.fig} is not a positive integer`)
+  if (!SKINS.includes(config.skin)) fail(config, `unknown skin '${String(config.skin)}'`)
   if (config.layers.length < 1) fail(config, 'no layers')
   config.steps.forEach((step, i) => {
     if (!Number.isInteger(step.layer) || step.layer < 0 || step.layer >= config.layers.length) {

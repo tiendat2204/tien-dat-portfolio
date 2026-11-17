@@ -20,6 +20,11 @@ test('ids and fig numbers match the registry', () => {
   assert.equal(agritaConfig.fig, 2)
 })
 
+test('each config names its generic skin', () => {
+  assert.equal(portfolioConfig.skin, 'web')
+  assert.equal(agritaConfig.skin, 'dashboard')
+})
+
 test('agrita names no database', () => {
   const db = /postgres|mysql|mongo|sqlite|database|\bdb\b/i
   for (const tier of [...agritaConfig.layers, ...agritaConfig.side]) {
@@ -41,7 +46,7 @@ test('every step fits the terminal viewport', () => {
 
 test('mid-scroll readout is non-empty and the settled terminal is complete', () => {
   for (const config of CONFIGS) {
-    assert.match(readoutAt(config, 0.5), /^→ \S/)
+    assert.match(readoutAt(config, 0.5), /^STEP \d+\/\d+ · \S/)
     const settled = terminalAt(config, 1)
     assert.ok(settled.blocks.length > 0)
     assert.ok(settled.blocks.every(block => block.done && block.result !== null))
@@ -58,4 +63,6 @@ test('the guard is not vacuous', () => {
   assert.throws(() => assertSafeConfig(step(['a'], 99)), /layer 99 out of range/)
   assert.throws(() => assertSafeConfig({ ...portfolioConfig, side: [{ id: 'x', label: 'x', tech: ['x'], icon: 'nope.svg' }] }), /missing icon 'nope.svg'/)
   assert.throws(() => assertSafeConfig(step(['a'.repeat(61)])), /longer than 60/)
+  const badSkin = { ...portfolioConfig, skin: 'kiosk' } as unknown as StackConfig
+  assert.throws(() => assertSafeConfig(badSkin), /unknown skin 'kiosk'/)
 })
