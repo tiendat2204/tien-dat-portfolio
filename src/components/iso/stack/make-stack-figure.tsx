@@ -100,14 +100,13 @@ function StackLive ({ config, art, progressRef, start }: LiveProps) {
     if (node) skinPaths.current[index] = node
   }, [])
 
-  useLoop(() => {
+  // Rewrites the sheet for the current progress; skips every write when the pose has not changed.
+  const paint = useCallback(() => {
     const progress = progressRef.current
     const moment = momentAt(config, art, progress)
     const terminal = terminalAt(config, progress)
     const key = keyOf(moment, terminal)
-    // Keep polling while near the viewport (useLoop stops offscreen): progress arrives through the ref, so an unchanged
-    // pose only skips the writes.
-    if (key === drawn.current) return true
+    if (key === drawn.current) return
     drawn.current = key
     const { drawing } = moment
 
@@ -183,6 +182,15 @@ function StackLive ({ config, art, progressRef, start }: LiveProps) {
     }
     if (panel.current) writeTerminal(panel.current, terminal)
     say(readoutAt(config, progress))
+  }, [config, art, progressRef, say])
+
+  // A figure that mounts mid-section shows its pose from the first paint, not one frame of the progress-0 sheet.
+  useLayoutEffect(() => paint(), [paint])
+
+  // Keep polling while near the viewport (useLoop stops offscreen): progress arrives through the ref, so an unchanged
+  // pose only skips the writes.
+  useLoop(() => {
+    paint()
     return true
   }, active)
 

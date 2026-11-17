@@ -76,7 +76,9 @@
     repeating-linear-gradient(to bottom, var(--tick) 0 1px, transparent 1px 16.66%) top right / 4px 100% no-repeat;
 }
 
-.sheet-layer {
+/* The skin layer, the skeleton layer and the scanline share one box, so the scanline always sits on the clip edge. */
+.sheet-layer,
+.sheet-scan {
   position: absolute;
   inset: 10px 10px 8px;
 }
@@ -91,9 +93,10 @@
   height: 100%;
 }
 
-/* The skin sits a little inside the drawing area, roughly over the stack it turns into. */
+/* The skin sits a little inside that box (padding, not a smaller box), roughly over the stack it turns into. */
 .sheet-skin {
-  inset: 9% 12% 7%;
+  box-sizing: border-box;
+  padding: 7% 10% 5%;
 }
 
 .sheet-skin .skin-svg {
@@ -103,8 +106,6 @@
 
 /* The scanline: the avatar's (a 1px rule fading out at both ends with a soft glow) and a faint wake above it. */
 .sheet-scan {
-  position: absolute;
-  inset: 10px 0 8px;
   pointer-events: none;
   will-change: transform;
 }
@@ -470,12 +471,31 @@
     padding-block: 5px;
   }
 
+  /* One line of fields, each wrapping as a unit behind its own 16px `·` slot. The list starts 16px left of the
+     cell's content box and the cell's left padding is masked in paper, so the slot of whichever field starts a line
+     (the first one included) is hidden: a wrapped line never begins with a dangling `·`. */
+  .sheet-title-cell {
+    position: relative;
+    overflow: hidden;
+    padding: 7px 8px;
+  }
+
+  .sheet-title-cell::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    width: 8px;
+    background: hsl(var(--background));
+  }
+
   .sheet-title {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 0 8px;
-    padding: 7px 8px;
+    margin-left: -16px;
     background: hsl(var(--background));
   }
 
@@ -488,9 +508,11 @@
     display: none;
   }
 
-  .sheet-title > div:not(:last-child)::after {
+  .sheet-title > div::before {
     content: "·";
-    margin-left: 8px;
+    display: inline-block;
+    width: 16px;
+    text-align: center;
     color: hsl(var(--muted-foreground));
   }
 

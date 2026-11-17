@@ -47,7 +47,7 @@ export type SheetMoment = {
   title: TitleBlock
 }
 
-export type SheetBindings = {
+type SheetBindings = {
   root?: Ref<HTMLDivElement>
   skinLayer?: Ref<HTMLDivElement>
   skinPath?: (index: number) => Ref<SVGPathElement>

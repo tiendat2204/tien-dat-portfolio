@@ -9,6 +9,11 @@ const MAX_LINE = 60
 // a finished step shows its prompt row, its code lines, its result row and then the idle `$ █` row the cursor moves
 // to (terminal-panel.tsx), and all of them must fit or the step's `$` prompt is half cut at the top.
 export const TERMINAL_ROWS = 5
+// Columns a notes row holds before it wraps (`.stack-term-log p` is pre-wrap, so a longer line takes a second row and
+// pushes the step's `$` prompt out of the viewport). The notes column is 64% of the sheet (stack.css `.sheet`), Plex
+// Mono at 10.5px (about 6.3px a column) less 20px padding: about 49 columns on the 540px card at a 1024px viewport,
+// the narrowest desktop card. 44 leaves a margin. Prompts are rendered after `$ `, so they count two more.
+export const TERMINAL_COLS = 44
 
 // Rows a finished step occupies in the terminal: prompt + code lines + result + the idle prompt row after it.
 export function stepRows (step: StackConfig['steps'][number]): number {
@@ -33,6 +38,8 @@ export function assertSafeConfig (config: StackConfig): void {
     if (!Number.isInteger(step.layer) || step.layer < 0 || step.layer >= config.layers.length) {
       fail(config, `step ${i} layer ${step.layer} out of range`)
     }
+    const wide = [`$ ${step.prompt}`, ...step.lines, step.result].find(text => text.length > TERMINAL_COLS)
+    if (wide !== undefined) fail(config, `step ${i} line '${wide}' (${wide.length}) exceeds ${TERMINAL_COLS} terminal columns`)
     const rows = stepRows(step)
     if (rows > TERMINAL_ROWS) fail(config, `step ${i} needs ${rows} terminal rows, more than ${TERMINAL_ROWS}`)
   })

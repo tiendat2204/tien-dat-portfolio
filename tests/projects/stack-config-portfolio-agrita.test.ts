@@ -5,7 +5,7 @@ import { agritaConfig } from '../../src/components/iso/figures/agrita/config'
 import { portfolioConfig } from '../../src/components/iso/figures/portfolio/config'
 import { readoutAt, terminalAt } from '../../src/components/iso/stack/engine'
 import type { StackConfig } from '../../src/components/iso/stack/types'
-import { assertSafeConfig, stepRows, TERMINAL_ROWS } from './stack-config-guard'
+import { assertSafeConfig, stepRows, TERMINAL_COLS, TERMINAL_ROWS } from './stack-config-guard'
 
 const CONFIGS = [portfolioConfig, agritaConfig]
 
@@ -62,7 +62,24 @@ test('the guard is not vacuous', () => {
   assert.doesNotThrow(() => assertSafeConfig(step(['a', 'b'])))
   assert.throws(() => assertSafeConfig(step(['a'], 99)), /layer 99 out of range/)
   assert.throws(() => assertSafeConfig({ ...portfolioConfig, side: [{ id: 'x', label: 'x', tech: ['x'], icon: 'nope.svg' }] }), /missing icon 'nope.svg'/)
-  assert.throws(() => assertSafeConfig(step(['a'.repeat(61)])), /longer than 60/)
+  assert.throws(() => assertSafeConfig({ ...portfolioConfig, title: 'a'.repeat(61) }), /longer than 60/)
   const badSkin = { ...portfolioConfig, skin: 'kiosk' } as unknown as StackConfig
   assert.throws(() => assertSafeConfig(badSkin), /unknown skin 'kiosk'/)
+})
+
+test('terminal text fits the notes column (TERMINAL_COLS)', () => {
+  assert.equal(TERMINAL_COLS, 44)
+  const step = (prompt: string, lines: string[], result: string): StackConfig => ({ ...portfolioConfig, steps: [{ layer: 0, prompt, lines, result }] })
+  assert.throws(() => assertSafeConfig(step('x', ['a'.repeat(45)], 'ok')), /exceeds 44 terminal columns/)
+  assert.doesNotThrow(() => assertSafeConfig(step('x', ['a'.repeat(44)], 'ok')))
+  // The prompt is rendered after `$ `, so it has two columns fewer.
+  assert.doesNotThrow(() => assertSafeConfig(step('p'.repeat(42), ['a'], 'ok')))
+  assert.throws(() => assertSafeConfig(step('p'.repeat(43), ['a'], 'ok')), /exceeds 44 terminal columns/)
+  assert.throws(() => assertSafeConfig(step('x', ['a'], 'r'.repeat(45))), /exceeds 44 terminal columns/)
+  for (const config of CONFIGS) {
+    for (const step of config.steps) {
+      assert.ok(step.prompt.length + 2 <= TERMINAL_COLS, `${config.id}: ${step.prompt}`)
+      for (const text of [...step.lines, step.result]) assert.ok(text.length <= TERMINAL_COLS, `${config.id}: ${text}`)
+    }
+  }
 })
