@@ -3,9 +3,9 @@ import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import { FIGURE_IDS, FIGURE_LOADERS } from '../../src/components/iso/registry'
 
-const EXPECTED = ['portfolio', 'agrita', 'eoffice', 'library', 'agrita-mobile', 'betatruyen']
+const EXPECTED = ['portfolio', 'agrita', 'eoffice', 'library', 'agrita-mobile', 'tangni', 'xn2', 'betatruyen']
 
-test('FIGURE_IDS lists the six figures in page order', () => {
+test('FIGURE_IDS lists the eight figures in page order', () => {
   assert.deepEqual([...FIGURE_IDS], EXPECTED)
 })
 

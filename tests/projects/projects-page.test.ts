@@ -6,7 +6,7 @@ test('buildProjectSections returns the page list in order with figures', () => {
   const sections = buildProjectSections()
   assert.deepEqual(sections.map(s => s.id), ['tien-dat-portfolio', 'agrita', 'eoffice', 'digital-library', 'agrita-mobile', 'tangni-web', 'xn2-admin', 'betatruyen'])
   assert.deepEqual(sections.map(s => s.index), [1, 2, 3, 4, 5, 6, 7, 8])
-  assert.deepEqual(sections.map(s => s.figureId), ['portfolio', 'agrita', 'eoffice', 'library', 'agrita-mobile', undefined, undefined, 'betatruyen'])
+  assert.deepEqual(sections.map(s => s.figureId), ['portfolio', 'agrita', 'eoffice', 'library', 'agrita-mobile', 'tangni', 'xn2', 'betatruyen'])
   assert.ok(sections.every(s => s.company.length > 0 && s.summary.length > 0))
   assert.equal(sections[7].company, 'VietDev Studio')
   assert.deepEqual(sections.map(s => s.period), ['June 2024 - Present', 'Jun 2025 - Present', 'Jun 2025 - Present', 'Jun 2025 - Present', undefined, undefined, undefined, 'Sep 2024 - Jun 2025'])

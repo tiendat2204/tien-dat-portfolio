@@ -1,4 +1,4 @@
-export type FigureId = 'portfolio' | 'agrita' | 'eoffice' | 'library' | 'agrita-mobile' | 'betatruyen'
+export type FigureId = 'portfolio' | 'agrita' | 'eoffice' | 'library' | 'agrita-mobile' | 'tangni' | 'xn2' | 'betatruyen'
 
 export type ProjectSection = {
   id: string
@@ -155,6 +155,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
     ],
     technologies: [VITE, REACT, TS, { name: 'TanStack Router/Query', icon: 'skills/tanstack.svg', iconDark: 'skills/tanstack-dark.svg' }, ZOD],
     links: [],
+    figureId: 'tangni',
   },
   {
     id: 'xn2-admin',
@@ -168,6 +169,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
     ],
     technologies: [VITE, REACT, TS, { name: 'Redux Toolkit', icon: 'skills/redux.svg' }, ZOD, TAILWIND, { name: 'dnd-kit' }, { name: 'Excalidraw' }],
     links: [],
+    figureId: 'xn2',
   },
   {
     id: 'betatruyen',
