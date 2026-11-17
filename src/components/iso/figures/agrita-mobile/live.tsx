@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef, type KeyboardEvent, type PointerEvent }
 
 import { useFigureActive } from '@/components/iso/figure-activity'
 import type { FigureInput, ProgressRef } from '@/components/iso/figure-contract'
-import { movesOf, type Move } from '@/components/iso/figures/ta-mobile/geometry'
-import { poseOf, taMobileModel } from '@/components/iso/figures/ta-mobile/model'
-import { SETTLED_READOUT, StationDrawing, TaMobileStatic } from '@/components/iso/figures/ta-mobile/static'
+import { movesOf, type Move } from '@/components/iso/figures/agrita-mobile/geometry'
+import { poseOf, agritaMobileModel } from '@/components/iso/figures/agrita-mobile/model'
+import { SETTLED_READOUT, StationDrawing, AgritaMobileStatic } from '@/components/iso/figures/agrita-mobile/static'
 import { useLoop, useReadout } from '@/components/iso/kit/react/live'
 
 type Moving = Exclude<Move, 'still'>
@@ -15,7 +15,7 @@ const MOVING: Moving[] = ['card', 'mark', 'head', 'collar']
 const JOG_STEP = 0.5
 const KEYS_LABEL = 'Field journal station. Scroll to stamp a journal card and sync it to the rack; move the pointer away from the uplink mast or use the arrow keys to drop the signal and keep the card in the outbox, Escape to restore it.'
 
-const START = taMobileModel.init()
+const START = agritaMobileModel.init()
 const START_POSE = poseOf(START)
 const START_MOVES = movesOf(START_POSE)
 
@@ -23,7 +23,7 @@ const clamp = (value: number, low: number, high: number) => Math.min(high, Math.
 
 // The scroll-driven figure. One frame loop steps the pure model and writes transforms, the stamp mark's visibility and
 // the readout straight onto the DOM; React renders it once.
-export function TaMobileLive ({ progressRef }: { progressRef: ProgressRef }) {
+export function AgritaMobileLive ({ progressRef }: { progressRef: ProgressRef }) {
   const active = useFigureActive()
   const { anchor, say } = useReadout<HTMLDivElement>()
   const slots = useRef<Record<Moving, SVGGElement[]>>({ card: [], mark: [], head: [], collar: [] })
@@ -42,9 +42,9 @@ export function TaMobileLive ({ progressRef }: { progressRef: ProgressRef }) {
   })
 
   useLoop((dt) => {
-    const next = taMobileModel.step(state.current, dt, inputOf())
+    const next = agritaMobileModel.step(state.current, dt, inputOf())
     state.current = next
-    const readout = taMobileModel.readout(next)
+    const readout = agritaMobileModel.readout(next)
     const key = `${next.phase}|${next.signal}|${next.flush}|${readout}`
     // Keep polling while near the viewport (useLoop stops it offscreen): scroll progress arrives through the ref, not
     // through React, so a settled frame only skips the DOM writes.
@@ -98,12 +98,12 @@ export function TaMobileLive ({ progressRef }: { progressRef: ProgressRef }) {
 }
 
 // Reduced motion: the settled pose, with its readout written once.
-export function TaMobileStill () {
+export function AgritaMobileStill () {
   const { anchor, say } = useReadout<HTMLDivElement>()
   useEffect(() => say(SETTLED_READOUT), [say])
   return (
     <div ref={anchor} className='station'>
-      <TaMobileStatic />
+      <AgritaMobileStatic />
     </div>
   )
 }

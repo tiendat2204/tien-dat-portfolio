@@ -30,7 +30,7 @@ function follow (current: number, target: number, dt: number, seconds: number) {
   return Math.abs(target - next) < 1e-4 ? target : next
 }
 
-export type TaMobileState = {
+export type AgritaMobileState = {
   // Scroll progress as last seen, clamped to 0..1: the readout's phase.
   progress: number
   // The pointer's offset from the mast, -1..1, 0 without a pointer: the signal.
@@ -43,11 +43,11 @@ export type TaMobileState = {
   flush: number
 }
 
-const connected = (state: Pick<TaMobileState, 'aim'>) => Math.abs(state.aim) <= TOLERANCE
+const connected = (state: Pick<AgritaMobileState, 'aim'>) => Math.abs(state.aim) <= TOLERANCE
 
-export const delivered = (state: Pick<TaMobileState, 'flush'>) => state.flush > 1 - 1e-6
+export const delivered = (state: Pick<AgritaMobileState, 'flush'>) => state.flush > 1 - 1e-6
 
-export const taMobileModel: FigureModel<TaMobileState> = {
+export const agritaMobileModel: FigureModel<AgritaMobileState> = {
   init () {
     return { progress: 0, aim: 0, phase: 0, signal: 1, flush: 0 }
   },
@@ -87,7 +87,7 @@ export const OUTBOX_X = -62
 export const RACK_X = 76
 
 // Everything the drawing needs from a state.
-export function poseOf (state: TaMobileState): StationPose {
+export function poseOf (state: AgritaMobileState): StationPose {
   const stroke = share(state.phase, 0.1, 0.32)
   const press = Math.sin(Math.PI * stroke)
   const toOutbox = smooth(share(state.phase, STAMPED, QUEUED))
@@ -95,4 +95,4 @@ export function poseOf (state: TaMobileState): StationPose {
   return { cardX, stamped: stroke >= 0.5, press, signal: state.signal }
 }
 
-export const SETTLED_STATE: TaMobileState = { progress: 1, aim: 0, phase: 1, signal: 1, flush: 1 }
+export const SETTLED_STATE: AgritaMobileState = { progress: 1, aim: 0, phase: 1, signal: 1, flush: 1 }

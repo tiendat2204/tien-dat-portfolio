@@ -1,4 +1,4 @@
-export type FigureId = 'portfolio' | 'agrita' | 'eoffice' | 'library' | 'ta-mobile' | 'betatruyen'
+export type FigureId = 'portfolio' | 'agrita' | 'eoffice' | 'library' | 'agrita-mobile' | 'betatruyen'
 
 export type ProjectSection = {
   id: string
@@ -121,7 +121,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
     figureId: 'library',
   },
   {
-    id: 'ta-mobile',
+    id: 'agrita-mobile',
     title: 'AgriTA Mobile',
     role: 'Mobile Developer',
     company: 'T.A Consultant',
@@ -142,7 +142,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
       { name: 'fl_chart' },
     ],
     links: [],
-    figureId: 'ta-mobile',
+    figureId: 'agrita-mobile',
   },
   {
     id: 'tangni-web',

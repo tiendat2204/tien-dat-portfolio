@@ -1,19 +1,19 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { delivered, taMobileModel, type TaMobileState } from '../../src/components/iso/figures/ta-mobile/model'
+import { delivered, agritaMobileModel, type AgritaMobileState } from '../../src/components/iso/figures/agrita-mobile/model'
 import type { FigureInput } from '../../src/components/iso/figure-contract'
 
 const DONE: FigureInput = { progress: 1, pointer: null }
 const DROPPED: FigureInput = { progress: 1, pointer: { x: 0.9, y: 0 } }
 
 function run (inputs: FigureInput[], dt = 0.016) {
-  let state = taMobileModel.init()
-  const states: TaMobileState[] = []
+  let state = agritaMobileModel.init()
+  const states: AgritaMobileState[] = []
   const readouts: string[] = []
   for (const input of inputs) {
-    state = taMobileModel.step(state, dt, input)
+    state = agritaMobileModel.step(state, dt, input)
     states.push(state)
-    readouts.push(taMobileModel.readout(state))
+    readouts.push(agritaMobileModel.readout(state))
   }
   return { state, states, readouts }
 }
@@ -21,19 +21,19 @@ function run (inputs: FigureInput[], dt = 0.016) {
 const hold = (input: FigureInput, frames: number) => Array.from({ length: frames }, () => input)
 
 test('a fresh card reads journal draft', () => {
-  const state = taMobileModel.step(taMobileModel.init(), 0.016, { progress: 0, pointer: null })
-  assert.equal(taMobileModel.readout(state), 'journal draft')
+  const state = agritaMobileModel.step(agritaMobileModel.init(), 0.016, { progress: 0, pointer: null })
+  assert.equal(agritaMobileModel.readout(state), 'journal draft')
 })
 
 test('holding progress at 1 with a connection syncs the card into the rack', () => {
   const { state } = run(hold(DONE, 600))
-  assert.equal(taMobileModel.readout(state), 'synced')
+  assert.equal(agritaMobileModel.readout(state), 'synced')
   assert.ok(delivered(state))
 })
 
 test('a card in the outbox with a connection but before the flush reads queued', () => {
   const { state } = run(hold({ progress: 0.5, pointer: null }, 300))
-  assert.equal(taMobileModel.readout(state), 'queued · outbox 1')
+  assert.equal(agritaMobileModel.readout(state), 'queued · outbox 1')
   assert.ok(!delivered(state))
 })
 
@@ -46,7 +46,7 @@ test('a dropped signal keeps the card queued in the outbox and never delivers it
 
 test('a pointer within the tolerance keeps the connection', () => {
   const { state } = run(hold({ progress: 1, pointer: { x: 0.1, y: 0.8 } }, 600))
-  assert.equal(taMobileModel.readout(state), 'synced')
+  assert.equal(agritaMobileModel.readout(state), 'synced')
 })
 
 test('synced is never shown while progress is under 0.9', () => {
@@ -68,8 +68,8 @@ test('the same inputs give the same states', () => {
 })
 
 test('step leaves its input state untouched', () => {
-  const before: TaMobileState = taMobileModel.step(taMobileModel.init(), 0.016, { progress: 0.6, pointer: null })
+  const before: AgritaMobileState = agritaMobileModel.step(agritaMobileModel.init(), 0.016, { progress: 0.6, pointer: null })
   const copy = structuredClone(before)
-  taMobileModel.step(before, 0.016, { progress: 1, pointer: { x: 1, y: 0 } })
+  agritaMobileModel.step(before, 0.016, { progress: 1, pointer: { x: 1, y: 0 } })
   assert.deepEqual(before, copy)
 })

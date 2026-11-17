@@ -1,10 +1,10 @@
 import type { Ref } from 'react'
 
-import { HEIGHT, PARTS, WIDTH, movesOf, type Item, type Mark, type Move } from '@/components/iso/figures/ta-mobile/geometry'
-import { poseOf, SETTLED_STATE, taMobileModel } from '@/components/iso/figures/ta-mobile/model'
+import { HEIGHT, PARTS, WIDTH, movesOf, type Item, type Mark, type Move } from '@/components/iso/figures/agrita-mobile/geometry'
+import { poseOf, SETTLED_STATE, agritaMobileModel } from '@/components/iso/figures/agrita-mobile/model'
 import { Dots, IsoFigure, Line, Solid } from '@/components/iso/kit/react/draw'
 
-import '@/components/iso/figures/ta-mobile/ta-mobile.css'
+import '@/components/iso/figures/agrita-mobile/agrita-mobile.css'
 
 export const LABEL =
   'A field journal station on a heavy base: a rugged handheld logger with a camera stands in a cradle with its stylus, a stamp press prints a photo mark on a journal card, the card drops into a slotted outbox, and a belt carries it to a bin in front of a server rack once the uplink mast beside the outbox has a signal. A plot tray with crop pegs and a weather vane stand at the front.'
@@ -12,7 +12,7 @@ export const LABEL =
 // The settled pose: the card stamped, synced and resting in the rack bin, the outbox empty, the signal up.
 const SETTLED = poseOf(SETTLED_STATE)
 const SETTLED_MOVES = movesOf(SETTLED)
-export const SETTLED_READOUT = taMobileModel.readout(SETTLED_STATE)
+export const SETTLED_READOUT = agritaMobileModel.readout(SETTLED_STATE)
 
 function MarkView ({ mark }: { mark: Mark }) {
   if (mark.kind === 'solid') {
@@ -72,6 +72,6 @@ export function StationDrawing ({ moves, stamped, slotRef }: DrawingProps) {
 }
 
 // Reduced motion: the card synced into the rack bin. No hooks, safe to render anywhere.
-export function TaMobileStatic () {
+export function AgritaMobileStatic () {
   return <StationDrawing moves={SETTLED_MOVES} stamped />
 }

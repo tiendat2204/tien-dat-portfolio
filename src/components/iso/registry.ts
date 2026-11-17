@@ -1,7 +1,7 @@
 import type { FigureModule } from '@/components/iso/figure-contract'
 import type { FigureId } from '@/data/projects-page'
 
-export const FIGURE_IDS: readonly FigureId[] = ['portfolio', 'agrita', 'eoffice', 'library', 'ta-mobile', 'betatruyen']
+export const FIGURE_IDS: readonly FigureId[] = ['portfolio', 'agrita', 'eoffice', 'library', 'agrita-mobile', 'betatruyen']
 
 // One dynamic import per figure, so the route ships no figure code up front.
 export const FIGURE_LOADERS: Record<FigureId, () => Promise<{ default: FigureModule }>> = {
@@ -9,7 +9,7 @@ export const FIGURE_LOADERS: Record<FigureId, () => Promise<{ default: FigureMod
   agrita: () => import('@/components/iso/figures/agrita'),
   eoffice: () => import('@/components/iso/figures/eoffice'),
   library: () => import('@/components/iso/figures/library'),
-  'ta-mobile': () => import('@/components/iso/figures/ta-mobile'),
+  'agrita-mobile': () => import('@/components/iso/figures/agrita-mobile'),
   betatruyen: () => import('@/components/iso/figures/betatruyen'),
 }
 

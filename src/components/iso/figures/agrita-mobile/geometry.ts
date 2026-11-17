@@ -35,7 +35,7 @@ import {
 } from '@/components/iso/kit/iso-kit'
 import * as latheModule from '@/components/iso/kit/lathe.mjs'
 import * as tubeModule from '@/components/iso/kit/tube.mjs'
-import type { StationPose } from '@/components/iso/figures/ta-mobile/model'
+import type { StationPose } from '@/components/iso/figures/agrita-mobile/model'
 
 export const WIDTH = 600
 export const HEIGHT = 390

@@ -1,7 +1,7 @@
 /*
   Geometry audit for the field journal station (not imported by the app). Run from the repo root:
 
-    node --import tsx src/components/iso/figures/ta-mobile/audit.ts
+    node --import tsx src/components/iso/figures/agrita-mobile/audit.ts
 
   It records every drawn item's true shapes into the kit's audit recorder in the exact painter's order the page uses
   (keys are draw positions, never re-settled), then runs every check of kit/audit.mjs at a grid of poses that covers
@@ -10,8 +10,8 @@
 */
 import * as auditModule from '@/components/iso/kit/audit.mjs'
 import { dotsSvg, lineSvg, solidSvg, translateAlong, type Plan, type Point3, type Projection } from '@/components/iso/kit/iso-kit'
-import { PARTS, PROJECTION as P, ROUTES, offsetsOf, type Frame, type Mark, type Shape } from '@/components/iso/figures/ta-mobile/geometry'
-import { OUTBOX_X, PRESS_X, RACK_X, type StationPose } from '@/components/iso/figures/ta-mobile/model'
+import { PARTS, PROJECTION as P, ROUTES, offsetsOf, type Frame, type Mark, type Shape } from '@/components/iso/figures/agrita-mobile/geometry'
+import { OUTBOX_X, PRESS_X, RACK_X, type StationPose } from '@/components/iso/figures/agrita-mobile/model'
 
 // The slice of kit/audit.mjs (plain JS) this script uses. Recorded shapes and results stay opaque here.
 type Recorded = { readonly kind: string }
