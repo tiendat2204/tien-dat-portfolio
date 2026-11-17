@@ -1,0 +1,274 @@
+/*
+  Stack anatomy layout. The card body is the drawing with its layer chips on the right (aligned with each board at the
+  open stack's height) and the terminal under them. The drawing box always keeps the SVG's own aspect, so a chip's
+  `--y` (a share of the viewBox height) lands on its board. Below `sm` the card grows with its content and the chips
+  fall back to a plain list under the drawing.
+*/
+.stack-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.stack-row {
+  flex: 1 1 auto;
+  min-height: 0;
+  container-type: size;
+  display: flex;
+  align-items: center;
+}
+
+.stack-art {
+  position: relative;
+  flex: none;
+  width: min(56cqw, calc(100cqh * var(--stack-ratio)));
+  aspect-ratio: var(--stack-ratio);
+}
+
+.stack-art .iso-stage,
+.stack-art .iso-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* The scan: a soft beam trailing a fine rule, like the avatar's scanline. */
+.stack-beam {
+  fill: var(--anatomy-hi);
+  opacity: 0.1;
+  stroke: none;
+}
+
+/* The board's LED: dim until the packet passes it. */
+.stack-plate [data-part$='.led'] .iso-dots circle {
+  opacity: 0.15;
+  transition: opacity 160ms;
+}
+
+.stack-plate[data-active] [data-part$='.led'] .iso-dots circle {
+  opacity: 1;
+}
+
+/* --- Chips --------------------------------------------------------------------------------------------------------- */
+
+.stack-chips-slot {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: calc(100cqw - 100%);
+  height: 100%;
+}
+
+.stack-chips {
+  position: relative;
+  height: 100%;
+  transition: opacity 120ms linear;
+}
+
+.stack-chip-list,
+.stack-chip-side {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stack-chip {
+  position: absolute;
+  left: 0;
+  top: calc(var(--y) * 100%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  transform: translateY(-50%);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 10px;
+  line-height: 16px;
+  color: hsl(var(--muted-foreground));
+  white-space: nowrap;
+}
+
+.stack-chip-tick {
+  flex: none;
+  width: 14px;
+  height: 1px;
+  background: hsl(var(--border));
+}
+
+.stack-chip-icon {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  filter: grayscale(1);
+  opacity: 0.8;
+}
+
+:where(.dark) .stack-chip-icon {
+  filter: grayscale(1) invert(1);
+}
+
+.stack-chip-label {
+  flex: none;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+  padding: 0 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stack-chip-tech {
+  display: flex;
+  min-width: 0;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.stack-tech {
+  flex: none;
+  border: 1px dashed hsl(var(--border));
+  background: hsl(var(--background));
+  padding: 0 4px;
+}
+
+/* A row too long for the column ends in an ellipsis on its last chip (the full list is in the chip's title). */
+.stack-tech:last-child {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stack-chip[data-active] {
+  color: hsl(var(--foreground));
+}
+
+.stack-chip[data-active] .stack-chip-tick {
+  background: hsl(var(--foreground));
+}
+
+.stack-chip[data-active] .stack-chip-label {
+  border-color: hsl(var(--foreground));
+  background: hsl(var(--foreground));
+  color: hsl(var(--background));
+}
+
+.stack-chip[data-active] .stack-tech {
+  border-style: solid;
+  border-color: hsl(var(--foreground) / 0.5);
+}
+
+/* Side modules: one row at the bottom of the column, under a hairline. */
+.stack-chip-side {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  border-top: 1px dashed hsl(var(--border));
+  padding-top: 4px;
+}
+
+.stack-chip-side .stack-chip {
+  position: static;
+  transform: none;
+}
+
+.stack-chip-side .stack-chip-tick {
+  width: 6px;
+}
+
+/* --- Terminal ------------------------------------------------------------------------------------------------------ */
+
+.stack-term {
+  flex: none;
+}
+
+.stack-term-screen {
+  display: flex;
+  flex-direction: column-reverse;
+  height: calc(5 * 16px + 10px);
+  overflow: hidden;
+  padding: 5px 10px;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.stack-term-screen[data-scroll] {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.stack-term-log p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.stack-term-block + .stack-term-block:has(> p:not([hidden])) {
+  margin-top: 4px;
+}
+
+/* --- Phone: the card grows, chips become a list under the drawing ------------------------------------------------- */
+
+@media (width < 640px) {
+  .stack-figure {
+    height: auto;
+  }
+
+  .stack-row {
+    flex-direction: column;
+    align-items: stretch;
+    container-type: inline-size;
+  }
+
+  .stack-art {
+    width: 100%;
+    aspect-ratio: auto;
+  }
+
+  .stack-art .iso-stage {
+    width: min(100%, 340px);
+    height: auto;
+    margin: 0 auto;
+    aspect-ratio: var(--stack-ratio);
+  }
+
+  .stack-chips-slot {
+    position: static;
+    width: 100%;
+    height: auto;
+    margin-top: 12px;
+  }
+
+  .stack-chips {
+    height: auto;
+    opacity: 1 !important;
+  }
+
+  .stack-chip-list {
+    display: grid;
+    gap: 6px;
+  }
+
+  .stack-chip {
+    position: static;
+    transform: none;
+    flex-wrap: wrap;
+    white-space: normal;
+    font-size: 11px;
+  }
+
+  .stack-chip-tech {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  .stack-chip-side {
+    position: static;
+    margin-top: 8px;
+  }
+}
