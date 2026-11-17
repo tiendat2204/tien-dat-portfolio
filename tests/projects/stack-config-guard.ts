@@ -5,6 +5,15 @@ import type { StackConfig } from '../../src/components/iso/stack/types'
 
 const ICON_DIR = join(process.cwd(), 'public', 'icons', 'skills')
 const MAX_LINE = 60
+// Rows the terminal viewport shows (src/components/iso/stack/stack.css, `.stack-term-screen` height calc(5 * 16px + 10px)):
+// a finished step shows its prompt row, its code lines, its result row and then the idle `$ █` row the cursor moves
+// to (terminal-panel.tsx), and all of them must fit or the step's `$` prompt is half cut at the top.
+export const TERMINAL_ROWS = 5
+
+// Rows a finished step occupies in the terminal: prompt + code lines + result + the idle prompt row after it.
+export function stepRows (step: StackConfig['steps'][number]): number {
+  return 1 + step.lines.length + 1 + 1
+}
 const BANNED = ['http', '://', 'localhost', 'bearer ', 'sk-', 'password', 'secret', 'token=', 't.a consultant', 'diamond', 'vietdev']
 const IPV4 = /\d+\.\d+\.\d+\.\d+/
 
@@ -22,6 +31,8 @@ export function assertSafeConfig (config: StackConfig): void {
     if (!Number.isInteger(step.layer) || step.layer < 0 || step.layer >= config.layers.length) {
       fail(config, `step ${i} layer ${step.layer} out of range`)
     }
+    const rows = stepRows(step)
+    if (rows > TERMINAL_ROWS) fail(config, `step ${i} needs ${rows} terminal rows, more than ${TERMINAL_ROWS}`)
   })
 
   const tiers = [...config.layers, ...config.side]

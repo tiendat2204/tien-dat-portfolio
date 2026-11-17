@@ -5,7 +5,7 @@ import { agritaConfig } from '../../src/components/iso/figures/agrita/config'
 import { portfolioConfig } from '../../src/components/iso/figures/portfolio/config'
 import { readoutAt, terminalAt } from '../../src/components/iso/stack/engine'
 import type { StackConfig } from '../../src/components/iso/stack/types'
-import { assertSafeConfig } from './stack-config-guard'
+import { assertSafeConfig, stepRows, TERMINAL_ROWS } from './stack-config-guard'
 
 const CONFIGS = [portfolioConfig, agritaConfig]
 
@@ -26,6 +26,17 @@ test('agrita names no database', () => {
     assert.ok(!db.test(tier.label), `label ${tier.label}`)
     for (const tech of tier.tech) assert.ok(!db.test(tech), `tech ${tech}`)
   }
+  // Step text may use Drizzle's `db.query`, but names no database product.
+  const product = /postgres|mysql|mongo|sqlite|mariadb/i
+  for (const step of agritaConfig.steps) {
+    for (const text of [step.prompt, ...step.lines, step.result]) assert.ok(!product.test(text), `step text ${text}`)
+  }
+})
+
+test('every step fits the terminal viewport', () => {
+  for (const config of CONFIGS) {
+    for (const step of config.steps) assert.ok(stepRows(step) <= TERMINAL_ROWS, `${config.id}: ${step.prompt}`)
+  }
 })
 
 test('mid-scroll readout is non-empty and the settled terminal is complete', () => {
@@ -38,9 +49,13 @@ test('mid-scroll readout is non-empty and the settled terminal is complete', () 
 })
 
 test('the guard is not vacuous', () => {
-  const bad: StackConfig = { ...portfolioConfig, steps: [{ layer: 0, prompt: 'open', lines: ['fetch(\'http://x\')'], result: 'ok' }] }
-  assert.throws(() => assertSafeConfig(bad))
-  assert.throws(() => assertSafeConfig({ ...portfolioConfig, steps: [{ layer: 99, prompt: 'x', lines: [], result: 'ok' }] }))
-  assert.throws(() => assertSafeConfig({ ...portfolioConfig, layers: [{ ...portfolioConfig.layers[0], icon: 'nope.svg' }] }))
-  assert.throws(() => assertSafeConfig({ ...portfolioConfig, steps: [{ layer: 0, prompt: 'x', lines: ['a'.repeat(61)], result: 'ok' }] }))
+  const step = (lines: string[], layer = 0): StackConfig => ({ ...portfolioConfig, steps: [{ layer, prompt: 'x', lines, result: 'ok' }] })
+  assert.throws(() => assertSafeConfig(step(['fetch(\'http://x\')'])), /banned text 'http'/)
+  assert.throws(() => assertSafeConfig(step(['ping 10.0.0.1'])), /IPv4/)
+  assert.throws(() => assertSafeConfig(step(['open localhost'])), /banned text 'localhost'/)
+  assert.throws(() => assertSafeConfig(step(['a', 'b', 'c'])), /needs 6 terminal rows/)
+  assert.doesNotThrow(() => assertSafeConfig(step(['a', 'b'])))
+  assert.throws(() => assertSafeConfig(step(['a'], 99)), /layer 99 out of range/)
+  assert.throws(() => assertSafeConfig({ ...portfolioConfig, side: [{ id: 'x', label: 'x', tech: ['x'], icon: 'nope.svg' }] }), /missing icon 'nope.svg'/)
+  assert.throws(() => assertSafeConfig(step(['a'.repeat(61)])), /longer than 60/)
 })
