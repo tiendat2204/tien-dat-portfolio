@@ -15,7 +15,8 @@ const LEAD_FROM = 0.05
 const LEAD_SPREAD = 0.25
 const LEAD_SPAN = 0.2
 const FACE_SPAN = 0.1
-// More parts than this and the parts list switches to one-line rows (stack.css) so every row stays on the sheet.
+// More rows than this (one per layer plus one `+` row per side module) and the parts list switches to one-line rows
+// (stack.css): nine 30px two-line rows plus the strip and head (41px) are 311px, inside the 318px row of the 527px card.
 const DENSE_ROWS = 9
 // The side modules' rows fill once every balloon has drawn.
 export const SIDE_ROWS_AT = LEAD_FROM + LEAD_SPREAD + LEAD_SPAN + FACE_SPAN
@@ -114,36 +115,34 @@ function Bom ({ config, moment, bomRef }: { config: StackConfig, moment: SheetMo
         <span>parts</span>
         <span>bom</span>
       </div>
-      <div className='sheet-bom-table'>
-        <div className='sheet-bom-head' aria-hidden='true'>
-          <span>no</span>
-          <span>part · spec</span>
-        </div>
-        <ol ref={bomRef} className='sheet-bom-list' aria-label='Parts, top to bottom'>
-          {bomRows(config).map((row, k) => (
-            <BomRow
-              key={row.n}
-              n={String(row.n).padStart(2, '0')}
-              label={row.label}
-              tech={row.tech}
-              attrs={{
-                'data-row': String(k),
-                'data-shown': (moment.drawing.reveal[k]?.face ?? 1) >= 0.5 ? '' : undefined,
-                'data-active': moment.step === row.n ? '' : undefined,
-              }}
-            />
-          ))}
-          {config.side.map(layer => (
-            <BomRow
-              key={layer.id}
-              n='+'
-              label={layer.label}
-              tech={layer.tech.join(' · ')}
-              attrs={{ 'data-side': '', 'data-shown': moment.drawing.explode >= SIDE_ROWS_AT ? '' : undefined }}
-            />
-          ))}
-        </ol>
+      <div className='sheet-bom-head' aria-hidden='true'>
+        <span>no</span>
+        <span>part · spec</span>
       </div>
+      <ol ref={bomRef} className='sheet-bom-list' aria-label='Parts, top to bottom'>
+        {bomRows(config).map((row, k) => (
+          <BomRow
+            key={row.n}
+            n={String(row.n).padStart(2, '0')}
+            label={row.label}
+            tech={row.tech}
+            attrs={{
+              'data-row': String(k),
+              'data-shown': (moment.drawing.reveal[k]?.face ?? 1) >= 0.5 ? '' : undefined,
+              'data-active': moment.step === row.n ? '' : undefined,
+            }}
+          />
+        ))}
+        {config.side.map(layer => (
+          <BomRow
+            key={layer.id}
+            n='+'
+            label={layer.label}
+            tech={layer.tech.join(' · ')}
+            attrs={{ 'data-side': '', 'data-shown': moment.drawing.explode >= SIDE_ROWS_AT ? '' : undefined }}
+          />
+        ))}
+      </ol>
     </div>
   )
 }

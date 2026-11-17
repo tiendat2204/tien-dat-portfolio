@@ -213,9 +213,9 @@
 .sheet-bom-head,
 .sheet-bom-list > li {
   display: grid;
-  grid-template-columns: 16px minmax(0, 1fr);
-  column-gap: 6px;
-  padding: 0 6px;
+  grid-template-columns: 13px minmax(0, 1fr);
+  column-gap: 5px;
+  padding: 0 5px;
   border-bottom: 1px solid hsl(var(--border));
 }
 
@@ -239,8 +239,8 @@
 .sheet-bom-list > li {
   box-sizing: border-box;
   align-items: start;
-  height: calc(2 * 12px + 7px);
-  padding-block: 3px 4px;
+  height: calc(2 * 12px + 6px);
+  padding-block: 3px;
   transition: color 160ms, background-color 160ms;
 }
 
@@ -259,13 +259,12 @@
 }
 
 .sheet-bom-part {
-  margin-right: 2px;
   font-size: 10.5px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .sheet-bom-spec {
+  font-size: 9.5px;
   color: hsl(var(--muted-foreground));
 }
 
@@ -455,6 +454,9 @@
 
   .sheet-bom-text {
     display: block;
+    -webkit-line-clamp: none;
+    line-clamp: none;
+    overflow: visible;
   }
 
   .sheet-bom-part {
