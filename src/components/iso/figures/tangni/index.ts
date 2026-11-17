@@ -1,3 +1,4 @@
-import { stubFigure } from '@/components/iso/figures/stub'
+import { tangniConfig } from '@/components/iso/figures/tangni/config'
+import { makeStackFigure } from '@/components/iso/stack/make-stack-figure'
 
-export default stubFigure({ id: 'tangni', fig: 6, title: 'TangNi Web', hint: 'stack anatomy coming soon' })
+export default makeStackFigure(tangniConfig)
