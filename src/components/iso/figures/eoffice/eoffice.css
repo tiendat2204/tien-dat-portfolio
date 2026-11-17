@@ -1,0 +1,21 @@
+/* Routing sorter: figure-scoped styles, coloured only through the kit's tokens so both themes follow. */
+
+/* Sheets read as paper, a step lighter than the belt and trays under them. */
+.sorter-paper > .iso-top {
+  fill: var(--anatomy-lit-top);
+}
+
+/* Fill the frame's box and fit the drawing inside it, so a short card scales the drawing instead of cropping it.
+   Focus uses the site's global ring. */
+.sorter {
+  height: 100%;
+  border-radius: 10px;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sorter .iso-stage,
+.sorter .iso-svg {
+  width: 100%;
+  height: 100%;
+}
