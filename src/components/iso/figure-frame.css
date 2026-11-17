@@ -34,9 +34,11 @@ html:not(.dark) .iso {
   square) but never more than the pinned viewport leaves: at 1280x720 the pinned area is 624px and the slot sits
   24px below the text column's top, so the card is capped at 100svh - 10rem (560px there); never under 400px, never
   over 600px (a taller sheet only adds empty paper around a drawing whose size is set by the column's width).
+  The empty slot (before the figure's chunk loads) takes the same box, so a pinned section is measured by
+  ScrollTrigger at its final height (GSAP fixes the pinned height inline).
 */
 @media (width >= 640px) {
-  [data-figure]:has(> .figure-frame) {
+  [data-figure] {
     aspect-ratio: 1;
     max-height: clamp(400px, 100svh - 10rem, 600px);
   }
@@ -90,6 +92,23 @@ html:not(.dark) .iso {
 @media (width < 640px) {
   [data-figure]:has(> .figure-frame) {
     aspect-ratio: auto;
+  }
+
+  /*
+    Until the figure's chunk loads, the empty slot reserves the phone sheet's height, which is the same for every
+    figure at a given width (stack.css): 582.5px of fixed rows plus the drawing area, whose width is the slot's less
+    28px and whose aspect is 1.25. Measured with the loaded sheet at 360, 390 and 430px; nothing below shifts.
+  */
+  [data-figure]:empty {
+    aspect-ratio: auto;
+  }
+
+  [data-figure]:empty::before {
+    content: "";
+    display: block;
+    box-sizing: content-box;
+    height: 582.5px;
+    padding-top: calc((100% - 28px) / 1.25);
   }
 
   .figure-frame,

@@ -432,11 +432,16 @@
     height: auto;
   }
 
+  /*
+    The phone sheet has one height for every figure at a given width, so the slot can reserve it before the figure's
+    chunk loads (figure-frame.css) and nothing below shifts: a fixed-aspect drawing area (the drawing meets inside
+    it), the parts list sized for its nine-row maximum (DENSE_ROWS) with the desktop's two-line rows, a title block
+    of two lines and the fixed notes.
+  */
   .sheet-draw {
-    aspect-ratio: calc(var(--art-ratio) * 0.92);
+    aspect-ratio: 1.25;
   }
 
-  /* Phone: a list, the part over its spec, which wraps freely. */
   .sheet-bom-head,
   .sheet-bom-list > li {
     grid-template-columns: 22px minmax(0, 1fr);
@@ -444,23 +449,7 @@
   }
 
   .sheet-bom-list {
-    line-height: 14px;
-  }
-
-  .sheet-bom-list > li {
-    height: auto;
-    padding-block: 5px;
-  }
-
-  .sheet-bom-text {
-    display: block;
-    -webkit-line-clamp: none;
-    line-clamp: none;
-    overflow: visible;
-  }
-
-  .sheet-bom-part {
-    display: block;
+    min-height: calc(9 * 30px);
   }
 
   /* One line of fields, each wrapping as a unit behind its own 16px `·` slot. The list starts 16px left of the
@@ -468,6 +457,8 @@
      (the first one included) is hidden: a wrapped line never begins with a dangling `·`. */
   .sheet-title-cell {
     position: relative;
+    box-sizing: border-box;
+    height: 64px;
     overflow: hidden;
     padding: 7px 8px;
   }
