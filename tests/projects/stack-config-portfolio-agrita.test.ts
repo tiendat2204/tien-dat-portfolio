@@ -39,8 +39,8 @@ test('agrita follows the real AgriTA web apps', () => {
   for (const word of [/landLot/, /season/i, /harvest/i, /trace/i]) assert.match(steps, word)
 })
 
-// The API and its database belong to a separate backend team (docs name PostgreSQL); the figure shows the frontend.
-test('agrita names no database', () => {
+// The API and its database belong to a separate backend team; the figure shows the frontend only.
+test('agrita claims no backend or database layer', () => {
   const db = /postgres|mysql|mongo|sqlite|database|\bdb\b/i
   for (const tier of [...agritaConfig.layers, ...agritaConfig.side]) {
     assert.ok(!db.test(tier.label), `label ${tier.label}`)

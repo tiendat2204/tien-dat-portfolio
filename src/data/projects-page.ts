@@ -71,7 +71,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
     summary: [
       'Agricultural SaaS for cooperatives (public-sector client, private, in development) that links farming, warehouse, sales and traceability on one data chain: land lot, crop season, harvest lot, stock lot, listed product and QR trace code',
       'Owned the UI/UX and frontend of three connected web apps built from the BA requirements: the AgriTA admin console and TA Farm (Vite SPA, TanStack Router) and the TA Market marketplace, public brand TA Nature (Next.js 16)',
-      'Shared design system across the apps: semantic tokens, data tables, permission-aware screens and loading, empty and error states; the apps share one session cookie and TA Market signs in through single sign-on',
+      'Shared design system across the apps: semantic tokens, data tables, permission-aware screens and loading, empty and error states; the console and TA Farm share one session cookie, while TA Market signs in through single sign-on',
       'TA Farm: growing areas and land lots drawn and edited on a map (Leaflet with Geoman over MapLibre GL), crop seasons, work tasks, cultivation logs, field risk reports, harvest lots received into warehouse stock and an offline outbox for field entries',
       'Traceability and marketplace: QR trace codes published per harvest lot with a public trace page, storefronts, product pages, cart, checkout and seller order handling',
       'Vitest unit tests, Playwright end-to-end tests and axe-core accessibility checks; all apps consume a separate AgriTA REST API',

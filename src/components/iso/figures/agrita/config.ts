@@ -49,7 +49,7 @@ export const agritaConfig: StackConfig = {
     {
       layer: 4,
       prompt: 'cat trace-code.api.ts',
-      lines: ['client.post(traceCodes, { harvestLotId })', '  .then(code => publish(code.id))'],
+      lines: ['client.post(traceCodes, { harvestLotId })', '  .then(res => publish(res.data.id))'],
       result: '201 published',
     },
   ],
