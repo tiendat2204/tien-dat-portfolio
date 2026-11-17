@@ -26,7 +26,7 @@ test('xn2 card identity', () => {
   assert.equal(xn2Config.fig, 7)
   assert.equal(xn2Config.skin, 'dashboard')
   assert.equal(xn2Config.title, 'XN2 stack')
-  assert.match(xn2Config.hint, /contract record/)
+  assert.equal(xn2Config.hint, 'scroll to follow a record down the stack')
 })
 
 test('xn2 follows the real XN2 frontend', () => {
@@ -42,6 +42,7 @@ test('xn2 follows the real XN2 frontend', () => {
 
 test('readout and settled terminal', () => {
   assert.match(readoutAt(xn2Config, 0.5), /^STEP \S/)
+  assert.equal(readoutAt(xn2Config, 0.6), 'STEP 3/5 · state · Redux Toolkit')
   const settled = terminalAt(xn2Config, 1)
   assert.ok(settled.blocks.length > 0)
   assert.ok(settled.blocks.every(block => block.done && block.result !== null))
@@ -55,4 +56,11 @@ test('xn2 names only frontend technologies found in the repo', () => {
   const texts = [...xn2Config.layers, ...xn2Config.side].map(tier => tier.label)
     .concat(xn2Config.steps.flatMap(step => [step.prompt, ...step.lines, step.result]))
   for (const text of texts) assert.ok(!backend.test(text), `backend claim ${text}`)
+})
+
+// Snippets stay generic: no verbatim identifiers from the client repo.
+test('xn2 snippets avoid repo identifiers', () => {
+  const code = xn2Config.steps.flatMap(step => [step.prompt, ...step.lines]).join('\n')
+  for (const word of [/isBetween/, /wardId/, /joinOperator/, /contract/i]) assert.doesNotMatch(code, word)
+  assert.doesNotMatch(xn2Config.hint, /contract/i)
 })

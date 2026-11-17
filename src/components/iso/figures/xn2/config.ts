@@ -8,7 +8,7 @@ export const xn2Config: StackConfig = {
   id: 'xn2',
   fig: 7,
   title: 'XN2 stack',
-  hint: 'scroll to open a contract record',
+  hint: 'scroll to follow a record down the stack',
   skin: 'dashboard',
   layers: [
     { id: 'ui', label: 'ui', tech: ['React 19', 'Radix UI', 'Tailwind CSS'], icon: 'react.svg' },
@@ -44,13 +44,13 @@ export const xn2Config: StackConfig = {
     {
       layer: 3,
       prompt: 'cat record.schema.ts',
-      lines: ['z.object({ code: z.string().min(1),', '  signed: z.iso.date(), wardId: z.uuid() })'],
+      lines: ['z.object({ code: z.string().min(1),', '  signed: z.iso.date(), areaId: z.uuid() })'],
       result: 'valid',
     },
     {
       layer: 4,
       prompt: 'cat record.api.ts',
-      lines: ['api.get(\'/records\', { params: { filters,', '  operator: \'isBetween\', page } })'],
+      lines: ['api.get(\'/records\', { params: { filters,', '  operator: \'between\', page } })'],
       result: '200',
     },
   ],
