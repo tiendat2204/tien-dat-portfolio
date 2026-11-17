@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useLenis } from 'lenis/react'
 import { useEffect, useRef, type ReactNode } from 'react'
 
-import { PIN_MIN_WIDTH, PIN_VIEWPORTS, scrollPlan } from '@/lib/projects/scroll-plan'
+import { PIN_MIN_WIDTH, PIN_TOP_OFFSET, PIN_VIEWPORTS, scrollPlan } from '@/lib/projects/scroll-plan'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -31,7 +31,7 @@ export function ProjectsScroller ({ children }: { children: ReactNode }) {
       // matchMedia only runs the callback when a condition matches, so `narrow` keeps the stacked mode reachable.
       {
         wide: `(min-width: ${PIN_MIN_WIDTH}px)`,
-        narrow: `(max-width: ${PIN_MIN_WIDTH - 1}px)`,
+        narrow: `(width < ${PIN_MIN_WIDTH}px)`,
         reduce: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
@@ -48,7 +48,7 @@ export function ProjectsScroller ({ children }: { children: ReactNode }) {
           if (mode === 'pinned') {
             ScrollTrigger.create({
               trigger: section,
-              start: 'top top',
+              start: `top ${PIN_TOP_OFFSET}px`,
               end: `+=${PIN_VIEWPORTS * 100}%`,
               pin: true,
               scrub: true,

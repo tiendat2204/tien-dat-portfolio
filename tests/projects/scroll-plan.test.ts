@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { PIN_VIEWPORTS, scrollPlan } from '../../src/lib/projects/scroll-plan'
+import { PIN_TOP_OFFSET, PIN_VIEWPORTS, scrollPlan } from '../../src/lib/projects/scroll-plan'
 
 test('scrollPlan pins on desktop widths', () => {
   assert.equal(scrollPlan(1280, false), 'pinned')
@@ -18,4 +18,12 @@ test('scrollPlan is static under reduced motion at any width', () => {
 
 test('PIN_VIEWPORTS is 1.5', () => {
   assert.equal(PIN_VIEWPORTS, 1.5)
+})
+
+test('PIN_TOP_OFFSET is 96', () => {
+  assert.equal(PIN_TOP_OFFSET, 96)
+})
+
+test('scrollPlan stacks fractional widths below 768px', () => {
+  assert.equal(scrollPlan(767.5, false), 'stacked')
 })
