@@ -8,7 +8,7 @@ import { useLoop, useReadout } from '@/components/iso/kit/react/live'
 import { readoutAt, sheetPose, terminalAt } from '@/components/iso/stack/engine'
 import { stackArt, type StackArt } from '@/components/iso/stack/geometry'
 import { scanClip, titleBlockOf } from '@/components/iso/stack/sheet-parts'
-import { SIDE_ROWS_AT, SheetView, revealOf, scanMove, skinClip, titleClip, type SheetMoment } from '@/components/iso/stack/sheet-view'
+import { SIDE_ROWS_AT, SheetView, revealOf, scanMove, skinClip, titleRules, type SheetMoment } from '@/components/iso/stack/sheet-view'
 import { skinShare } from '@/components/iso/stack/skins/index'
 import { axisMove, balloonMove } from '@/components/iso/stack/stack-drawing'
 import { writeTerminal, type TerminalState } from '@/components/iso/stack/terminal-panel'
@@ -176,7 +176,8 @@ function StackLive ({ config, art, progressRef, start }: LiveProps) {
       }
     }
     if (title.current) {
-      setStyle(title.current, 'clipPath', moment.skin < 1 ? titleClip(moment.skin) : '')
+      const rules = titleRules(moment.skin)
+      if (title.current.style.getPropertyValue('--rules') !== rules) title.current.style.setProperty('--rules', rules)
       const view = title.current.querySelector('[data-view]')
       if (view && view.textContent !== moment.title.view) view.textContent = moment.title.view
     }

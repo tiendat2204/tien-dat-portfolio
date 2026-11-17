@@ -249,6 +249,9 @@
 }
 
 .sheet-bom-list > li {
+  box-sizing: border-box;
+  /* Every row reserves exactly its two lines (part, spec), so nothing reflows while the packet moves. */
+  height: calc(2 * 14px + 9px);
   padding-block: 4px;
   transition: color 160ms, background-color 160ms;
 }
@@ -276,9 +279,9 @@
   color: hsl(var(--muted-foreground));
 }
 
-/* While the rows have two lines the spec may wrap onto a third rather than lose its last part. */
+/* The spec is a hair smaller than the part, so a three-tech spec still fits its one line at the desktop card. */
 .sheet-bom-list > li > .sheet-bom-spec {
-  white-space: normal;
+  font-size: 10px;
 }
 
 /* One-line rows on a short sheet. */
@@ -296,11 +299,8 @@
     grid-row: auto;
   }
 
-  .sheet-bom-list > li > .sheet-bom-spec {
-    white-space: nowrap;
-  }
-
   .sheet-bom-list > li {
+    height: auto;
     padding-block: 3px;
   }
 }
@@ -320,11 +320,8 @@
     grid-row: auto;
   }
 
-  .sheet[data-dense] .sheet-bom-list > li > .sheet-bom-spec {
-    white-space: nowrap;
-  }
-
   .sheet[data-dense] .sheet-bom-list > li {
+    height: auto;
     padding-block: 3px;
   }
 }
@@ -408,7 +405,9 @@
     "drawn drawn";
   gap: 1px;
   margin: 0;
-  background: hsl(var(--border));
+  /* The 1px gaps are the inner rules; they plot in left to right with the skin (`--rules`, set by the figure). The
+     cells and their text always show. */
+  background: linear-gradient(hsl(var(--border)), hsl(var(--border))) left / calc(var(--rules, 1) * 100%) 100% no-repeat;
 }
 
 .sheet-title > div {
@@ -468,7 +467,12 @@
   }
 
   .sheet-bom-list > li {
+    height: auto;
     padding-block: 5px;
+  }
+
+  .sheet-bom-list > li > .sheet-bom-spec {
+    white-space: normal;
   }
 
   /* One line of fields, each wrapping as a unit behind its own 16px `·` slot. The list starts 16px left of the

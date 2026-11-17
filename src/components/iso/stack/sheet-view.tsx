@@ -36,8 +36,8 @@ export const skinClip = (scan: number) => `inset(${(clamp01(scan) * 100).toFixed
 // The scanline's place: a share of the drawing area's height, moved by transform (composited, no layout).
 export const scanMove = (scan: number) => `translateY(${(clamp01(scan) * 100).toFixed(2)}%)`
 
-// The title block plots in left to right with the skin.
-export const titleClip = (draw: number) => `inset(0 ${(100 - clamp01(draw) * 100).toFixed(2)}% 0 0)`
+// The title block's inner rules plot in left to right with the skin (`--rules`, 0..1); its text is never clipped.
+export const titleRules = (draw: number) => clamp01(draw).toFixed(3)
 
 export type SheetMoment = {
   skin: number
@@ -148,7 +148,7 @@ function Bom ({ config, moment, bomRef }: { config: StackConfig, moment: SheetMo
 function TitleBlockView ({ title, draw, titleRef }: { title: TitleBlock, draw: number, titleRef?: Ref<HTMLDListElement> }) {
   return (
     <div className='sheet-title-cell'>
-      <dl ref={titleRef} className='sheet-title font-ibm' style={{ clipPath: draw < 1 ? titleClip(draw) : undefined }}>
+      <dl ref={titleRef} className='sheet-title font-ibm' style={{ '--rules': titleRules(draw) } as CSSProperties}>
         <div data-cell='title'><dt>title</dt><dd className='font-doto'>{title.title}</dd></div>
         <div data-cell='sheet'><dt>sheet</dt><dd>{title.sheet}</dd></div>
         <div data-cell='view'><dt>view</dt><dd data-view=''>{title.view}</dd></div>
