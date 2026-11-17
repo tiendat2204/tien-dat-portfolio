@@ -69,12 +69,11 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
     company: 'T.A Consultant',
     period: 'Jun 2025 - Present',
     summary: [
-      'Agricultural SaaS for cooperatives (public-sector client, private, in development) that links farming, warehouse, sales and traceability on one data chain: land lot, crop season, harvest lot, stock lot, listed product and QR trace code',
-      'Owned the UI/UX and frontend of three connected web apps built from the BA requirements: the AgriTA admin console and TA Farm (Vite SPA, TanStack Router) and the TA Market marketplace, public brand TA Nature (Next.js 16)',
-      'Shared design system across the apps: semantic tokens, data tables, permission-aware screens and loading, empty and error states; the console and TA Farm share one session cookie, while TA Market signs in through single sign-on',
-      'TA Farm: growing areas and land lots drawn and edited on a map (Leaflet with Geoman over MapLibre GL), crop seasons, work tasks, cultivation logs, field risk reports, harvest lots received into warehouse stock and an offline outbox for field entries',
-      'Traceability and marketplace: QR trace codes published per harvest lot with a public trace page, storefronts, product pages, cart, checkout and seller order handling',
-      'Vitest unit tests, Playwright end-to-end tests and axe-core accessibility checks; all apps consume a separate AgriTA REST API',
+      'Agricultural SaaS for cooperatives (private, in development) on one data chain: land lot, crop season, harvest lot, stock lot, product, QR trace',
+      'Owned the UI/UX and frontend of three connected web apps: the admin console and TA Farm (Vite SPA) and the TA Market marketplace (Next.js 16)',
+      'Shared design system: semantic tokens, data tables, permission-aware screens, loading, empty and error states',
+      'TA Farm: land lots on a map (Leaflet with Geoman over MapLibre GL), crop seasons, work tasks, cultivation logs, harvest lots, warehouse stock',
+      'TA Market: storefronts, cart, checkout, seller orders and public QR trace pages; Vitest, Playwright and axe-core tests',
     ],
     technologies: [
       REACT,
@@ -201,7 +200,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
     company: 'T.A Consultant',
     summary: [
       'Admin console for a bridge and ferry company, covering bridges, roads, ferries, records and contracts',
-      'Modules for accounts, roles, companies, investors, work items, city and ward lookups and a dashboard, plus a form-template editor with rich text and drawing drawing',
+      'Modules for accounts, roles, companies, investors, work items, city and ward lookups and a dashboard, plus a form-template editor with rich text and drawing',
       'Data tables with filter operators such as between and empty',
     ],
     technologies: [VITE, REACT, TS, { name: 'React Router' }, { name: 'Redux Toolkit', icon: 'skills/redux.svg' }, TANSTACK, { name: 'TanStack Table' }, { name: 'React Hook Form' }, ZOD, { name: 'Axios' }, TAILWIND, { name: 'dnd-kit' }, { name: 'Tiptap' }],
