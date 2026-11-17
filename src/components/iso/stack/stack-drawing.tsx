@@ -1,21 +1,24 @@
-import type { CSSProperties, Ref } from 'react'
+import type { Ref } from 'react'
 
 import { Dots, IsoFigure, Line, Solid } from '@/components/iso/kit/react/draw'
-import type { Item, Mark, StackArt } from '@/components/iso/stack/geometry'
-import type { StackLayer } from '@/components/iso/stack/types'
+import { fadeLineSvg, translateAlong } from '@/components/iso/kit/iso-kit'
+import { plateOffset, type Item, type Mark, type StackArt } from '@/components/iso/stack/geometry'
+import { balloonAnchors, centerlines } from '@/components/iso/stack/sheet-parts'
 
-// The view of one moment: what the drawing and the chips show. Built by `viewAt` from the pure engine.
-export type StackView = {
+// What the drawing shows at one moment: how far the stack is open, where the packet is, which board it lights
+// (`plate`, -1 for none) and how far each balloon has drawn in (`lead` for its leader, `face` for its circle).
+export type DrawingView = {
   explode: number
   packetY: number
-  // The config's layer index under the packet (0 is the top board) and whether the scan sweeps it now.
-  layer: number
-  scan: boolean
-  sweep: number
+  plate: number
+  reveal: { lead: number, face: number }[]
 }
 
-// Live passes a ref callback per moving group (keyed `board<i>`, `scan<i>`, `packet`) and writes poses itself.
+// Live passes a ref callback per moving group (keyed `board<i>`, `packet`, `axis`, `balloon<k>`) and writes poses itself.
 export type GroupRef = (key: string) => Ref<SVGGElement>
+
+// The centerline's ramps: it fades in from the base and out past the top board instead of stopping on a bare face.
+const AXIS_FADE: [number, number] = [10, 16]
 
 function MarkView ({ mark, lit }: { mark: Mark, lit: boolean }) {
   if (mark.kind === 'solid') {
@@ -24,7 +27,6 @@ function MarkView ({ mark, lit }: { mark: Mark, lit: boolean }) {
   }
   if (mark.kind === 'line') return <Line d={mark.d} tone={mark.tone} free={mark.free} />
   if (mark.kind === 'dots') return <Dots points={mark.points} size={mark.size} tone={mark.tone} />
-  if (mark.kind === 'beam') return <path className='stack-beam' d={mark.d} />
   return <path className='iso-halo' d={mark.d} />
 }
 
@@ -36,23 +38,36 @@ function ItemView ({ item, lit = false }: { item: Item, lit?: boolean }) {
   )
 }
 
-type DrawingProps = { art: StackArt, view: StackView, label: string, groupRef?: GroupRef }
+const tenth = (value: number) => Math.round(value * 10) / 10
 
-// The plate stack in painter's order. Static passes one view; Live passes refs and moves the groups itself.
+// The balloons are drawn where they sit on the open stack and moved with their board while it opens.
+export function balloonMove (art: StackArt, plate: number, explode: number): string {
+  return translateAlong(art.P, [0, 0, plateOffset(art.stack, plate, explode).z - plateOffset(art.stack, plate, 1).z])
+}
+
+// The centerline is drawn at its full length and grown from the base with the explode (centerlines() at any explode).
+export function axisMove (art: StackArt, explode: number): string {
+  const [{ x1, y1 }] = centerlines(art.stack, 1)
+  const share = Math.min(1, Math.max(0, Number.isFinite(explode) ? explode : 0))
+  return `translate(${tenth(x1)} ${tenth(y1)}) scale(1 ${share.toFixed(4)}) translate(${-tenth(x1)} ${-tenth(y1)})`
+}
+
+type DrawingProps = { art: StackArt, view: DrawingView, label: string, groupRef?: GroupRef }
+
+// The exploded stack in painter's order, then the drawing language over it: the dashed centerline through the boards
+// and one numbered balloon per board on a hairline leader that starts on the board (a dot) and ends under the balloon.
+// The packet comes last: it rides the bus in front of the boards' corners, so it passes over the leaders' roots.
+// Static passes one view; Live passes refs and moves the groups itself.
 export function StackDrawing ({ art, view, label, groupRef }: DrawingProps) {
-  const activePlate = art.count - 1 - view.layer
+  const balloons = balloonAnchors(art.stack, 1)
+  const packets = art.groups.filter(group => group.move === 'packet')
+  const axis = centerlines(art.stack, 1).map(({ x1, y1, x2, y2 }) => fadeLineSvg([[x1, y1], [x2, y2]], { fade: AXIS_FADE, tone: 'mid', className: 'sheet-axis-line' })).join('')
   return (
     <IsoFigure width={art.width} height={art.height} label={label}>
       {art.groups.map((group) => {
         if (group.move === 'still') return <g key={group.key}>{group.items.map((item, index) => <ItemView key={index} item={item} />)}</g>
-        if (group.move === 'packet') {
-          return (
-            <g key={group.key} ref={groupRef?.('packet')} transform={art.packetMove(view.packetY, view.explode)}>
-              {group.items.map((item, index) => <ItemView key={index} item={item} />)}
-            </g>
-          )
-        }
-        const active = group.plate === activePlate
+        if (group.move === 'packet') return null
+        const active = group.plate === view.plate
         return (
           <g
             key={group.key}
@@ -62,67 +77,51 @@ export function StackDrawing ({ art, view, label, groupRef }: DrawingProps) {
             transform={art.plateMove(group.plate, view.explode)}
           >
             {group.items.map((item, index) => <ItemView key={index} item={item} lit={active} />)}
-            <g ref={groupRef?.(`scan${group.plate}`)} className='stack-scan' transform={art.scanMove(view.sweep)} opacity={active && view.scan ? undefined : 0}>
-              {group.scan.map((item, index) => <ItemView key={index} item={item} />)}
-            </g>
             {group.top.map((item, index) => <ItemView key={index} item={item} />)}
           </g>
         )
       })}
+      <g
+        ref={groupRef?.('axis')}
+        className='sheet-axis'
+        transform={axisMove(art, view.explode)}
+        opacity={view.explode > 0 ? undefined : 0}
+        dangerouslySetInnerHTML={{ __html: axis }}
+      />
+      {balloons.map((balloon, k) => {
+        const plate = art.count - 1 - k
+        const reveal = view.reveal[k] ?? { lead: 1, face: 1 }
+        return (
+          <g
+            key={balloon.n}
+            ref={groupRef?.(`balloon${k}`)}
+            className='sheet-balloon'
+            data-active={plate === view.plate ? '' : undefined}
+            transform={balloonMove(art, plate, view.explode)}
+          >
+            <path
+              className='iso-line sheet-leader'
+              data-tone='mid'
+              d={`M${tenth(balloon.from[0])} ${tenth(balloon.from[1])} L${tenth(balloon.x)} ${tenth(balloon.y)}`}
+              pathLength={1}
+              strokeDashoffset={1 - reveal.lead}
+              opacity={reveal.lead > 0 ? undefined : 0}
+            />
+            <circle className='sheet-leader-root' cx={tenth(balloon.from[0])} cy={tenth(balloon.from[1])} r={0.9} opacity={reveal.lead > 0 ? undefined : 0} />
+            <g transform={`translate(${tenth(balloon.x)} ${tenth(balloon.y)})`}>
+              <g className='sheet-balloon-face' opacity={reveal.face > 0 ? reveal.face.toFixed(2) : 0}>
+                <circle r={6.5} />
+                <text textAnchor='middle' dominantBaseline='central'>{balloon.n}</text>
+              </g>
+            </g>
+          </g>
+        )
+      })}
+      {packets.map(group => (
+        <g key={group.key} ref={groupRef?.('packet')} transform={art.packetMove(view.packetY, view.explode)}>
+          {group.items.map((item, index) => <ItemView key={index} item={item} />)}
+        </g>
+      ))}
     </IsoFigure>
   )
-}
-
-function TechChip ({ name }: { name: string }) {
-  return <span className='stack-tech'>{name}</span>
-}
-
-function LayerChip ({ layer, active, y, dim }: { layer: StackLayer, active: boolean, y: number, dim?: boolean }) {
-  return (
-    <li
-      className='stack-chip'
-      data-layer={layer.id}
-      data-active={active ? '' : undefined}
-      data-dim={dim ? '' : undefined}
-      style={{ '--y': y.toFixed(4) } as CSSProperties}
-      title={[layer.label, ...layer.tech].join(' · ')}
-    >
-      <span aria-hidden='true' className='stack-chip-tick' />
-      {layer.icon && (
-        // eslint-disable-next-line @next/next/no-img-element -- tiny decorative skill icon, no optimisation needed
-        <img className='stack-chip-icon' src={`/icons/skills/${layer.icon}`} alt='' width={12} height={12} loading='lazy' />
-      )}
-      <span className='stack-chip-label'>{layer.label}</span>
-      <span className='stack-chip-tech'>
-        {layer.tech.map(name => <TechChip key={name} name={name} />)}
-      </span>
-    </li>
-  )
-}
-
-type ChipsProps = { art: StackArt, layers: StackLayer[], side: StackLayer[], view: StackView }
-
-// DOM labels beside the drawing, one per board at its open height, then the side modules. Below `sm` they fall back
-// to a plain list under the drawing (stack.css).
-export function StackChips ({ art, layers, side, view }: ChipsProps) {
-  return (
-    <div className='stack-chips' style={{ opacity: chipOpacity(view.explode) } as CSSProperties}>
-      <ol className='stack-chip-list' aria-label='Layers, top to bottom'>
-        {layers.map((layer, k) => (
-          <LayerChip key={layer.id} layer={layer} active={k === view.layer} y={art.chipShare(art.count - 1 - k)} />
-        ))}
-      </ol>
-      {side.length > 0 && (
-        <ul className='stack-chip-side' aria-label='Side modules'>
-          {side.map(layer => <LayerChip key={layer.id} layer={layer} active={false} y={1} dim />)}
-        </ul>
-      )}
-    </div>
-  )
-}
-
-// The chips sit at the open stack's heights, so they fade in as the stack opens instead of floating off the boards.
-export function chipOpacity (explode: number): string {
-  const share = Number.isFinite(explode) ? Math.min(1, Math.max(0, explode)) : 0
-  return (0.3 + 0.7 * share).toFixed(2)
 }

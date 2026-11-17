@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { layout, plateOffset } from '../../src/components/iso/stack/geometry'
+import { balloonAnchors, bomRows, centerlines, scanClip, titleBlockOf } from '../../src/components/iso/stack/sheet-parts'
+import type { StackConfig } from '../../src/components/iso/stack/types'
 
 const COUNTS = [1, 4, 8]
 
@@ -63,4 +65,95 @@ test('no offset is NaN, even for out-of-range explode values', () => {
       for (let i = 0; i < n; i++) assert.ok(finite(plateOffset(stack, i, explode)), `n ${n} i ${i} explode ${explode}`)
     }
   }
+})
+
+// --- The spec sheet's pure parts ----------------------------------------------------------------------------------
+
+const SHEET_CONFIG: StackConfig = {
+  id: 'agrita',
+  fig: 2,
+  title: 'Sample stack',
+  hint: 'scroll',
+  skin: 'dashboard',
+  layers: [
+    { id: 'ui', label: 'ui', tech: ['React 19', 'Next.js', 'shadcn/ui'] },
+    { id: 'api', label: 'api', tech: ['NestJS'] },
+    { id: 'orm', label: 'orm', tech: [] },
+  ],
+  side: [{ id: 'map', label: 'map', tech: ['Leaflet'] }],
+  steps: [],
+}
+
+const lengthOf = ({ x1, y1, x2, y2 }: { x1: number, y1: number, x2: number, y2: number }) => Math.hypot(x2 - x1, y2 - y1)
+
+test('bomRows numbers the layers 1..N in layer order and joins their tech with a middle dot', () => {
+  const rows = bomRows(SHEET_CONFIG)
+  assert.deepEqual(rows, [
+    { n: 1, label: 'ui', tech: 'React 19 · Next.js · shadcn/ui' },
+    { n: 2, label: 'api', tech: 'NestJS' },
+    { n: 3, label: 'orm', tech: '' },
+  ])
+})
+
+test('balloonAnchors gives one balloon per layer, numbered 1..N, lower on the sheet as n grows', () => {
+  for (const n of COUNTS) {
+    const stack = layout(n)
+    for (const explode of [0, 0.5, 1]) {
+      const balloons = balloonAnchors(stack, explode)
+      assert.equal(balloons.length, n)
+      assert.deepEqual(balloons.map(balloon => balloon.n), Array.from({ length: n }, (_, k) => k + 1))
+      for (const balloon of balloons) assert.ok([balloon.x, balloon.y, ...balloon.from].every(Number.isFinite))
+      for (let k = 1; k < n; k++) assert.ok(balloons[k].y > balloons[k - 1].y, `n ${n} explode ${explode} k ${k}`)
+    }
+  }
+})
+
+test('balloons sit to the right of the part their leader starts on, inside the viewBox', () => {
+  for (const n of COUNTS) {
+    const stack = layout(n)
+    const [, , width, height] = stack.viewBox
+    for (const balloon of balloonAnchors(stack, 1)) {
+      assert.ok(balloon.x > balloon.from[0], 'right of its part')
+      assert.ok(balloon.x < width && balloon.y > 0 && balloon.y < height, 'inside the viewBox')
+    }
+  }
+})
+
+test('centerlines have zero length when assembled and grow as the stack opens', () => {
+  for (const n of COUNTS) {
+    const stack = layout(n)
+    const closed = centerlines(stack, 0)
+    const half = centerlines(stack, 0.5)
+    const open = centerlines(stack, 1)
+    assert.ok(open.length >= 1)
+    closed.forEach((line, i) => {
+      assert.ok(lengthOf(line) < 1e-9, `closed ${i}`)
+      assert.ok(lengthOf(half[i]) > lengthOf(line))
+      assert.ok(lengthOf(open[i]) > lengthOf(half[i]))
+      assert.ok(Math.abs(open[i].x1 - open[i].x2) < 1e-9, 'vertical on the sheet')
+    })
+  }
+})
+
+test('titleBlockOf holds exactly title, sheet, view and drawn', () => {
+  assert.deepEqual(titleBlockOf(SHEET_CONFIG, 'Tiến Đạt', 'assembly'), { title: 'Sample stack', sheet: 'Fig 2 / 8', view: 'Assembly', drawn: 'Tiến Đạt' })
+  assert.equal(titleBlockOf(SHEET_CONFIG, 'Someone', 'skin').view, 'Skin')
+  assert.equal(titleBlockOf(SHEET_CONFIG, 'Someone', 'skin').drawn, 'Someone')
+})
+
+test('scanClip hides the skeleton at 0, shows it all at 1 and opens monotonically', () => {
+  const bottom = (value: string) => {
+    const match = /^inset\(0(?:%|px)? 0(?:%|px)? ([\d.]+)% 0(?:%|px)?\)$/.exec(value)
+    assert.ok(match, value)
+    return Number(match[1])
+  }
+  assert.equal(bottom(scanClip(0)), 100)
+  assert.equal(bottom(scanClip(1)), 0)
+  let last = Infinity
+  for (let i = 0; i <= 40; i++) {
+    const value = bottom(scanClip(i / 40))
+    assert.ok(value <= last, `scan ${i / 40}`)
+    last = value
+  }
+  for (const odd of [-1, 2, Number.NaN]) assert.ok(Number.isFinite(bottom(scanClip(odd))))
 })

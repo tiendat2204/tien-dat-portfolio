@@ -1,44 +1,188 @@
 /*
-  Stack anatomy layout. The card body is the drawing with its layer chips on the right (aligned with each board at the
-  open stack's height) and the terminal under them. The drawing box always keeps the SVG's own aspect, so a chip's
-  `--y` (a share of the viewBox height) lands on its board. Below `sm` the card grows with its content and the chips
-  fall back to a plain list under the drawing.
+  The spec sheet (sheet-view.tsx). One hairline grid on paper inside the frame's hatch margin, like a drawing sheet:
+
+    desktop (>= 640px)              phone (< 640px)
+    +--------------+---------+      +------------------+
+    | drawing      | parts   |      | drawing          |
+    | (skin/scan/  | (BOM)   |      | parts (BOM list) |
+    |  assembly)   |         |      | title, one line  |
+    +--------------+---------+      | notes            |
+    | notes        | title   |      +------------------+
+    +--------------+---------+
+
+  The grid's 1px gaps over the border colour are the rules. The drawing area holds two stacked layers, the skin and
+  the skeleton, clipped by the X-ray scan (clip-path inset, composited) and the scanline moved by transform.
 */
-.stack-figure {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-}
-
-.stack-row {
-  flex: 1 1 auto;
-  min-height: 0;
+.sheet {
   container-type: size;
+  display: grid;
+  grid-template-columns: minmax(0, 64fr) minmax(0, 36fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "draw parts"
+    "notes title";
+  gap: 1px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--border));
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+.sheet > * {
+  min-width: 0;
+  min-height: 0;
+  background: hsl(var(--background));
+}
+
+/* The hatch title strip shared by the parts list and the notes (the terminal's own header style). */
+.sheet-strip {
   display: flex;
-  align-items: center;
-}
-
-.stack-art {
-  position: relative;
   flex: none;
-  width: min(58cqw, calc(100cqh * var(--stack-ratio)));
-  aspect-ratio: var(--stack-ratio);
+  align-items: center;
+  justify-content: space-between;
+  height: 22px;
+  padding: 0 8px;
+  border-bottom: 1px solid hsl(var(--border));
+  font-size: 10px;
+  color: hsl(var(--muted-foreground));
 }
 
-.stack-art .iso-stage,
-.stack-art .iso-svg {
+.sheet-strip > span {
+  background: hsl(var(--background));
+  padding: 0 4px;
+}
+
+/* --- Drawing area ------------------------------------------------------------------------------------------------- */
+
+.sheet-draw {
+  grid-area: draw;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Zone ticks along the drawing area's edges, unlabeled, like a drawing frame. */
+.sheet-draw::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --tick: hsl(var(--border));
+  background:
+    repeating-linear-gradient(to right, var(--tick) 0 1px, transparent 1px 12.5%) top left / 100% 4px no-repeat,
+    repeating-linear-gradient(to right, var(--tick) 0 1px, transparent 1px 12.5%) bottom left / 100% 4px no-repeat,
+    repeating-linear-gradient(to bottom, var(--tick) 0 1px, transparent 1px 16.66%) top left / 4px 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--tick) 0 1px, transparent 1px 16.66%) top right / 4px 100% no-repeat;
+}
+
+.sheet-layer {
+  position: absolute;
+  inset: 10px 10px 8px;
+}
+
+.sheet-layer[hidden] {
+  display: none;
+}
+
+.sheet-skeleton .iso-stage,
+.sheet-skeleton .iso-svg {
   width: 100%;
   height: 100%;
 }
 
-/* The scan: a soft beam trailing a fine rule, like the avatar's scanline. */
-.stack-beam {
+/* The skin sits a little inside the drawing area, roughly over the stack it turns into. */
+.sheet-skin {
+  inset: 9% 12% 7%;
+}
+
+.sheet-skin .skin-svg {
+  height: 100%;
+  --skin-tone: color-mix(in srgb, var(--anatomy-hi) 70%, var(--anatomy-mid));
+}
+
+/* The scanline: the avatar's (a 1px rule fading out at both ends with a soft glow) and a faint wake above it. */
+.sheet-scan {
+  position: absolute;
+  inset: 10px 0 8px;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.sheet-scan[hidden] {
+  display: none;
+}
+
+.sheet-scan > span {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, hsl(var(--foreground) / 0.7), transparent);
+  box-shadow: 0 0 8px 1px hsl(var(--foreground) / 0.4);
+}
+
+.sheet-scan > span::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 1px;
+  left: 0;
+  height: 32px;
+  background: linear-gradient(to top, hsl(var(--foreground) / 0.06), transparent);
+}
+
+/* The centerline: a chain line (long dash, dot) in screen px. */
+.sheet-axis-line {
+  stroke-dasharray: 9 2.5 1.5 2.5;
+}
+
+/* Balloons: one size on screen at any card width (`--k` is the drawing's scale, set by SheetView). */
+.sheet-balloon-face {
+  transform: scale(calc(1 / var(--k, 1)));
+}
+
+.sheet-balloon-face circle {
+  fill: var(--anatomy-paper);
+  stroke: var(--anatomy-mid);
+  stroke-width: 0.75px;
+}
+
+.sheet-balloon-face text {
   fill: var(--anatomy-hi);
-  opacity: 0.1;
-  stroke: none;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 8.5px;
+  font-weight: 500;
+}
+
+/* A leader is drawn in with a dash over `pathLength` 1, so it cannot use non-scaling-stroke (Chrome would lay the
+   dash out in screen space); its width is divided by the drawing's scale instead. */
+.iso-svg path.sheet-leader {
+  vector-effect: none;
+  stroke-width: calc(var(--anatomy-weight) / var(--k, 1));
+  stroke-dasharray: 1 1;
+}
+
+.sheet-leader-root {
+  fill: var(--anatomy-mid);
+}
+
+.sheet-balloon[data-active] .sheet-balloon-face circle {
+  fill: var(--anatomy-lit);
+  stroke: var(--anatomy-lit);
+}
+
+.sheet-balloon[data-active] .sheet-balloon-face text {
+  fill: var(--anatomy-paper);
+}
+
+.iso-svg .sheet-balloon[data-active] path.sheet-leader {
+  stroke: var(--anatomy-lit);
+}
+
+.sheet-balloon[data-active] .sheet-leader-root {
+  fill: var(--anatomy-lit);
 }
 
 /* The board's LED: dim until the packet passes it. */
@@ -51,152 +195,177 @@
   opacity: 1;
 }
 
-/* --- Chips --------------------------------------------------------------------------------------------------------- */
+/* --- Parts list (BOM) --------------------------------------------------------------------------------------------- */
 
-.stack-chips-slot {
-  position: absolute;
-  top: 0;
-  left: 100%;
-  width: calc(100cqw - 100%);
-  height: 100%;
+.sheet-bom {
+  grid-area: parts;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.stack-chips {
-  position: relative;
-  height: 100%;
-  transition: opacity 120ms linear;
+/* One grid for the head and every row (subgrid), so the columns line up down the list. */
+.sheet-bom-table {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  column-gap: 4px;
 }
 
-.stack-chip-list,
-.stack-chip-side {
+.sheet-bom-head,
+.sheet-bom-list,
+.sheet-bom-list > li {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+}
+
+.sheet-bom-head,
+.sheet-bom-list > li {
+  padding: 0 8px;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.sheet-bom-head {
+  padding-block: 6px 4px;
+  font-size: 8.5px;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Two-line rows (part, then its spec under it) while the sheet is tall; one line with an ellipsis when it is not. */
+.sheet-bom-head > span:last-child {
+  display: none;
+}
+
+.sheet-bom-list {
   margin: 0;
   padding: 0;
   list-style: none;
+  font-size: 10.5px;
+  line-height: 14px;
 }
 
-.stack-chip {
-  position: absolute;
-  left: 0;
-  top: calc(var(--y) * 100%);
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  max-width: 100%;
-  transform: translateY(-50%);
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: 10px;
-  line-height: 16px;
+.sheet-bom-list > li {
+  padding-block: 4px;
+  transition: color 160ms, background-color 160ms;
+}
+
+.sheet-bom-n {
+  grid-row: span 2;
+  font-variant-numeric: tabular-nums;
   color: hsl(var(--muted-foreground));
-  white-space: nowrap;
 }
 
-.stack-chip-tick {
-  flex: none;
-  width: 6px;
-  height: 1px;
-  background: hsl(var(--border));
-}
-
-.stack-chip-icon {
-  flex: none;
-  width: 12px;
-  height: 12px;
-  filter: grayscale(1);
-  opacity: 0.8;
-}
-
-:where(.dark) .stack-chip-icon {
-  filter: grayscale(1) invert(1);
-}
-
-.stack-chip-label {
-  flex: none;
-  border: 1px solid hsl(var(--border));
-  background: hsl(var(--background));
-  padding: 0 3px;
+.sheet-bom-part {
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
-.stack-chip-tech {
-  display: flex;
-  min-width: 0;
-  gap: 3px;
-  overflow: hidden;
-}
-
-.stack-tech {
-  flex: none;
-  border: 1px dashed hsl(var(--border));
-  background: hsl(var(--background));
-  padding: 0 2px;
-}
-
-/* A row too long for the column ends in an ellipsis on its last chip (the full list is in the chip's title). */
-.stack-tech:last-child {
-  flex: 0 1 auto;
+.sheet-bom-part,
+.sheet-bom-spec {
   min-width: 0;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.stack-chip[data-active] {
-  color: hsl(var(--foreground));
+.sheet-bom-spec {
+  color: hsl(var(--muted-foreground));
 }
 
-.stack-chip[data-active] .stack-chip-tick {
+/* While the rows have two lines the spec may wrap onto a third rather than lose its last part. */
+.sheet-bom-list > li > .sheet-bom-spec {
+  white-space: normal;
+}
+
+/* One-line rows on a short sheet. */
+@container (height < 400px) {
+  .sheet-bom-table {
+    grid-template-columns: 22px max-content minmax(0, 1fr);
+    column-gap: 8px;
+  }
+
+  .sheet-bom-head > span:last-child {
+    display: inline;
+  }
+
+  .sheet-bom-n {
+    grid-row: auto;
+  }
+
+  .sheet-bom-list > li > .sheet-bom-spec {
+    white-space: nowrap;
+  }
+
+  .sheet-bom-list > li {
+    padding-block: 3px;
+  }
+}
+
+/* The same one-line rows when the stack has more parts than two-line rows can hold. */
+@media (width >= 640px) {
+  .sheet[data-dense] .sheet-bom-table {
+    grid-template-columns: 22px max-content minmax(0, 1fr);
+    column-gap: 8px;
+  }
+
+  .sheet[data-dense] .sheet-bom-head > span:last-child {
+    display: inline;
+  }
+
+  .sheet[data-dense] .sheet-bom-n {
+    grid-row: auto;
+  }
+
+  .sheet[data-dense] .sheet-bom-list > li > .sheet-bom-spec {
+    white-space: nowrap;
+  }
+
+  .sheet[data-dense] .sheet-bom-list > li {
+    padding-block: 3px;
+  }
+}
+
+/* A blank form until the balloon draws: the rules show, the text does not. */
+.sheet-bom-list > li:not([data-shown]) > span {
+  color: transparent;
+}
+
+.sheet-bom-list > li[data-active] {
   background: hsl(var(--foreground));
 }
 
-.stack-chip[data-active] .stack-chip-label {
-  border-color: hsl(var(--foreground));
-  background: hsl(var(--foreground));
+.sheet-bom-list > li[data-active] > span {
   color: hsl(var(--background));
 }
 
-.stack-chip[data-active] .stack-tech {
-  border-style: solid;
-  border-color: hsl(var(--foreground) / 0.5);
-}
-
-/* Side modules: one row at the bottom of the column, under a hairline. */
-.stack-chip-side {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 10px;
-  border-top: 1px dashed hsl(var(--border));
-  padding-top: 4px;
-}
-
-.stack-chip-side .stack-chip {
-  position: static;
-  transform: none;
-}
-
-.stack-chip-side .stack-chip-tick {
-  width: 6px;
-}
-
-/* --- Terminal ------------------------------------------------------------------------------------------------------ */
+/* --- Notes -------------------------------------------------------------------------------------------------------- */
 
 .stack-term {
-  flex: none;
+  grid-area: notes;
+  display: flex;
+  flex-direction: column;
 }
 
 .stack-term-screen {
   display: flex;
   flex-direction: column-reverse;
-  height: calc(4 * 16px + 10px);
+  height: calc(5 * 16px + 10px);
   overflow: hidden;
   padding: 5px 10px;
   /* Older lines scroll off under a short fade instead of a hard cut through a row. */
   mask-image: linear-gradient(to bottom, transparent 0, #000 14px);
-  font-size: 11px;
+  font-size: 10.5px;
   line-height: 16px;
+}
+
+/* A tall sheet gives the notes a sixth row (TERMINAL_ROWS in the config guard is the five-row minimum). */
+@container (height >= 440px) {
+  .stack-term-screen {
+    height: calc(6 * 16px + 10px);
+  }
 }
 
 .stack-term-screen[data-scroll] {
@@ -220,63 +389,117 @@
   margin-top: 4px;
 }
 
-/* --- Phone: the card grows, chips become a list under the drawing ------------------------------------------------- */
+/* --- Title block -------------------------------------------------------------------------------------------------- */
+
+.sheet-title-cell {
+  grid-area: title;
+  display: flex;
+}
+
+.sheet-title {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas:
+    "title title"
+    "sheet view"
+    "drawn drawn";
+  gap: 1px;
+  margin: 0;
+  background: hsl(var(--border));
+}
+
+.sheet-title > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 8px;
+  background: hsl(var(--background));
+}
+
+.sheet-title > [data-cell="title"] { grid-area: title; }
+.sheet-title > [data-cell="sheet"] { grid-area: sheet; }
+.sheet-title > [data-cell="view"] { grid-area: view; }
+.sheet-title > [data-cell="drawn"] { grid-area: drawn; }
+
+.sheet-title dt {
+  font-size: 8.5px;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.sheet-title dd {
+  margin: 0;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sheet-title [data-cell="title"] dd {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+/* --- Phone: one column; the card grows with its content -------------------------------------------------------------- */
 
 @media (width < 640px) {
-  .stack-figure {
+  .sheet {
+    container-type: normal;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    grid-template-areas:
+      "draw"
+      "parts"
+      "title"
+      "notes";
     height: auto;
   }
 
-  .stack-row {
-    flex-direction: column;
-    align-items: stretch;
-    container-type: inline-size;
+  .sheet-draw {
+    aspect-ratio: calc(var(--art-ratio) * 0.92);
   }
 
-  .stack-art {
-    width: 100%;
-    aspect-ratio: auto;
+  .sheet-bom-list > li {
+    padding-block: 5px;
   }
 
-  .stack-art .iso-stage {
-    width: min(100%, 340px);
-    height: auto;
-    margin: 0 auto;
-    aspect-ratio: var(--stack-ratio);
-  }
-
-  .stack-chips-slot {
-    position: static;
-    width: 100%;
-    height: auto;
-    margin-top: 12px;
-  }
-
-  .stack-chips {
-    height: auto;
-    opacity: 1 !important;
-  }
-
-  .stack-chip-list {
-    display: grid;
-    gap: 6px;
-  }
-
-  .stack-chip {
-    position: static;
-    transform: none;
+  .sheet-title {
+    display: flex;
     flex-wrap: wrap;
-    white-space: normal;
-    font-size: 11px;
+    align-items: baseline;
+    gap: 0 8px;
+    padding: 7px 8px;
+    background: hsl(var(--background));
   }
 
-  .stack-chip-tech {
-    flex-wrap: wrap;
-    overflow: visible;
+  .sheet-title > div {
+    display: block;
+    padding: 0;
   }
 
-  .stack-chip-side {
-    position: static;
-    margin-top: 8px;
+  .sheet-title dt {
+    display: none;
+  }
+
+  .sheet-title > div:not(:last-child)::after {
+    content: "·";
+    margin-left: 8px;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .sheet-title dd {
+    display: inline;
+    font-size: 10.5px;
+  }
+
+  .sheet-title [data-cell="title"] dd {
+    font-size: 12px;
   }
 }

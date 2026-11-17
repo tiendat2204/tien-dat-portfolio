@@ -1,6 +1,5 @@
 import type { Ref } from 'react'
 
-import { Icon } from '@/components/Icon'
 import type { terminalAt } from '@/components/iso/stack/engine'
 import type { TerminalStep } from '@/components/iso/stack/types'
 
@@ -40,20 +39,17 @@ function idleShown (state: TerminalState, steps: TerminalStep[]) {
 
 type PanelProps = { id: string, steps: TerminalStep[], state: TerminalState, scroll?: boolean, panelRef?: Ref<HTMLDivElement> }
 
-// The owner's terminal voice: a `$` prompt in muted ink, typed code in Plex Mono, a muted result line and the
-// pixel-block cursor. Static renders it once; Live renders it once and then rewrites it with `writeTerminal`.
+// The sheet's NOTES block in the owner's terminal voice: a `$` prompt in muted ink, typed code in Plex Mono, a muted
+// result line and the pixel-block cursor, under a hatch title strip. The sheet's grid draws its border. Static renders
+// it once; Live renders it once and then rewrites it with `writeTerminal`.
 export function TerminalPanel ({ id, steps, state, scroll = false, panelRef }: PanelProps) {
   const cursor = <span data-cursor='' aria-hidden='true' className={CURSOR_CLASS} />
   const idle = idleShown(state, steps)
   return (
-    <div ref={panelRef} className='stack-term relative border bg-background font-ibm'>
-      <Icon aria-hidden='true' className='absolute -top-2 -left-2 z-10 size-4 text-black dark:text-white' />
-      <Icon aria-hidden='true' className='absolute -top-2 -right-2 z-10 size-4 text-black dark:text-white' />
-      <Icon aria-hidden='true' className='absolute -bottom-2 -left-2 z-10 size-4 text-black dark:text-white' />
-      <Icon aria-hidden='true' className='absolute -right-2 -bottom-2 z-10 size-4 text-black dark:text-white' />
-      <div className='flex h-6 items-center justify-between border-b bg-lines-pattern-light px-2 text-[10px] text-muted-foreground dark:bg-lines-pattern'>
-        <span className='bg-background px-1'>~/{id}</span>
-        <span className='bg-background px-1'>tty</span>
+    <div ref={panelRef} className='stack-term font-ibm'>
+      <div className='sheet-strip bg-lines-pattern-light dark:bg-lines-pattern'>
+        <span>notes</span>
+        <span>~/{id}</span>
       </div>
       <div className='stack-term-screen' data-scroll={scroll ? '' : undefined} tabIndex={scroll ? 0 : undefined} aria-label={scroll ? 'Terminal output' : undefined}>
         <div className='stack-term-log'>

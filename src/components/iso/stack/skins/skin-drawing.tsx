@@ -1,45 +1,51 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useLayoutEffect, useMemo, useRef, type Ref } from 'react'
 
-import { skinPaths, skinViewBox } from '@/components/iso/stack/skins/index'
-import type { SkinKind } from '@/components/iso/stack/skins/index'
+import { skinPaths, skinShare, skinViewBox } from '@/components/iso/stack/skins/index'
+import type { SkinKind } from '@/components/iso/stack/types'
 import '@/components/iso/stack/skins/skin.css'
 
-// The share of path `index` (of `count`) drawn at `draw` 0..1: each path draws over its own equal slice, in order.
-function drawn (draw: number, index: number, count: number): number {
-  const value = Number.isFinite(draw) ? draw * count - index : 0
-  return Math.min(1, Math.max(0, value))
+type SkinProps = {
+  kind: SkinKind
+  // 0..1: how much of the skin is drawn on the first render. A live caller then writes each path's
+  // `stroke-dashoffset` itself through `pathRef` with the same slice (`skinShare`), without re-rendering.
+  draw: number
+  pathRef?: (index: number) => Ref<SVGPathElement>
 }
 
-// The line-art skin: hairline wireframe paths that draw themselves in as `draw` goes 0 to 1.
-// The hairline is kept by dividing the stroke width by the rendered scale (`--skin-k`) rather than by
-// `vector-effect: non-scaling-stroke`, which makes Chrome lay `pathLength` dashes out in screen space (at 2x every path
-// would stop half drawn).
-export function SkinDrawing ({ kind, draw }: { kind: SkinKind, draw: number }) {
+// The line-art skin: hairline wireframe paths that draw themselves in as `draw` goes 0 to 1. The svg fills its box
+// (`meet`), and the hairline is kept by dividing the stroke width by the rendered scale (`--skin-k`, measured before
+// the first paint) rather than by `vector-effect: non-scaling-stroke`, which makes Chrome lay `pathLength` dashes out
+// in screen space (at 2x every path would stop half drawn). The skin is never put under a transform, so its box is
+// its layout size.
+export function SkinDrawing ({ kind, draw, pathRef }: SkinProps) {
   const paths = useMemo(() => skinPaths(kind), [kind])
   const svgRef = useRef<SVGSVGElement>(null)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const svg = svgRef.current
-    if (!svg || typeof ResizeObserver === 'undefined') return
+    if (!svg) return
     const measure = (): void => {
-      const width = svg.getBoundingClientRect().width
-      if (width > 0) svg.style.setProperty('--skin-k', String(width / skinViewBox[2]))
+      const { width, height } = svg.getBoundingClientRect()
+      const k = Math.min(width / skinViewBox[2], height > 0 ? height / skinViewBox[3] : Infinity)
+      if (k > 0 && Number.isFinite(k)) svg.style.setProperty('--skin-k', k.toFixed(4))
     }
+    measure()
+    if (typeof ResizeObserver === 'undefined') return
     const observer = new ResizeObserver(measure)
     observer.observe(svg)
-    measure()
     return () => observer.disconnect()
   }, [])
 
   return (
     <svg ref={svgRef} className='skin-svg' viewBox={skinViewBox.join(' ')} aria-hidden='true' focusable='false' data-skin={kind}>
       {paths.map((d, index) => {
-        const share = drawn(draw, index, paths.length)
+        const share = skinShare(draw, index, paths.length)
         return (
           <path
             key={index}
+            ref={pathRef?.(index)}
             className='skin-line'
             d={d}
             pathLength={1}

@@ -51,6 +51,10 @@ const OPEN_GAP = 8
 const PITCH = BOARD_T + STANDOFF_H
 
 const PLATE: Plan = { x: -50, y: -36, w: 100, d: 72, r: 3 }
+
+// What the sheet's balloons and centerline hang from: a board's plan, where its body starts above its offset
+// (the standoffs) and its thickness.
+export const BOARD = { plan: PLATE, standoff: STANDOFF_H, thickness: BOARD_T } as const
 const BASE: Plan = { x: -100, y: -52, w: 170, d: 100, r: 6 }
 const BASE_H = 5
 const FOOT_H = 2.5
@@ -91,7 +95,7 @@ function extremes (count: number): Point3[] {
 }
 
 // The viewBox height follows the stack's height at one fixed scale per width, so every layer count shares a scale.
-function projectionOf (count: number): { P: Projection, height: number } {
+export function projectionOf (count: number): { P: Projection, height: number } {
   const points = extremes(count)
   const unit = fitProjection(points, 1000, 1000, { pad: 0 })
   const flat = points.map(point => iso(point, unit))
@@ -129,14 +133,13 @@ export type Mark =
   | { kind: 'line', d: string, tone: LineTone, free?: boolean }
   | { kind: 'dots', points: Flat[], size: number, tone: Tone }
   | { kind: 'halo', d: string }
-  | { kind: 'beam', d: string }
 
 export type Item = { name: string, marks: Mark[], shapes: Shape[] }
 
-// A group of items moved together: still, one board (by plate index), the packet, or a board's scan line.
+// A group of items moved together: still, one board (by plate index) or the packet.
 export type Group =
   | { key: string, move: 'still', items: Item[] }
-  | { key: string, move: 'plate', plate: number, items: Item[], scan: Item[], top: Item[] }
+  | { key: string, move: 'plate', plate: number, items: Item[], top: Item[] }
   | { key: string, move: 'packet', items: Item[] }
 
 export type StackArt = {
@@ -146,13 +149,10 @@ export type StackArt = {
   count: number
   groups: Group[]
   stack: StackLayout
-  // Screen transform of board i, of the packet at packetY (0 top board, 1 bottom board), of a scan line at 0..1.
+  // Screen transform of board i and of the packet at packetY (0 top board, 1 bottom board).
   plateMove (i: number, explode: number): string
   packetMove (packetY: number, explode: number): string
   packetOffset (packetY: number, explode: number): Point3
-  scanMove (sweep: number): string
-  // Where each board's right corner sits when the stack is open, as a share of the viewBox height (for the chips).
-  chipShare (i: number): number
 }
 
 const solid = (paths: SolidPaths, tone: Tone = 'mid', options: Partial<Extract<Mark, { kind: 'solid' }>> = {}): Mark => ({ kind: 'solid', paths, tone, crease: 'faint', ...options })
@@ -259,11 +259,8 @@ function build (count: number, sides: number): StackArt {
   // --- The boards, bottom to top -------------------------------------------------------------------------------------
 
   const top = STANDOFF_H + BOARD_T
-  const scanFrom = PLATE.x + 8
-  const scanTo = PLATE.x + PLATE.w - 8
   for (let i = 0; i < count; i++) {
     items = []
-    const scan: Item[] = []
     const onTopItems: Item[] = []
     const name = `board${i}`
     // Standoffs under the board, far to near.
@@ -295,10 +292,6 @@ function build (count: number, sides: number): StackArt {
       line(traces, 'lo'),
       ...screws(PLATE, 6, top),
     ], [slab(PLATE, STANDOFF_H, BOARD_T, 4)])
-    // The scan beam and its rule, drawn on the top face and moved across it in x.
-    const beamW = 5
-    const beam = onTop([[scanFrom - beamW, PLATE.y + 0.6], [scanFrom, PLATE.y + 0.6], [scanFrom, PLATE.y + PLATE.d - 0.6], [scanFrom - beamW, PLATE.y + PLATE.d - 0.6]], top, P, true)
-    scan.push({ name: `${name}.scan`, marks: [{ kind: 'beam', d: beam }, line(lineOnTop([scanFrom, PLATE.y], [scanFrom, PLATE.y + PLATE.d], top, P), 'hi')], shapes: [] })
     // Ruler strip along the front edge, the IC with its pins, a label plate and the status LED.
     const strip: Plan = { x: PLATE.x + 8, y: PLATE.y + PLATE.d - 8, w: 56, d: 4.4, r: 0.6 }
     const ticks = topTicks(strip.x + 2, strip.x + strip.w - 2, 3, 5, strip.y, top + 0.5, [1.4, 2.6], P)
@@ -330,7 +323,7 @@ function build (count: number, sides: number): StackArt {
     // The port bracket on the +x face that meets the bus, drawn after the board it stands out from.
     const port: Plan = { x: edge, y: BUS[1] - 3, w: BUS[0] - BUS_R - edge, d: 6, r: 0.4 }
     onTopItems.push({ name: `${name}.port`, marks: [solid(slabOf(port, STANDOFF_H + 0.8, BOARD_T - 1.6, P, 2, 0.3), 'mid')], shapes: [slab(port, STANDOFF_H + 0.8, BOARD_T - 1.6, 2)] })
-    groups.push({ key: name, move: 'plate', plate: i, items, scan, top: onTopItems })
+    groups.push({ key: name, move: 'plate', plate: i, items, top: onTopItems })
   }
 
   // --- The bus riser on the right, then the packet that rides it -----------------------------------------------------
@@ -356,7 +349,6 @@ function build (count: number, sides: number): StackArt {
     const to = plateOffset(stack, 0, explode).z
     return [0, 0, from + (to - from) * y]
   }
-  const corner = (i: number) => at([PLATE.x + PLATE.w, PLATE.y, plateOffset(stack, i, 1).z + STANDOFF_H + BOARD_T / 2])
 
   return {
     P,
@@ -368,8 +360,6 @@ function build (count: number, sides: number): StackArt {
     plateMove: (i, explode) => translateAlong(P, [0, 0, plateOffset(stack, i, explode).z]),
     packetMove: (packetY, explode) => translateAlong(P, packetOffset(packetY, explode)),
     packetOffset,
-    scanMove: sweep => translateAlong(P, [(scanTo - scanFrom) * clamp01(sweep), 0, 0]),
-    chipShare: i => corner(i)[1] / height,
   }
 }
 
