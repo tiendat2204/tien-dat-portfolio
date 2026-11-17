@@ -1,0 +1,26 @@
+/*
+  Line-art skins: the hairline wireframe the spec sheet opens on. Same weight and tones as the kit's lines
+  (`--anatomy-weight`, a mix of `--anatomy-mid` and `--anatomy-hi`), with fallbacks when rendered outside an `.iso` scope. `--skin-weight` and
+  `--skin-tone` tune them per use. The draw-in is a dash per path (`pathLength` 1, offset 1 = hidden, 0 = drawn).
+  The weight is divided by `--skin-k` (rendered px per viewBox unit, set by SkinDrawing) so it stays a screen
+  hairline at any size; `vector-effect: non-scaling-stroke` is not used because Chrome then measures `pathLength`
+  dashes in screen space and the draw-in stops early when the drawing is scaled.
+*/
+.skin-svg {
+  --skin-k: 1;
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  /* Between the kit's `mid` and `hi`: a hairline at `mid` alone is too faint to read as the opening view. */
+  color: var(--skin-tone, color-mix(in srgb, var(--anatomy-hi, currentColor) 55%, var(--anatomy-mid, currentColor)));
+}
+
+.skin-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: calc(var(--skin-weight, var(--anatomy-weight, 0.6px)) / var(--skin-k));
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 1;
+}
