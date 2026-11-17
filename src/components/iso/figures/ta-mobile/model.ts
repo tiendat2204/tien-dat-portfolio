@@ -6,12 +6,12 @@ import type { FigureInput, FigureModel } from '@/components/iso/figure-contract'
 // drops, and the card stays queued in the outbox.
 
 // Phase boundaries in scroll progress.
-export const STAMPED = 0.4
-export const QUEUED = 0.55
-export const SYNCED = 0.9
+const STAMPED = 0.4
+const QUEUED = 0.55
+const SYNCED = 0.9
 
 // How far (in pointer units, -1..1) the pointer may stray from the mast before the signal drops.
-export const TOLERANCE = 0.25
+const TOLERANCE = 0.25
 
 const PHASE_SECONDS = 0.25
 const SIGNAL_SECONDS = 0.2
@@ -19,7 +19,7 @@ const FLUSH_SECONDS = 0.3
 
 const clamp = (value: number, low: number, high: number) => Math.min(high, Math.max(low, value))
 const share = (value: number, from: number, to: number) => clamp((value - from) / (to - from), 0, 1)
-export const smooth = (value: number) => {
+const smooth = (value: number) => {
   const t = clamp(value, 0, 1)
   return t * t * (3 - 2 * t)
 }
@@ -43,7 +43,7 @@ export type TaMobileState = {
   flush: number
 }
 
-export const connected = (state: Pick<TaMobileState, 'aim'>) => Math.abs(state.aim) <= TOLERANCE
+const connected = (state: Pick<TaMobileState, 'aim'>) => Math.abs(state.aim) <= TOLERANCE
 
 export const delivered = (state: Pick<TaMobileState, 'flush'>) => state.flush > 1 - 1e-6
 
