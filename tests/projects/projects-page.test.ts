@@ -23,8 +23,8 @@ test('agrita-mobile is AgriTA Mobile and betatruyen leads with the owner stateme
   assert.deepEqual(mobile?.links, [])
   const beta = sections.find(s => s.id === 'betatruyen')
   assert.equal(beta?.summary[0], 'Built and maintained a story community forum with over 10,000 users, supporting reading, community interaction and content sharing')
-  assert.ok(beta?.technologies.some(t => t.name === 'Celery'))
-  assert.ok(beta?.technologies.some(t => t.name === 'RabbitMQ'))
+  assert.ok(beta?.technologies.some(t => t.name === 'Django'))
+  assert.ok(!beta?.technologies.some(t => ['Dragonfly', 'Celery', 'RabbitMQ'].includes(t.name)))
 })
 
 test('agrita, the library and tangni describe the real repos', () => {
