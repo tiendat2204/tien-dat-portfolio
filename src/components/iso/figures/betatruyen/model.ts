@@ -5,11 +5,11 @@ import type { FigureInput, FigureModel } from '@/components/iso/figure-contract'
 // rating beam tips and the story's book rises one place in the ranking rack (0.65..0.95). Geometry, the live loop and
 // the readout all read the same numbers.
 
-export const STAGES = ['reading', 'commented', 'rating', 'ranked up'] as const
-export const BOUNDS = [0.35, 0.65, 0.95] as const
+const STAGES = ['reading', 'commented', 'rating', 'ranked up'] as const
+const BOUNDS = [0.35, 0.65, 0.95] as const
 
 // How far a hover or an arrow key swings the ranking lever, in radians at most.
-export const NUDGE = 0.18
+const NUDGE = 0.18
 
 const RUN_SECONDS = 0.3
 const NUDGE_SECONDS = 0.3
