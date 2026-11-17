@@ -42,7 +42,7 @@ html:not(.dark) .iso {
 .figure-frame-head,
 .figure-frame-foot {
   flex: none;
-  min-height: 32px;
+  min-height: 30px;
 }
 
 .figure-frame-head {
@@ -56,17 +56,13 @@ html:not(.dark) .iso {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 14px;
+  padding: 8px 12px;
   background-size: 36px 36px;
 }
 
 .figure-frame-body > * {
   width: 100%;
   max-height: 100%;
-}
-
-.figure-frame [data-readout]:empty::before {
-  content: "\2026";
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -7,7 +7,7 @@
 .stack-figure {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -24,7 +24,7 @@
 .stack-art {
   position: relative;
   flex: none;
-  width: min(56cqw, calc(100cqh * var(--stack-ratio)));
+  width: min(58cqw, calc(100cqh * var(--stack-ratio)));
   aspect-ratio: var(--stack-ratio);
 }
 
@@ -80,7 +80,7 @@
   top: calc(var(--y) * 100%);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 3px;
   max-width: 100%;
   transform: translateY(-50%);
   font-family: "IBM Plex Mono", ui-monospace, monospace;
@@ -92,7 +92,7 @@
 
 .stack-chip-tick {
   flex: none;
-  width: 14px;
+  width: 6px;
   height: 1px;
   background: hsl(var(--border));
 }
@@ -113,15 +113,15 @@
   flex: none;
   border: 1px solid hsl(var(--border));
   background: hsl(var(--background));
-  padding: 0 5px;
+  padding: 0 3px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
 }
 
 .stack-chip-tech {
   display: flex;
   min-width: 0;
-  gap: 4px;
+  gap: 3px;
   overflow: hidden;
 }
 
@@ -129,7 +129,7 @@
   flex: none;
   border: 1px dashed hsl(var(--border));
   background: hsl(var(--background));
-  padding: 0 4px;
+  padding: 0 2px;
 }
 
 /* A row too long for the column ends in an ellipsis on its last chip (the full list is in the chip's title). */
@@ -190,9 +190,11 @@
 .stack-term-screen {
   display: flex;
   flex-direction: column-reverse;
-  height: calc(5 * 16px + 10px);
+  height: calc(4 * 16px + 10px);
   overflow: hidden;
   padding: 5px 10px;
+  /* Older lines scroll off under a short fade instead of a hard cut through a row. */
+  mask-image: linear-gradient(to bottom, transparent 0, #000 14px);
   font-size: 11px;
   line-height: 16px;
 }
@@ -200,6 +202,12 @@
 .stack-term-screen[data-scroll] {
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+/* The settled log opens at its end; it still scrolls by wheel, touch and keys, without a scrollbar thumb. */
+.stack-term-screen[data-scroll]::-webkit-scrollbar {
+  display: none;
 }
 
 .stack-term-log p {

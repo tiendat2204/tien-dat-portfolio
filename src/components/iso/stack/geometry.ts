@@ -3,8 +3,8 @@
   z is up. A base plate on feet carries two guide posts behind the stack and a bus riser on its right. Each layer is
   a board (bevelled, laminated, with a groove, corner screws, a ruler strip, an IC, traces, a label plate and an LED)
   on four standoffs; brackets on its back faces ride the guide posts and a port bracket on its right face meets the
-  bus. The packet (a small block) rides the bus up and down. Side modules are small satellite boards on the base in
-  front of the stack.
+  bus. The packet (a small block) rides the bus up and down. Side modules are small satellite boards on the base to
+  the left of the stack (the base grows sideways, not forward, so the drawing stays wide rather than tall).
 
   Boards are built at the rest place of board 0 and moved with a transform: `plateOffset` is the only thing that
   changes as the stack opens. Plate index 0 is the bottom board; the config's layer k is board n - 1 - k, so the
@@ -45,15 +45,15 @@ export const WIDTH = 400
 const PAD = 8
 
 // Board thickness, standoff height (the assembled gap) and the extra gap a fully opened stack adds per board.
-const BOARD_T = 4.5
-const STANDOFF_H = 3
-const OPEN_GAP = 14
+const BOARD_T = 4
+const STANDOFF_H = 2.5
+const OPEN_GAP = 8
 const PITCH = BOARD_T + STANDOFF_H
 
 const PLATE: Plan = { x: -50, y: -36, w: 100, d: 72, r: 3 }
-const BASE: Plan = { x: -66, y: -52, w: 138, d: 116, r: 6 }
-const BASE_H = 6
-const FOOT_H = 3
+const BASE: Plan = { x: -100, y: -52, w: 170, d: 100, r: 6 }
+const BASE_H = 5
+const FOOT_H = 2.5
 
 // Guide posts behind the -y and -x faces, the bus riser beside the +x face.
 const POST_R = 2.6
@@ -61,12 +61,12 @@ const POST_A: Plane = [30, PLATE.y - 3 - POST_R]
 const POST_B: Plane = [PLATE.x - 3 - POST_R, 20]
 const BUS_R = 3
 const BUS: Plane = [PLATE.x + PLATE.w + 3 + BUS_R, -20]
-const COLLAR_H = 1.4
+const COLLAR_H = 1.2
 const CAP_H = 1.6
-const HEADROOM = 7
+const HEADROOM = 4
 
 // The packet: a block on the bus's +x side, centred on board 0's mid-thickness at rest.
-const PACKET = 7.5
+const PACKET = 6.5
 const PACKET_PLAN: Plan = { x: BUS[0] + BUS_R, y: BUS[1] - PACKET / 2, w: PACKET, d: PACKET, r: 0.8 }
 const PACKET_Z = STANDOFF_H + BOARD_T / 2 - PACKET / 2
 
@@ -167,8 +167,9 @@ const BOARD_LAYOUTS = [
   { ic: { x: 0, y: -24, w: 26, d: 14 }, label: { x: -36, y: -16 } },
 ]
 
-const SIDE_SLOTS: Plane[] = [[-54, 40], [-27, 40], [0, 40]]
-const SIDE_PLAN = { w: 24, d: 18 }
+// Satellite places on the base's front-left, clear of the stack and of guide post B on screen.
+const SIDE_SLOTS: Plane[] = [[-86, 25], [-68, 25], [-92, 8]]
+const SIDE_PLAN = { w: 16, d: 16 }
 const SIDE_STANDOFF = 2.5
 const SIDE_T = 3
 
@@ -198,25 +199,29 @@ function build (count: number, sides: number): StackArt {
   for (const [x, y] of byDepth(corners(BASE, 16))) {
     item('stand.foot', [solid(cylinder(x, y, 5, -BASE_H - FOOT_H, FOOT_H, P, 24), 'lo')], [post(x, y, 5, -BASE_H - FOOT_H, FOOT_H, true)])
   }
-  const ruler: Plan = { x: 57, y: 2, w: 6, d: 48, r: 1 }
+  const ruler: Plan = { x: 57, y: 2, w: 6, d: 38, r: 1 }
   const rulerTicks = topTicks(ruler.y + 4, ruler.y + ruler.d - 4, 4, 5, ruler.x, 0.6, [1.8, 3.2], P, 'y')
-  const tag: Plan = { x: 30, y: 42, w: 22, d: 14, r: 1.2 }
+  // The label plate takes the first satellite place a side module does not use (none when all three are used).
+  const free = SIDE_SLOTS[Math.min(SIDE_SLOTS.length, sides)] as Plane | undefined
+  const tag: Plan = { x: free?.[0] ?? 0, y: (free?.[1] ?? 0) + 3, w: 16, d: 10, r: 1.2 }
   item('stand.plate', [
     solid(slabOf(BASE, -BASE_H, BASE_H, P, 6, 1.2), 'lo', { inner: [{ d: sideSeam(BASE, -BASE_H / 2, P, 6), tone: 'faint' }] }),
     line(planOutline(insetPlan(BASE, 4), 0, P, 6), 'faint'),
-    ...screws(BASE, 8, 0, 2),
+    ...screws(BASE, 6, 0, 2),
   ], [slab(BASE, -BASE_H, BASE_H, 6, true)])
   item('stand.ruler', [
     solid(slabOf(ruler, 0, 0.6, P, 3), 'lo', { crease: 'none' }),
     line(rulerTicks.minor, 'lo'),
     line(rulerTicks.major, 'mid'),
   ], [slab(ruler, 0, 0.6, 3, true)])
-  item('stand.tag', [
-    solid(slabOf(tag, 0, 0.8, P, 3), 'lo', { crease: 'none' }),
-    line(planOutline(insetPlan(tag, 1.4), 0.8, P, 3), 'faint'),
-    line([12, 15, 9].map((w, row) => lineOnTop([tag.x + 3.4, tag.y + 4.4 + row * 3.4], [tag.x + 3.4 + w, tag.y + 4.4 + row * 3.4], 0.8, P)).join(''), 'lo', true),
-    dots([at([tag.x + tag.w - 2.4, tag.y + 2.4, 0.8]), at([tag.x + tag.w - 2.4, tag.y + tag.d - 2.4, 0.8])], 0.42),
-  ], [slab(tag, 0, 0.8, 3, true)])
+  if (free) {
+    item('stand.tag', [
+      solid(slabOf(tag, 0, 0.8, P, 3), 'lo', { crease: 'none' }),
+      line(planOutline(insetPlan(tag, 1.4), 0.8, P, 3), 'faint'),
+      line([9, 6].map((w, row) => lineOnTop([tag.x + 3.4, tag.y + 3.6 + row * 3], [tag.x + 3.4 + w, tag.y + 3.6 + row * 3], 0.8, P)).join(''), 'lo', true),
+      dots([at([tag.x + tag.w - 2.4, tag.y + 2.4, 0.8]), at([tag.x + tag.w - 2.4, tag.y + tag.d - 2.4, 0.8])], 0.42),
+    ], [slab(tag, 0, 0.8, 3, true)])
+  }
 
   // --- Guide posts behind the stack: collar, post, cap ---------------------------------------------------------------
 
@@ -228,6 +233,28 @@ function build (count: number, sides: number): StackArt {
   }
   still('posts')
   for (const [name, at2, r] of [['guide.a', POST_A, POST_R], ['guide.b', POST_B, POST_R]] as const) guide(name, at2, r)
+
+  // --- Satellite boards for the side modules, front-left of post B, behind the boards, far to near -----
+
+  still('side')
+  const slots = SIDE_SLOTS.slice(0, Math.max(0, Math.min(SIDE_SLOTS.length, sides))).map((slot, index) => ({ slot, index }))
+  slots.sort((a, b) => depthOf([a.slot[0], a.slot[1], 0], P) - depthOf([b.slot[0], b.slot[1], 0], P))
+  for (const { slot: [sx, sy], index } of slots) {
+    const plan: Plan = { x: sx, y: sy, w: SIDE_PLAN.w, d: SIDE_PLAN.d, r: 1.6 }
+    const z = SIDE_STANDOFF
+    const sideTop = z + SIDE_T
+    const name = `side${index}`
+    for (const [x, y] of byDepth(corners(plan, 4))) item(`${name}.standoff`, [solid(cylinder(x, y, 1.4, 0, z, P, 16), 'lo')], [post(x, y, 1.4, 0, z)])
+    item(`${name}.board`, [
+      solid(slabOf(plan, z, SIDE_T, P, 3, 0.5), 'mid', { inner: [{ d: sideSeam(plan, z + SIDE_T / 2, P, 3), tone: 'faint' }] }),
+      ...screws(plan, 2, sideTop, 0.8),
+    ], [slab(plan, z, SIDE_T, 3)])
+    const chip: Plan = { x: plan.x + 4, y: plan.y + 4, w: 8, d: 8, r: 0.6 }
+    item(`${name}.chip`, [
+      solid(slabOf(chip, sideTop, 1.8, P, 2, 0.3), 'mid'),
+      dots(Array.from({ length: 3 }, (_, k): Flat => at([chip.x + 2 + k * 2, chip.y + chip.d + 1, sideTop])), 0.4),
+    ], [slab(chip, sideTop, 1.8, 2)])
+  }
 
   // --- The boards, bottom to top -------------------------------------------------------------------------------------
 
@@ -304,28 +331,6 @@ function build (count: number, sides: number): StackArt {
     const port: Plan = { x: edge, y: BUS[1] - 3, w: BUS[0] - BUS_R - edge, d: 6, r: 0.4 }
     onTopItems.push({ name: `${name}.port`, marks: [solid(slabOf(port, STANDOFF_H + 0.8, BOARD_T - 1.6, P, 2, 0.3), 'mid')], shapes: [slab(port, STANDOFF_H + 0.8, BOARD_T - 1.6, 2)] })
     groups.push({ key: name, move: 'plate', plate: i, items, scan, top: onTopItems })
-  }
-
-  // --- Satellite boards for the side modules, far to near ------------------------------------------------------------
-
-  still('side')
-  const slots = SIDE_SLOTS.slice(0, Math.max(0, Math.min(SIDE_SLOTS.length, sides)))
-  for (const [index, [sx, sy]] of slots.entries()) {
-    const plan: Plan = { x: sx, y: sy, w: SIDE_PLAN.w, d: SIDE_PLAN.d, r: 1.6 }
-    const z = SIDE_STANDOFF
-    const sideTop = z + SIDE_T
-    const name = `side${index}`
-    for (const [x, y] of byDepth(corners(plan, 4))) item(`${name}.standoff`, [solid(cylinder(x, y, 1.4, 0, z, P, 16), 'lo')], [post(x, y, 1.4, 0, z)])
-    item(`${name}.board`, [
-      solid(slabOf(plan, z, SIDE_T, P, 3, 0.5), 'mid', { inner: [{ d: sideSeam(plan, z + SIDE_T / 2, P, 3), tone: 'faint' }] }),
-      line(planOutline(insetPlan(plan, 2.4), sideTop, P, 3), 'faint'),
-      ...screws(plan, 4, sideTop, 1),
-    ], [slab(plan, z, SIDE_T, 3)])
-    const chip: Plan = { x: plan.x + 7, y: plan.y + 5, w: 12, d: 10, r: 0.6 }
-    item(`${name}.chip`, [
-      solid(slabOf(chip, sideTop, 1.8, P, 2, 0.3), 'mid'),
-      dots(Array.from({ length: 3 }, (_, k): Flat => at([chip.x + 3 + k * 3, chip.y + chip.d + 1, sideTop])), 0.4),
-    ], [slab(chip, sideTop, 1.8, 2)])
   }
 
   // --- The bus riser on the right, then the packet that rides it -----------------------------------------------------

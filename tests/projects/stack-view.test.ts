@@ -25,6 +25,13 @@ test('layout(n) gives a finite viewBox with a positive size', () => {
   }
 })
 
+test('the viewBox is wide enough for the drawing to lead the card (5 layers at least 1.35 : 1)', () => {
+  const [, , width, height] = layout(5).viewBox
+  assert.ok(width / height >= 1.35, `ratio ${(width / height).toFixed(2)}`)
+  const ratios = [1, 4, 5, 6, 8].map(n => layout(n).viewBox[2] / layout(n).viewBox[3])
+  for (let i = 1; i < ratios.length; i++) assert.ok(ratios[i] < ratios[i - 1], 'taller with more layers')
+})
+
 test('plateOffset at explode 0 is the assembled position', () => {
   const stack = layout(5)
   for (let i = 0; i < 5; i++) assert.deepEqual(plateOffset(stack, i, 0), stack.plateOffsets[i])

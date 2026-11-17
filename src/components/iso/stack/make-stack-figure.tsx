@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, type CSSProperties, type Ref } from 'react'
+import { useCallback, useLayoutEffect, useRef, type CSSProperties, type Ref } from 'react'
 
 import { useFigureActive } from '@/components/iso/figure-activity'
 import type { FigureModule, ProgressRef } from '@/components/iso/figure-contract'
@@ -62,9 +62,11 @@ function StackFigureView ({ config, art, view, terminal, scroll, rootRef, groupR
   )
 }
 
+// The frame's readout pill is filled by the figure (FigureSlot passes no readout), so the settled text is written
+// before the first paint: the pill never shows an empty or placeholder state.
 function SettledReadout ({ text }: { text: string }) {
   const { anchor, say } = useReadout<HTMLSpanElement>()
-  useEffect(() => say(text), [say, text])
+  useLayoutEffect(() => say(text), [say, text])
   return <span ref={anchor} hidden />
 }
 

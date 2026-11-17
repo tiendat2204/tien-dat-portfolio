@@ -3,7 +3,7 @@
 
     node --import tsx src/components/iso/stack/audit.ts
 
-  For 1, 4, 6 and 8 layers (with all three satellite boards) it records every drawn item's true shapes into the kit's
+  For 1, 4, 6 and 8 layers (with all three satellite boards, then 0 to 2 for 1, 5 and 8 layers) it records every drawn item's true shapes into the kit's
   audit recorder in the exact painter's order the page uses (keys are draw positions, never re-settled), with each
   board at its offset for the explode amount and the packet at the top, middle and bottom of its travel, then runs
   every check of kit/audit.mjs. Explode 0, 0.5 and 1. It ends `audit passed` or exits 1.
@@ -38,9 +38,7 @@ const A = auditModule as unknown as {
   failures (result: Result): number
 }
 
-type Pose = { layers: number, explode: number, packetY: number }
-
-const SIDES = 3
+type Pose = { layers: number, sides: number, explode: number, packetY: number }
 
 function markSvg (mark: Mark) {
   if (mark.kind === 'solid') return solidSvg(mark.paths, { tone: mark.tone, crease: mark.crease, inner: (mark.inner ?? []).map(seam => lineSvg(seam.d, { tone: seam.tone })).join('') })
@@ -78,21 +76,26 @@ function auditPose (art: StackArt, pose: Pose) {
     }
   }
   const overlaps = A.overlapsOf(R.items, P, { states: [0], skip: A.sameRun })
+  // Solver bypassed on purpose: keys are the authored draw order the page paints, and depth cycles are not detected by the solver.
   R.settled = { items: R.items, overlaps, solved: { keys: R.items.map(entry => entry.key), rules: 0, cycles: [], dropped: [] }, states: [0] }
   return { result: A.audit(R, P, {}), R }
 }
 
-const poses: Pose[] = [1, 4, 6, 8].flatMap(layers => [0, 0.5, 1].flatMap(explode => [0, 0.5, 1].map(packetY => ({ layers, explode, packetY }))))
+// Every pose with all three satellite boards; fewer side modules (the label plate takes a free place) at rest and open.
+const poses: Pose[] = [
+  ...[1, 4, 6, 8].flatMap(layers => [0, 0.5, 1].flatMap(explode => [0, 0.5, 1].map(packetY => ({ layers, sides: 3, explode, packetY })))),
+  ...[0, 1, 2].flatMap(sides => [1, 5, 8].flatMap(layers => [0, 1].map(explode => ({ layers, sides, explode, packetY: 0.5 })))),
+]
 
 let total = 0
 const started = Date.now()
 const seen = new Set<string>()
 for (const pose of poses) {
-  const art = stackArt(pose.layers, SIDES)
+  const art = stackArt(pose.layers, pose.sides)
   const { result, R } = auditPose(art, pose)
   const count = A.failures(result)
   total += count
-  const label = `layers ${pose.layers} · explode ${pose.explode} · packet ${pose.packetY}`
+  const label = `layers ${pose.layers} · sides ${pose.sides} · explode ${pose.explode} · packet ${pose.packetY}`
   if (count) {
     const lines = A.report(result).split('\n').filter((text: string) => !seen.has(text))
     lines.forEach((text: string) => seen.add(text))
