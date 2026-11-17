@@ -1,7 +1,7 @@
 import type { StackConfig } from '@/components/iso/stack/types'
 
 // Digital Library for a Pagoda: a book checked out through the web app's frontend stack. Tech from the app's
-// package.json and README (Next.js 16 App Router); the REST API it calls is a separate backend whose stack is
+// package.json and README (Next.js 16 App Router); an external API it calls is a separate backend whose stack is
 // not shown here. Snippets are representative with generic identifiers, not the project's code or routes.
 export const libraryConfig: StackConfig = {
   id: 'library',
@@ -49,7 +49,7 @@ export const libraryConfig: StackConfig = {
     {
       layer: 4,
       prompt: 'cat checkout.schema.ts',
-      lines: ['z.object({ borrowDate: z.date(), dueDate })', '  .refine(o => o.dueDate >= o.borrowDate)'],
+      lines: ['z.object({ borrowDate: z.date(),', '  dueDate: z.date() }).refine(isOrdered)'],
       result: 'valid',
     },
   ],

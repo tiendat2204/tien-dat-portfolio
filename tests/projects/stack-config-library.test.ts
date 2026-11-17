@@ -45,3 +45,9 @@ test('mid-scroll readout and settled terminal', () => {
   assert.ok(settled.blocks.length > 0)
   assert.ok(settled.blocks.every(block => block.done && block.result !== null))
 })
+
+test('validation snippet is a complete schema expression', () => {
+  const code = libraryConfig.steps[4].lines.join('\n')
+  assert.match(code, /dueDate: z\.date\(\)/)
+  assert.doesNotMatch(code, /dueDate \}\)/)
+})
