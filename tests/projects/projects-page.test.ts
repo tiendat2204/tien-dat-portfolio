@@ -27,6 +27,31 @@ test('agrita-mobile is AgriTA Mobile and betatruyen leads with the owner stateme
   assert.ok(beta?.technologies.some(t => t.name === 'RabbitMQ'))
 })
 
+test('agrita, the library and tangni describe the real repos', () => {
+  const sections = buildProjectSections()
+  const text = (id: string) => sections.find(s => s.id === id)?.summary.join('\n') ?? ''
+  const techs = (id: string) => sections.find(s => s.id === id)?.technologies.map(t => t.name) ?? []
+  const agrita = text('agrita')
+  assert.match(agrita, /land lot, crop season, harvest lot/)
+  assert.match(agrita, /TA Farm/)
+  assert.match(agrita, /TA Market/)
+  assert.match(agrita, /Vite SPA/)
+  assert.match(agrita, /Next\.js 16/)
+  assert.match(agrita, /Geoman/)
+  assert.ok(!/NestJS|Drizzle/.test(agrita))
+  assert.ok(!techs('agrita').some(n => /NestJS|Drizzle/.test(n)))
+  assert.ok(techs('agrita').includes('Vite'))
+  assert.ok(techs('agrita').includes('Zustand'))
+  const library = text('digital-library')
+  assert.match(library, /barcode/)
+  assert.match(library, /40,000\+ books with 1,000\+ active users/)
+  assert.ok(techs('digital-library').includes('Redux Toolkit'))
+  const tangni = text('tangni-web')
+  assert.match(tangni, /secretary reviews/)
+  assert.match(tangni, /Vite SPA/)
+  assert.ok(techs('tangni-web').includes('Zustand'))
+})
+
 test('toSection tolerates an entry without a figure', () => {
   const [entry] = PROJECT_PAGE_ENTRIES
   const section = toSection({ ...entry, id: 'unknown-thing', figureId: undefined }, 1)

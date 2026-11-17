@@ -25,13 +25,27 @@ test('each config names its generic skin', () => {
   assert.equal(agritaConfig.skin, 'dashboard')
 })
 
+test('agrita follows the real AgriTA web apps', () => {
+  assert.deepEqual(agritaConfig.layers.map(layer => layer.label), ['ui', 'routes', 'data', 'forms', 'api'])
+  assert.deepEqual(agritaConfig.side.map(tier => tier.label), ['map', 'market', 'tests'])
+  const tech = [...agritaConfig.layers, ...agritaConfig.side].flatMap(tier => tier.tech)
+  for (const name of ['Vite', 'TanStack Router', 'TanStack Query', 'React Hook Form', 'Zod', 'Axios', 'Leaflet', 'Geoman', 'Next.js 16']) {
+    assert.ok(tech.includes(name), `missing ${name}`)
+  }
+  assert.ok(!tech.some(name => /NestJS|Drizzle/.test(name)))
+  assert.equal(agritaConfig.steps.length, 5)
+  assert.deepEqual(agritaConfig.steps.map(step => step.layer), [0, 1, 2, 3, 4])
+  const steps = agritaConfig.steps.flatMap(step => [step.prompt, ...step.lines]).join('\n')
+  for (const word of [/landLot/, /season/i, /harvest/i, /trace/i]) assert.match(steps, word)
+})
+
+// The API and its database belong to a separate backend team (docs name PostgreSQL); the figure shows the frontend.
 test('agrita names no database', () => {
   const db = /postgres|mysql|mongo|sqlite|database|\bdb\b/i
   for (const tier of [...agritaConfig.layers, ...agritaConfig.side]) {
     assert.ok(!db.test(tier.label), `label ${tier.label}`)
     for (const tech of tier.tech) assert.ok(!db.test(tech), `tech ${tech}`)
   }
-  // Step text may use Drizzle's `db.query`, but names no database product.
   const product = /postgres|mysql|mongo|sqlite|mariadb/i
   for (const step of agritaConfig.steps) {
     for (const text of [step.prompt, ...step.lines, step.result]) assert.ok(!product.test(text), `step text ${text}`)
