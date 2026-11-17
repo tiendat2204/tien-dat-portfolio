@@ -36,7 +36,7 @@ export function ProjectsScroller ({ children }: { children: ReactNode }) {
       },
       (context) => {
         const reduce = context.conditions?.reduce === true
-        const mode = scrollPlan(window.innerWidth, reduce)
+        const mode = scrollPlan(context.conditions?.narrow === true ? PIN_MIN_WIDTH - 1 : PIN_MIN_WIDTH, reduce)
 
         if (mode === 'static') {
           sections.forEach(section => writeProgress(section, 1))

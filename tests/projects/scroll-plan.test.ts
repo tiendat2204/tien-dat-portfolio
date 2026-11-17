@@ -4,10 +4,11 @@ import { PIN_TOP_OFFSET, PIN_VIEWPORTS, scrollPlan } from '../../src/lib/project
 
 test('scrollPlan pins on desktop widths', () => {
   assert.equal(scrollPlan(1280, false), 'pinned')
-  assert.equal(scrollPlan(768, false), 'pinned')
+  assert.equal(scrollPlan(1024, false), 'pinned')
 })
 
-test('scrollPlan stacks below 768px', () => {
+test('scrollPlan stacks below 1024px', () => {
+  assert.equal(scrollPlan(1023, false), 'stacked')
   assert.equal(scrollPlan(767, false), 'stacked')
 })
 
@@ -24,6 +25,6 @@ test('PIN_TOP_OFFSET is 96', () => {
   assert.equal(PIN_TOP_OFFSET, 96)
 })
 
-test('scrollPlan stacks fractional widths below 768px', () => {
-  assert.equal(scrollPlan(767.5, false), 'stacked')
+test('scrollPlan stacks fractional widths below 1024px', () => {
+  assert.equal(scrollPlan(1023.5, false), 'stacked')
 })
