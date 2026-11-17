@@ -1,3 +1,4 @@
-import { stubFigure } from '@/components/iso/figures/stub'
+import { xn2Config } from '@/components/iso/figures/xn2/config'
+import { makeStackFigure } from '@/components/iso/stack/make-stack-figure'
 
-export default stubFigure({ id: 'xn2', fig: 7, title: 'XN2 Bridge & Ferry Management', hint: 'stack anatomy coming soon' })
+export default makeStackFigure(xn2Config)
