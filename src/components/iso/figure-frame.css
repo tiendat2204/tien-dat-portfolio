@@ -29,7 +29,19 @@ html:not(.dark) .iso {
   box-shadow: none;
 }
 
-/* One frame size for every figure: the card fills the slot's 4:3 box. */
+/*
+  One frame size for every figure. The slot (figure-slot.tsx) is a 4:3 box; the spec sheet wants more height (up to
+  square) but never more than the pinned viewport leaves: at 1280x720 the pinned area is 624px and the slot sits
+  24px below the text column's top, so the card is capped at 100svh - 10rem (560px there); never under 400px, never
+  over 600px (a taller sheet only adds empty paper around a drawing whose size is set by the column's width).
+*/
+@media (width >= 640px) {
+  [data-figure]:has(> .figure-frame) {
+    aspect-ratio: 1;
+    max-height: clamp(400px, 100svh - 10rem, 600px);
+  }
+}
+
 .figure-frame,
 .figure-frame .iso-figure {
   height: 100%;

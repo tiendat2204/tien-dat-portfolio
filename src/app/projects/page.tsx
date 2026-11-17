@@ -47,7 +47,7 @@ export default function ProjectsPage () {
                 ))}
               </ul>
             </div>
-            <div className='min-w-0 lg:max-h-[calc(100svh-8rem)]'>
+            <div className='min-w-0'>
               <FigureSlot figureId={section.figureId} />
             </div>
           </section>
