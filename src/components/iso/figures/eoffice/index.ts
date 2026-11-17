@@ -1,3 +1,4 @@
-import { stubFigure } from '@/components/iso/figures/stub'
+import { eofficeConfig } from '@/components/iso/figures/eoffice/config'
+import { makeStackFigure } from '@/components/iso/stack/make-stack-figure'
 
-export default stubFigure({ id: 'eoffice', fig: 3, title: 'E-Office Workflow', hint: 'stack anatomy coming soon' })
+export default makeStackFigure(eofficeConfig)
