@@ -1,3 +1,4 @@
-import { stubFigure } from '@/components/iso/figures/stub'
+import { agritaMobileConfig } from '@/components/iso/figures/agrita-mobile/config'
+import { makeStackFigure } from '@/components/iso/stack/make-stack-figure'
 
-export default stubFigure({ id: 'agrita-mobile', fig: 5, title: 'AgriTA Mobile', hint: 'stack anatomy coming soon' })
+export default makeStackFigure(agritaMobileConfig)
