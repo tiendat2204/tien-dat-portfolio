@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { libraryModel, PRESS_AT, stampPress, type LibraryState } from '../../src/components/iso/figures/library/model'
+import { cardAt, CARD_LAND, CARD_REST, hookAt, libraryModel, OPEN, PRESS_AT, stampPress, type LibraryState } from '../../src/components/iso/figures/library/model'
 import type { FigureInput } from '../../src/components/iso/figure-contract'
 
 const BROWSING = '40,000+ books · browsing'
@@ -91,4 +91,36 @@ test('step leaves its input state untouched', () => {
   const copy = structuredClone(before)
   libraryModel.step(before, 0.5, { progress: 1, pointer: { x: 1, y: 0 } })
   assert.deepEqual(before, copy)
+})
+
+const near = (a: number[], b: number[], tolerance = 1e-6) => a.every((value, index) => Math.abs(value - b[index]) < tolerance)
+
+test('the hoist hook holds the card from the lift until the card is stamped, and is above it otherwise', () => {
+  for (let index = 0; index <= 1000; index++) {
+    const flow = index / 1000
+    const hook = hookAt(flow)
+    const card = cardAt(flow)
+    if (hook.holding) assert.ok(near(hook.at, card.at), `hook on the card at flow ${flow}`)
+    else assert.ok(hook.at[2] >= card.at[2] - 1e-9, `hook never below the card it is not holding, at flow ${flow}`)
+  }
+  // It holds the card for the whole carry: whenever the card is off the drawer floor and off the desk.
+  for (let index = 0; index <= 1000; index++) {
+    const flow = index / 1000
+    const card = cardAt(flow)
+    const resting = Math.abs(card.at[2] - CARD_REST[2]) < 1e-6 || (card.tilt > 1 - 1e-9 && Math.abs(card.at[2] - CARD_LAND[2]) < 1e-6)
+    if (!resting) assert.ok(hookAt(flow).holding, `card carried without the hook at flow ${flow}`)
+  }
+  assert.ok(!hookAt(0).holding && hookAt(0).at[2] > cardAt(0).at[2] + 10)
+  assert.ok(!hookAt(1).holding && hookAt(1).at[2] > cardAt(1).at[2] + 10)
+})
+
+test('the hook waits over the open drawer and moves without jumps', () => {
+  const parked = hookAt(0).at
+  assert.ok(near([parked[0], parked[1]], [CARD_REST[0], CARD_REST[1] + OPEN]))
+  let last = hookAt(0).at
+  for (let index = 1; index <= 2000; index++) {
+    const next = hookAt(index / 2000).at
+    assert.ok(Math.hypot(next[0] - last[0], next[1] - last[1], next[2] - last[2]) < 1, `jump at flow ${index / 2000}`)
+    last = next
+  }
 })

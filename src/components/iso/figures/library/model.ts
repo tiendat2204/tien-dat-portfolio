@@ -8,36 +8,43 @@ export type Point = [number, number, number]
 // The catalog size from the CV, shown in the readout.
 const CATALOG = '40,000+ books'
 
-// How far the picked drawer slides out on its rails, in world units along +y.
-export const OPEN = 40
+// How far the picked drawer slides out on its rails, in world units along +y: far enough to bring the picked card
+// clear of the cabinet top and under the hoist's line.
+export const OPEN = 31
 // How far a hover or an arrow key pulls the neighbouring drawer, at most.
 export const PEEK = 9
 
 // The picked card, by the centre of its bottom edge: standing in the closed drawer, lifted clear of the drawer, over
 // the loan desk, down on the desk beside the stamp, and slid under the stamp.
-export const CARD_REST: Point = [-86, -27, 66.5]
+export const CARD_REST: Point = [-86, -27, 67]
 export const CARD_LIFT = 24
 const CARD_OVER: Point = [30, 4, 56]
 const CARD_DOWN: Point = [30, 4, 44]
 export const CARD_LAND: Point = [62, 4, 44]
 // The card is drawn in front of the drawer's contents (not inside them) once it has risen this far.
-export const CARD_CLEAR = 17
+const CARD_CLEAR = 17
 // The arc the card follows over the gap between the cabinet and the desk.
 const CARD_ARC = 10
 
 // How far the stamp's plunger travels down to meet the card.
 export const STAMP_TRAVEL = 9.5
 
-// The loan, in shares of `flow`: the drawer opens, the card lifts, crosses, sets down and slides, the stamp presses
-// and lifts. The stamp reaches the card at PRESS_AT, which is when the loan is recorded.
+// How far the hoist's hook rises off the stamped card once it lets go.
+const HOOK_OFF = 22
+
+// The loan, in shares of `flow`: the drawer opens, the hoist's hook comes down onto the card, the card lifts, crosses,
+// sets down and slides, the stamp presses and lifts, and the hook lets go. The stamp reaches the card at PRESS_AT,
+// which is when the loan is recorded.
 const PHASE = {
-  open: [0, 0.35],
+  open: [0, 0.27],
+  grip: [0.27, 0.35],
   lift: [0.35, 0.43],
   cross: [0.43, 0.6],
   down: [0.6, 0.64],
   slide: [0.64, 0.7],
   press: [0.7, 0.8],
   release: [0.8, 0.9],
+  leave: [0.86, 0.98],
 } as const
 export const PRESS_AT = PHASE.press[1]
 
@@ -88,6 +95,32 @@ export function cardAt (flow: number): CardPose {
   }
   if (flow < PHASE.slide[0]) return { at: mix(CARD_OVER, CARD_DOWN, share(flow, PHASE.down)), tilt: 1, clear: true }
   return { at: mix(CARD_DOWN, CARD_LAND, share(flow, PHASE.slide)), tilt: 1, clear: true }
+}
+
+type HookPose = {
+  // The point of the card the hook holds it by (the centre of its bottom edge), or where that point would be.
+  at: Point
+  // True while the hook carries the card: then `at` is the card's own `at`.
+  holding: boolean
+  // True once the hook is above the drawer's walls: it is then drawn over the cabinet, like the card.
+  clear: boolean
+}
+
+// The hoist carries the card from the drawer to the desk. It waits over the open drawer, comes down onto the card,
+// holds it through the lift, the crossing, the set-down and the slide, and rises off it once the stamp has lifted.
+export function hookAt (flow: number): HookPose {
+  const open: Point = [CARD_REST[0], CARD_REST[1] + OPEN, CARD_REST[2]]
+  if (flow < PHASE.lift[0]) {
+    const drop = share(flow, PHASE.grip)
+    const at: Point = [open[0], open[1], open[2] + CARD_LIFT * (1 - drop)]
+    return { at, holding: false, clear: at[2] - open[2] >= CARD_CLEAR }
+  }
+  if (flow < PHASE.leave[0]) {
+    const card = cardAt(flow)
+    return { at: card.at, holding: true, clear: card.clear }
+  }
+  const rise = share(flow, PHASE.leave) * HOOK_OFF
+  return { at: [CARD_LAND[0], CARD_LAND[1], CARD_LAND[2] + rise], holding: rise <= 0, clear: true }
 }
 
 export type LibraryState = {
