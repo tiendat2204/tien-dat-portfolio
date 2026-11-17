@@ -128,3 +128,102 @@ test('engine functions are pure', () => {
   }
   assert.deepEqual(CONFIG, snapshot)
 })
+
+const FIVE: StackConfig = {
+  ...CONFIG,
+  steps: [
+    { layer: 1, prompt: 'curl /api/v1/farms', lines: ['@Get()', 'findAll ()'], result: '200 OK' },
+    { layer: 3, prompt: 'psql', lines: ['select * from farms;'], result: '12 rows' },
+  ],
+}
+
+// Down-travel window of layer k of n.
+function windowOf (k: number, n: number): [number, number] {
+  return [0.15 + 0.5 * k / n, 0.15 + 0.5 * (k + 1) / n]
+}
+
+function mid (k: number, n: number): number {
+  const [a, b] = windowOf(k, n)
+  return (a + b) / 2
+}
+
+function charsOf (block: { prompt: string, typed: string[] }): number {
+  return block.prompt.length + block.typed.reduce((s, l) => s + l.length, 0)
+}
+
+test('terminalAt types each step only inside its layer window', () => {
+  const inZero = terminalAt(FIVE, mid(0, 5))
+  assert.ok(inZero.blocks.every(b => charsOf(b) === 0 && !b.done))
+  const inOne = terminalAt(FIVE, mid(1, 5))
+  assert.ok(charsOf(inOne.blocks[0]) > 0 && !inOne.blocks[0].done)
+  assert.equal(charsOf(inOne.blocks[1]), 0)
+  assert.equal(inOne.cursor.block, 0)
+  assert.equal(stackPose(mid(1, 5), 5).active, 1)
+  const inTwo = terminalAt(FIVE, mid(2, 5))
+  assert.ok(inTwo.blocks[0].done && inTwo.blocks[0].result === '200 OK')
+  assert.equal(charsOf(inTwo.blocks[1]), 0)
+  const inThree = terminalAt(FIVE, mid(3, 5))
+  assert.ok(charsOf(inThree.blocks[1]) > 0 && !inThree.blocks[1].done)
+  assert.equal(inThree.cursor.block, 1)
+  assert.equal(stackPose(mid(3, 5), 5).active, 3)
+})
+
+test('terminalAt splits a shared layer window between its steps in order', () => {
+  const shared: StackConfig = {
+    ...CONFIG,
+    steps: [
+      { layer: 2, prompt: 'first', lines: ['a'], result: 'one' },
+      { layer: 2, prompt: 'second', lines: ['b'], result: 'two' },
+    ],
+  }
+  const [a, b] = windowOf(2, 5)
+  const early = terminalAt(shared, a + (b - a) * 0.25)
+  assert.ok(charsOf(early.blocks[0]) > 0 && !early.blocks[0].done)
+  assert.equal(charsOf(early.blocks[1]), 0)
+  const late = terminalAt(shared, a + (b - a) * 0.75)
+  assert.ok(late.blocks[0].done)
+  assert.ok(charsOf(late.blocks[1]) > 0 && !late.blocks[1].done)
+  assert.equal(late.cursor.block, 1)
+})
+
+test('terminalAt is monotone and complete by 0.65 for unsorted and out-of-range layers', () => {
+  const messy: StackConfig = {
+    ...CONFIG,
+    steps: [
+      { layer: 9, prompt: 'deploy', lines: ['ok'], result: 'live' },
+      { layer: 2, prompt: 'build', lines: ['tsc'], result: 'built' },
+      { layer: -4, prompt: 'start', lines: [''], result: 'up' },
+    ],
+  }
+  for (const config of [FIVE, messy, CONFIG]) {
+    let last = 0
+    for (const p of sweep(400)) {
+      const len = terminalAt(config, p).blocks.reduce((s, b) => s + charsOf(b), 0)
+      assert.ok(len >= last, `typed shrank at ${p}`)
+      last = len
+    }
+    for (const p of [0.65, 0.8, 1]) {
+      const state = terminalAt(config, p)
+      state.blocks.forEach((b, i) => {
+        assert.equal(b.done, true, `block ${i} not done at ${p}`)
+        assert.equal(b.result, config.steps[i].result)
+      })
+    }
+  }
+  assert.ok(charsOf(terminalAt(messy, mid(0, 5)).blocks[2]) > 0)
+  assert.equal(charsOf(terminalAt(messy, mid(3, 5)).blocks[0]), 0)
+  assert.ok(charsOf(terminalAt(messy, mid(4, 5)).blocks[0]) > 0)
+})
+
+test('terminalAt works for 1 and 8 layers', () => {
+  for (const count of [1, 8]) {
+    const layers = Array.from({ length: count }, (_, i) => ({ id: `l${i}`, label: `l${i}`, tech: [`t${i}`] }))
+    const config: StackConfig = { ...CONFIG, layers, steps: layers.map((_, i) => ({ layer: i, prompt: `p${i}`, lines: [`line ${i}`], result: `r${i}` })) }
+    for (const p of sweep(50)) {
+      const state = terminalAt(config, p)
+      assert.equal(state.blocks.length, count)
+      assert.ok(state.cursor.block >= 0 && state.cursor.block < count)
+    }
+    assert.ok(terminalAt(config, 0.65).blocks.every(b => b.done))
+  }
+})
