@@ -248,6 +248,18 @@
     margin-right: -50vw;
     width: 100vw;
   }
+  .shell-output {
+    opacity: 0;
+  }
+  .shell-output[data-shown] {
+    opacity: 1;
+    transition: opacity 0.25s ease-out;
+  }
+  @media (scripting: none), (prefers-reduced-motion: reduce) {
+    .shell-output {
+      opacity: 1;
+    }
+  }
   .signature {
     fill: none;
     stroke: currentColor;

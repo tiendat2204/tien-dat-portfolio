@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { AwardCard } from '@/components/AwardCard'
-import BlurFadeText from '@/components/magicui/blur-fade-text'
+import { ShellPrompt } from '@/components/shell-prompt'
 import { ProjectCard } from '@/components/project-card'
 import { ResumeCard } from '@/components/resume-card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -119,15 +119,9 @@ export default function Page () {
               </div>
 
               <div className='flex items-center justify-between border-y'>
-                <div className='flex min-w-0 items-center'>
-                  <span aria-hidden='true' className='pl-3 font-ibm text-lg text-muted-foreground sm:pl-4 sm:text-xl'>$</span>
-                  <BlurFadeText
-                    delay={BLUR_FADE_DELAY}
-                    className='min-w-0 truncate text-2xl font-extrabold tracking-tight sm:text-3xl font-doto pl-2 pr-3 sm:pr-4'
-                    yOffset={0}
-                    text={DATA.name}
-                  />
-                </div>
+                <ShellPrompt command='whoami' className='min-w-0 px-3 py-1.5 sm:px-4'>
+                  <span className='block truncate font-doto text-2xl font-extrabold tracking-tight sm:text-3xl'>{DATA.name}</span>
+                </ShellPrompt>
                 <div className='size-6 shrink-0 mr-3 sm:mr-4'>
                   <Icons.Logo />
                 </div>

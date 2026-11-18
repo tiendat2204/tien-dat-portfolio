@@ -60,7 +60,8 @@ export function Footer () {
 
       <div className='flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b px-4 py-3'>
         <span className='whitespace-nowrap'>
-          <span className='text-muted-foreground'>~/</span>{host}
+          <span className='text-emerald-600 dark:text-emerald-400'>➜</span>
+          <span className='ml-2 text-cyan-600 dark:text-cyan-400'>~/{host}</span>
           <span className='ml-0.5 inline-block h-4 w-2 translate-y-0.5 bg-foreground motion-safe:animate-pulse' />
         </span>
         <Status status='online'>
