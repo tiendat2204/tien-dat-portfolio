@@ -12,7 +12,6 @@ import { SITE_INFO, UMAMI_WEBSITE_ID } from '@/data/config'
 import { SEO_PROFILE } from '@/data/seo'
 import Script from 'next/script'
 import Section from '@/components/landing/section'
-import TransitionProvider from '@/components/TransitionProvider'
 import { CommandMenu } from '@/components/command-menu'
 import { UiEffects } from '@/components/ui-effects'
 import { KeyboardShortcuts } from '@/components/keyboard-shortcuts'
@@ -133,33 +132,31 @@ export default async function RootLayout ({
         )}
         suppressHydrationWarning
       >
-        <TransitionProvider>
-          <Section
-            className='overflow-x-clip w-full'
-            crossesOffset='lg:translate-y-[3.15rem]'
-            customPaddings
-            id='hero'
-          >
+        <Section
+          className='overflow-x-clip w-full'
+          crossesOffset='lg:translate-y-[3.15rem]'
+          customPaddings
+          id='hero'
+        >
 
-            <ReactLenis root />
-            <TooltipProvider delayDuration={0}>
+          <ReactLenis root />
+          <TooltipProvider delayDuration={0}>
 
-              <Providers>
-                <Header stars={stars} />
+            <Providers>
+              <Header stars={stars} />
 
-                {children}
-                <Footer />
-                <CommandMenu
-                  posts={getAllPosts().map((p) => ({ slug: p.slug, title: p.metadata.title }))}
-                  components={getAllComponents().map((c) => ({ slug: c.slug, title: c.metadata.title }))}
-                />
-                <UiEffects />
-                <KeyboardShortcuts />
-              </Providers>
-            </TooltipProvider>
+              {children}
+              <Footer />
+              <CommandMenu
+                posts={getAllPosts().map((p) => ({ slug: p.slug, title: p.metadata.title }))}
+                components={getAllComponents().map((c) => ({ slug: c.slug, title: c.metadata.title }))}
+              />
+              <UiEffects />
+              <KeyboardShortcuts />
+            </Providers>
+          </TooltipProvider>
 
-          </Section>
-        </TransitionProvider>
+        </Section>
         {UMAMI_WEBSITE_ID && (
           <Script
             src='https://cloud.umami.is/script.js'
