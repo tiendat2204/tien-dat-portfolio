@@ -21,6 +21,7 @@ import {
 */
 
 const CHAIN = 5
+const CHAIN_LABELS = ['land lot', 'season', 'harvest', 'stock', 'product']
 const BLOCK_W = 96
 const BLOCK_H = 48
 const BLOCK_Y = 226
@@ -61,7 +62,7 @@ export function AgritaDiagram () {
           <g key={i}>
             <g style={rise(a, a + 0.06, 0, 8)}>
               <rect x={x} y={BLOCK_Y} width={BLOCK_W} height={BLOCK_H} className='dg-fill' />
-              <path d={`M${x + 24} ${cy}H${x + 72}`} className='dg-edge' style={{ strokeWidth: 6 }} />
+              <text x={x + BLOCK_W / 2} y={cy} textAnchor='middle'>{CHAIN_LABELS[i]}</text>
             </g>
             {i < CHAIN - 1 ? <path d={`M${x + BLOCK_W} ${cy}H${x + 124}`} pathLength={1} className='dg-edge' style={draw(a + 0.04, a + 0.08)} /> : null}
             <rect x={x} y={BLOCK_Y} width={BLOCK_W} height={BLOCK_H} className='dg-wash' style={pulse(passAt(i) - 0.03, passAt(i) + 0.08, 0.02)} />
