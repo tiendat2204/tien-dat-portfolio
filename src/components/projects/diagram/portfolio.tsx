@@ -66,7 +66,7 @@ export function PortfolioDiagram () {
         </g>
         <path d='M572 44A5 5 0 1 0 573 54A4 4 0 0 1 572 44Z' className='dg-solid' style={fade(0.82, 0.88)} />
       </g>
-      <text x={590} y={49} textAnchor='end' className='dg-dim dg-small' style={fade(0.78, 0.86)}>theme</text>
+      <text x={556} y={49} textAnchor='end' className='dg-dim dg-small' style={fade(0.78, 0.86)}>theme</text>
 
       {/* the build facts */}
       <g style={fade(0.9, 0.96)}>

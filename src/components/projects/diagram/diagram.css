@@ -1,0 +1,82 @@
+/* Hand-drawn project diagrams: colours come from the site tokens so both themes follow the page. */
+.dg-section {
+  --p: 0;
+}
+@media (scripting: none) {
+  .dg-section {
+    --p: 1;
+  }
+}
+
+.dg {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: hsl(var(--foreground));
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+.dg text {
+  dominant-baseline: central;
+  fill: currentColor;
+  font-size: 11px;
+}
+.dg .dg-dim {
+  fill: hsl(var(--muted-foreground));
+}
+.dg .dg-small {
+  font-size: 9px;
+}
+.dg .dg-line,
+.dg .dg-edge,
+.dg .dg-accent {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.2;
+}
+.dg .dg-line {
+  stroke: hsl(var(--foreground) / 0.8);
+}
+.dg .dg-edge {
+  stroke: hsl(var(--border));
+}
+.dg .dg-accent {
+  stroke: hsl(var(--primary));
+}
+.dg .dg-fill {
+  fill: hsl(var(--card));
+  stroke: hsl(var(--border));
+}
+.dg .dg-solid {
+  fill: hsl(var(--primary));
+}
+.dg .dg-ink {
+  fill: hsl(var(--foreground));
+}
+.dg .dg-wash {
+  fill: hsl(var(--primary) / 0.14);
+}
+.dg .dg-dash {
+  stroke-dasharray: 3 3;
+}
+.dg text.dg-on {
+  fill: hsl(var(--primary-foreground));
+}
+
+/* The frame of a figure slot (fig caption, dotted ground). */
+.dg-frame {
+  position: relative;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem;
+  background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
+  background-size: 14px 14px;
+  padding: 0.75rem;
+}
+.dg-caption {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.75rem;
+  font: 10px/1 var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0.04em;
+  color: hsl(var(--muted-foreground));
+}

@@ -1,4 +1,4 @@
-import { draw, fade, pulse, rise, travel } from '@/components/projects/diagram/anim'
+import { draw, fade, pulse, rise, seg, travel } from '@/components/projects/diagram/anim'
 
 // AgriTA mobile: a phone with the tasks list ticking, a camera snap into a journal entry, a dropped connection that
 // parks the entry in the offline outbox, and the queue flying up to the server once signal returns.
@@ -45,7 +45,7 @@ export function AgritaMobileDiagram () {
       {/* the journal entry that holds the photo, then waits for signal */}
       <rect x={60} y={346} width={104} height={36} rx={4} className='dg-edge dg-dash' style={fade(0.42, 0.48)} />
       <g style={rise(0.42, 0.5, 0, -10)}>
-        <g style={travel(0.56, 0.68, 220, 0)}>
+        <g style={{ ...travel(0.56, 0.68, 220, 0), opacity: `calc(1 - ${seg(0.76, 0.8)})` }}>
           <rect x={60} y={346} width={104} height={36} rx={4} className='dg-fill' />
           <rect x={66} y={352} width={24} height={24} rx={3} className='dg-edge' />
           <path d='M69 372L76 362L81 368L84 364L88 372Z' className='dg-line' />
@@ -57,7 +57,7 @@ export function AgritaMobileDiagram () {
       {/* bottom nav */}
       <path d='M52 404H218' className='dg-edge' style={fade(0.08, 0.14)} />
       {TABS.map((t, i) => (
-        <text key={t} x={73 + i * 41} y={424} textAnchor='middle' className={i === 1 ? 'dg-small' : 'dg-dim dg-small'} style={fade(0.08, 0.14)}>{t}</text>
+        <text key={t} x={66 + i * 46} y={424} textAnchor='middle' className={i === 1 ? 'dg-small' : 'dg-dim dg-small'} style={fade(0.08, 0.14)}>{t}</text>
       ))}
 
       {/* connectivity */}
@@ -89,7 +89,7 @@ export function AgritaMobileDiagram () {
         <text x={456} y={76} className='dg-dim dg-small'>server</text>
         <path d='M456 88H600' className='dg-edge' />
       </g>
-      <path d='M392 330C420 330 420 262 440 252' pathLength={1} className='dg-accent dg-dash' style={draw(0.74, 0.82)} />
+      <path d='M392 330C420 330 420 262 440 252' pathLength={1} className='dg-accent dg-dash' style={{ ...draw(0.74, 0.82), opacity: `calc(1 - ${seg(0.9, 0.95)})` }} />
       {[0, 1, 2].map((i) => {
         const y = 108 + i * 42
         const a = 0.86 + i * 0.035

@@ -53,7 +53,7 @@ export function BetatruyenDiagram () {
         <circle cx={354} cy={128} r={8} className='dg-fill' />
         <path d='M370 124H430' className='dg-line' />
         <path d='M370 134H590M346 152H590' className='dg-edge' style={{ strokeWidth: 4 }} />
-        <text x={348} y={118} className='dg-dim dg-small'>comment</text>
+        <text x={450} y={124} className='dg-dim dg-small'>comment</text>
       </g>
       {[0, 1].map((i) => (
         <g key={i} style={{ ...rise(0.54 + i * 0.07, 0.6 + i * 0.07, 0, 8), transformOrigin: `${380}px ${190 + i * 40}px` }}>
