@@ -1,94 +1,49 @@
-import { insetPlan, iso, planOutline, slabOf, type Plan, type Projection, type SolidPaths } from '@/components/iso/kit/iso-kit'
+// Geometry of the AgriTA figure: the land lots on the TA Farm map and the QR matrix. All numbers are viewBox units (640 x 520).
 
-// The pure geometry of the AgriTA figure: the exploded frontend stack (kit isometry), the TA Farm land lots and the
-// QR matrix on the product label. All numbers are viewBox units (640 x 520).
-
-// --- The stack: five boards of the apps' real frontend layers (figures/agrita/config.ts), top board first --------------
-
-export type Layer = { id: string, label: string, tech: string }
-
-export const LAYERS: Layer[] = [
-  { id: 'ui', label: 'ui', tech: 'React 19 · shadcn/ui' },
-  { id: 'routes', label: 'routes', tech: 'TanStack Router' },
-  { id: 'data', label: 'data', tech: 'Query · Zustand' },
-  { id: 'forms', label: 'forms', tech: 'Hook Form · Zod' },
-  { id: 'api', label: 'api', tech: 'Axios · OpenAPI' },
-]
-
-const PLAN: Plan = { x: -38, y: -26, w: 76, d: 52, r: 3 }
-const THICK = 4
-const PITCH = 6
-const OPEN = 18
-// A lower camera than the kit's default keeps each opened board's label clear of the board above.
-const ELEVATION = 22
-export const PROJ: Projection = { origin: [420, 190], scale: 1, elevation: ELEVATION }
-
-// Screen px one world z unit rises: cos(elevation) * the kit's unit.
-const Z_PX = Math.cos((ELEVATION * Math.PI) / 180) * Math.sqrt(1.6)
-
-export type Board = {
-  layer: Layer
-  n: number
-  solid: SolidPaths
-  inset: string
-  label: [number, number]
-  root: [number, number]
-  balloon: [number, number]
-  lift: number
-}
-
-// Board k (0 = bottom = api) assembled at z = k * PITCH; `lift` is how far (screen px) it rises when the stack opens.
-export const BOARDS: Board[] = LAYERS.map((layer, i) => {
-  const k = LAYERS.length - 1 - i
-  const z = k * PITCH
-  const top = z + THICK
-  const root = iso([PLAN.x + PLAN.w, PLAN.y + PLAN.r, top - THICK / 2], PROJ)
-  const balloon: [number, number] = [root[0] + 30, root[1] - 9]
-  return {
-    layer,
-    n: i + 1,
-    solid: slabOf(PLAN, z, THICK, PROJ),
-    inset: planOutline(insetPlan(PLAN, 7), top, PROJ),
-    label: iso([9, 7, top], PROJ),
-    root,
-    balloon,
-    lift: k * OPEN * Z_PX,
-  }
-}).reverse()
-
-export const AXIS_X = PROJ.origin[0]
-export const AXIS_TOP = BOARDS[BOARDS.length - 1]!.label[1] - BOARDS[BOARDS.length - 1]!.lift - 28
-export const AXIS_BOTTOM = iso([0, 0, -6], PROJ)[1]
-
-// --- TA Farm: land lot polygons on the map panel, lot B being edited with Geoman -----------------------------------------
+// --- The map: land lot polygons, the second one being the lot in edit mode ---------------------------------------------
 
 export const LOTS = [
-  'M62 70L150 60L166 122L76 138Z',
-  'M176 66L278 58L298 126L192 132Z',
-  'M304 86L322 90L322 150L300 142Z',
-  'M86 146L198 140L212 184L96 190Z',
-  'M216 140L296 134L312 178L226 186Z',
+  'M48 62L150 50L168 112L62 126Z',
+  'M184 54L300 46L322 118L206 130Z',
+  'M338 50L440 56L452 124L350 130Z',
+  'M470 60L590 54L584 128L478 134Z',
+  'M72 140L196 134L206 180L84 184Z',
+  'M228 144L352 140L360 182L238 186Z',
 ]
 export const ACTIVE_LOT = 1
-export const LOT_VERTICES: [number, number][] = [[176, 66], [278, 58], [298, 126], [192, 132]]
-export const LOT_MIDPOINTS: [number, number][] = LOT_VERTICES.map(([x, y], i) => {
-  const [nx, ny] = LOT_VERTICES[(i + 1) % LOT_VERTICES.length]!
-  return [(x + nx) / 2, (y + ny) / 2]
-})
-// The same lot as a thumbnail on the trace page (scaled into a 60 x 44 box).
-export const LOT_THUMB = 'M556 350L598 347L606 375L562 378Z'
+export const LOT_VERTICES: [number, number][] = [[184, 54], [300, 46], [322, 118], [206, 130]]
+// The same lot as a thumbnail on the trace page.
+export const LOT_THUMB = 'M548 348L592 345L600 374L556 378Z'
 
-// --- The QR matrix on the label: three finder patterns and a seeded data field (decorative, encodes nothing) ------------
+// --- The QR matrix: version 2 layout (25 modules), finders, timing rows, one alignment pattern, seeded data ---------------
 
-export const QR_N = 21
-export const QR_CELL = 4.4
-export const QR_X = 32
-export const QR_Y = 338
+export const QR_N = 25
+export const QR_CELL = 7.2
+export const QR_X = 24
+export const QR_Y = 310
 export const QR_SIZE = QR_N * QR_CELL
-const BANDS = 7
+export const QR_FINDERS: [number, number][] = [[0, 0], [0, QR_N - 7], [QR_N - 7, 0]]
+const ALIGN = 18
+const BANDS = 5
 
+const cell = (r: number, c: number) => `M${QR_X + c * QR_CELL} ${QR_Y + r * QR_CELL}h${QR_CELL}v${QR_CELL}h${-QR_CELL}z`
 const inFinder = (r: number, c: number) => (r < 8 && c < 8) || (r < 8 && c >= QR_N - 8) || (r >= QR_N - 8 && c < 8)
+const inAlign = (r: number, c: number) => Math.abs(r - ALIGN) <= 2 && Math.abs(c - ALIGN) <= 2
 
+// The fixed modules: the timing rows and the alignment pattern.
+function fixedCells () {
+  let d = ''
+  for (let i = 8; i < QR_N - 8; i += 2) d += cell(6, i) + cell(i, 6)
+  for (let r = ALIGN - 2; r <= ALIGN + 2; r++) {
+    for (let c = ALIGN - 2; c <= ALIGN + 2; c++) {
+      const ring = Math.max(Math.abs(r - ALIGN), Math.abs(c - ALIGN))
+      if (ring !== 1) d += cell(r, c)
+    }
+  }
+  return d
+}
+
+// The data field in diagonal bands so it can fill in progressively (decorative, encodes nothing).
 function dataBands () {
   let seed = 7
   const next = () => {
@@ -98,14 +53,14 @@ function dataBands () {
   const bands: string[] = Array.from({ length: BANDS }, () => '')
   for (let r = 0; r < QR_N; r++) {
     for (let c = 0; c < QR_N; c++) {
-      const on = next() % 100 < 48
-      if (!on || inFinder(r, c)) continue
+      const on = next() % 100 < 44
+      if (!on || inFinder(r, c) || inAlign(r, c) || r === 6 || c === 6) continue
       const band = Math.min(BANDS - 1, Math.floor(((r + c) / (2 * QR_N - 2)) * BANDS))
-      bands[band] += `M${QR_X + c * QR_CELL} ${QR_Y + r * QR_CELL}h${QR_CELL}v${QR_CELL}h${-QR_CELL}z`
+      bands[band] += cell(r, c)
     }
   }
   return bands
 }
 
-export const QR_FINDERS: [number, number][] = [[0, 0], [0, QR_N - 7], [QR_N - 7, 0]]
+export const QR_FIXED = fixedCells()
 export const QR_BANDS = dataBands()
