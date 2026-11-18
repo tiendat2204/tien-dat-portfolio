@@ -20,10 +20,25 @@ const NEXT = { name: 'Next.js', icon: 'skills/nextjs.svg', iconDark: 'skills/nex
 const TS = { name: 'TypeScript', icon: 'skills/typescript.svg' }
 const TAILWIND = { name: 'Tailwind CSS', icon: 'skills/tailwindcss.svg' }
 const SHADCN = { name: 'shadcn/ui', icon: 'skills/shadcn.svg', iconDark: 'skills/shadcn-dark.svg' }
-const TANSTACK = { name: 'TanStack Query', icon: 'skills/tanstack.svg', iconDark: 'skills/tanstack-dark.svg' }
 const VITE = { name: 'Vite', icon: 'skills/vite.svg' }
 const ZOD = { name: 'Zod', icon: 'skills/zod.svg' }
-const REDUX = { name: 'Redux', icon: 'skills/redux.svg' }
+
+const tech = (name: string, icon?: string, iconDark?: string) => ({
+  name,
+  ...(icon ? { icon: `skills/${icon}` } : {}),
+  ...(iconDark ? { iconDark: `skills/${iconDark}` } : {}),
+})
+const REDUX_TK = tech('Redux Toolkit', 'redux.svg')
+const RHF = tech('React Hook Form', 'react-hook-form.svg')
+const AXIOS = tech('Axios', 'axios.svg')
+const ROUTER = tech('React Router', 'react-router.svg')
+const ZUSTAND = tech('Zustand', 'zustand.svg')
+const TANSTACK_ALL = tech('TanStack', 'tanstack.svg', 'tanstack-dark.svg')
+const VITEST = tech('Vitest', 'vitest.svg')
+const PLAYWRIGHT = tech('Playwright', 'playwright.svg')
+const TIPTAP = tech('Tiptap', 'tiptap.png')
+const MSW = tech('MSW', 'msw.svg')
+const RECHARTS = tech('Recharts')
 
 export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
   {
@@ -41,21 +56,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
       'Designed mobile-first responsive layouts with clean animations and transitions',
       'Set up analytics to track user engagement and content performance',
     ],
-    technologies: [
-      NEXT,
-      TS,
-      TAILWIND,
-      SHADCN,
-      { name: 'Framer Motion', icon: 'skills/motion.svg', iconDark: 'skills/motion-dark.svg' },
-      { name: 'Vercel', icon: 'skills/vercel.svg', iconDark: 'skills/vercel-dark.svg' },
-      { name: 'GitHub', icon: 'skills/github.svg', iconDark: 'skills/github-dark.svg' },
-      REACT,
-      { name: 'JavaScript', icon: 'skills/javascript.svg' },
-      { name: 'Figma', icon: 'skills/figma.svg' },
-      { name: 'Postman', icon: 'skills/postman.svg' },
-      { name: 'VSCode', icon: 'skills/vscode.svg' },
-      { name: 'WebStorm', icon: 'skills/webstorm.svg' },
-    ],
+    technologies: [REACT, NEXT, TS, TAILWIND, SHADCN, tech('MDX', 'mdx.svg'), tech('Motion', 'motion.svg', 'motion-dark.svg'), tech('GSAP', 'gsap.svg'), tech('Vercel', 'vercel.svg', 'vercel-dark.svg'), tech('GitHub', 'github.svg', 'github-dark.svg')],
     links: [
       { type: 'Website', href: 'https://tiendat.work/' },
       { type: 'Source', href: 'https://github.com/tiendat2204/tien-dat-portfolio' },
@@ -75,23 +76,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
       'TA Farm: land lots on a map (Leaflet with Geoman over MapLibre GL), crop seasons, work tasks, cultivation logs, harvest lots, warehouse stock',
       'TA Market: storefronts, cart, checkout, seller orders and public QR trace pages; Vitest, Playwright and axe-core tests',
     ],
-    technologies: [
-      REACT,
-      TS,
-      VITE,
-      NEXT,
-      { name: 'TanStack Router/Query/Table', icon: 'skills/tanstack.svg', iconDark: 'skills/tanstack-dark.svg' },
-      TAILWIND,
-      SHADCN,
-      { name: 'Zustand', icon: 'skills/zustand.svg' },
-      { name: 'React Hook Form', icon: 'skills/react-hook-form.svg' },
-      ZOD,
-      { name: 'MapLibre GL', icon: 'skills/maplibre.svg' },
-      { name: 'Leaflet + Geoman', icon: 'skills/leaflet.svg' },
-      { name: 'Recharts' },
-      { name: 'Playwright', icon: 'skills/playwright.svg' },
-      { name: 'Vitest', icon: 'skills/vitest.svg' },
-    ],
+    technologies: [REACT, TS, VITE, NEXT, TAILWIND, SHADCN, TANSTACK_ALL, ZUSTAND, RHF, ZOD, AXIOS, tech('MapLibre GL', 'maplibre.svg'), tech('Leaflet', 'leaflet.svg'), tech('Geoman', 'geoman.png'), RECHARTS, VITEST, PLAYWRIGHT],
     links: [],
     figureId: 'agrita',
   },
@@ -105,7 +90,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
       'Built business workflow features and secure APIs for an e-office system',
       'Delivered an automated approval system that reduced approval workflow time by 70%',
     ],
-    technologies: [REACT, TS, VITE, TAILWIND, { name: 'TanStack Query', icon: 'skills/tanstack.svg', iconDark: 'skills/tanstack-dark.svg' }, REDUX],
+    technologies: [REACT, TS, VITE, TAILWIND, SHADCN, ROUTER, TANSTACK_ALL, REDUX_TK, RHF, ZOD, AXIOS],
     links: [],
     figureId: 'eoffice',
   },
@@ -123,20 +108,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
       'Manages 40,000+ books with 1,000+ active users',
       'Built with Next.js 16 and React 19, TanStack Query and Table, Redux Toolkit and Zustand, React Hook Form and Zod, Tiptap and Playwright end-to-end tests',
     ],
-    technologies: [
-      NEXT,
-      REACT,
-      TS,
-      { name: 'TanStack Query/Table', icon: 'skills/tanstack.svg', iconDark: 'skills/tanstack-dark.svg' },
-      { name: 'Redux Toolkit', icon: 'skills/redux.svg' },
-      { name: 'Zustand', icon: 'skills/zustand.svg' },
-      TAILWIND,
-      SHADCN,
-      { name: 'React Hook Form', icon: 'skills/react-hook-form.svg' },
-      ZOD,
-      { name: 'Tiptap' },
-      { name: 'Playwright', icon: 'skills/playwright.svg' },
-    ],
+    technologies: [NEXT, REACT, TS, TAILWIND, SHADCN, TANSTACK_ALL, REDUX_TK, ZUSTAND, RHF, ZOD, TIPTAP, PLAYWRIGHT],
     links: [],
     figureId: 'library',
   },
@@ -152,15 +124,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
       'Cultivation journal with camera photo upload, and harvest create, list and detail screens',
       'Notifications, a sync center and an offline journal outbox, with weather on the home dashboard',
     ],
-    technologies: [
-      { name: 'Flutter', icon: 'skills/flutter.svg' },
-      { name: 'Dart', icon: 'skills/dart.svg' },
-      { name: 'Riverpod', icon: 'skills/riverpod.svg' },
-      { name: 'dio' },
-      { name: 'go_router' },
-      { name: 'shadcn_ui', icon: 'skills/shadcn.svg', iconDark: 'skills/shadcn-dark.svg' },
-      { name: 'fl_chart', icon: 'skills/fl-chart.svg' },
-    ],
+    technologies: [tech('Flutter', 'flutter.svg'), tech('Dart', 'dart.svg'), tech('Riverpod', 'riverpod.svg'), tech('dio', 'dio.png'), tech('go_router', 'flutter.svg'), SHADCN, tech('fl_chart', 'fl-chart.svg'), tech('Sentry', 'sentry.svg')],
     links: [],
     figureId: 'agrita-mobile',
   },
@@ -176,20 +140,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
       'Vite SPA with React 19 and TypeScript: file-based TanStack Router with zod-validated URL search state, TanStack Query and Table, Zustand, React Hook Form and Zod',
       'Accessible forms and page states, per-route code splitting with a first-load size budget, Vitest with MSW and Playwright tests',
     ],
-    technologies: [
-      VITE,
-      REACT,
-      TS,
-      { name: 'TanStack Router/Query/Table', icon: 'skills/tanstack.svg', iconDark: 'skills/tanstack-dark.svg' },
-      { name: 'Zustand', icon: 'skills/zustand.svg' },
-      { name: 'React Hook Form', icon: 'skills/react-hook-form.svg' },
-      ZOD,
-      TAILWIND,
-      SHADCN,
-      { name: 'Vitest', icon: 'skills/vitest.svg' },
-      { name: 'Playwright', icon: 'skills/playwright.svg' },
-      { name: 'MSW', icon: 'skills/msw.svg' },
-    ],
+    technologies: [VITE, REACT, TS, TAILWIND, SHADCN, TANSTACK_ALL, ZUSTAND, RHF, ZOD, AXIOS, VITEST, MSW, PLAYWRIGHT],
     links: [],
     figureId: 'tangni',
   },
@@ -203,7 +154,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
       'Modules for accounts, roles, companies, investors, work items, city and ward lookups and a dashboard, plus a form-template editor with rich text and drawing',
       'Data tables with filter operators such as between and empty',
     ],
-    technologies: [VITE, REACT, TS, { name: 'React Router', icon: 'skills/react-router.svg' }, { name: 'Redux Toolkit', icon: 'skills/redux.svg' }, TANSTACK, { name: 'TanStack Table', icon: 'skills/tanstack.svg', iconDark: 'skills/tanstack-dark.svg' }, { name: 'React Hook Form', icon: 'skills/react-hook-form.svg' }, ZOD, { name: 'Axios', icon: 'skills/axios.svg' }, TAILWIND, { name: 'dnd-kit', icon: 'skills/dnd-kit.svg' }, { name: 'Tiptap' }],
+    technologies: [VITE, REACT, TS, TAILWIND, ROUTER, REDUX_TK, TANSTACK_ALL, RHF, ZOD, AXIOS, tech('dnd-kit', 'dnd-kit.svg'), TIPTAP, RECHARTS],
     links: [],
     figureId: 'xn2',
   },
@@ -221,16 +172,7 @@ export const PROJECT_PAGE_ENTRIES: ProjectPageEntry[] = [
       'Secure authentication with JWT and Django REST Framework, CI/CD with GitHub Actions',
       'Built reusable components and hooks',
     ],
-    technologies: [
-      NEXT,
-      REACT,
-      SHADCN,
-      TANSTACK,
-      TAILWIND,
-      { name: 'Django', icon: 'skills/django.svg' },
-      { name: 'PostgreSQL', icon: 'skills/postgresql.svg' },
-      { name: 'Python', icon: 'skills/python.svg' },
-    ],
+    technologies: [NEXT, REACT, SHADCN, TAILWIND, TANSTACK_ALL, REDUX_TK, RHF, ZOD, AXIOS, tech('Django', 'django.svg'), tech('GitHub Actions', 'github.svg', 'github-dark.svg')],
     links: [],
     figureId: 'betatruyen',
   },
