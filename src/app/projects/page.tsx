@@ -56,7 +56,7 @@ export default function ProjectsPage () {
     buildProjectsCollectionJsonLd(SITE_INFO.url, sections.map(section => ({ id: section.id, title: section.title, description: section.summary[0] }))),
   ]
   return (
-    <main className='mx-auto w-full max-w-3xl border-x pb-24 lg:max-w-[1360px] 2xl:max-w-[1600px]'>
+    <main className='mx-auto w-full max-w-3xl border-x pb-24 lg:max-w-[min(1360px,calc(100vw-14rem))] 2xl:max-w-[min(1600px,calc(100vw-14rem))]'>
       <script
         type='application/ld+json'
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
