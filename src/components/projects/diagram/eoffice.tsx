@@ -1,87 +1,145 @@
 import type { CSSProperties } from 'react'
 
-import { draw, fade, seg, travel } from '@/components/projects/diagram/anim'
+import { fade, pulse, rise, seg, travel } from '@/components/projects/diagram/anim'
 
-// E-Office: a document page wireframe (title, text bars, a table of cells) and, at its right, the approval track
-// draft -> review -> active with a lock before the last step. Over --p (see anim.ts): draw the page and the track
-// (0-0.25), the status block walks draft -> review, the lock opens and it walks on to active (0.25-0.75), the
-// stamp lands on the page and the status cells turn solid (0.75-0.95).
+/*
+  E-Office, one wireframe: the document page (title, a status pill, the documents table with its name / status / rev
+  columns) and, at its right, the four steps of changing a status: the `set active` menu item, the role guard lock,
+  the file upload, the toast. Below, the frontend stack as five cells that light up as the action passes through them.
+  Beats of `--p`: 0-0.18 the ghosted scene comes to full strength; 0.2-0.78 the action walks the right column and
+  the stack (ui -> routes -> forms -> data -> api); 0.8-0.95 the pill flips draft -> active, the stamp lands, the toast.
+*/
 
-const PAGE = { x: 64, y: 48, w: 320, h: 424 }
-const COLS = [96, 160, 224, 288, 352]
-const ROWS = [212, 242, 272, 302, 332]
-const TRACK_X = 480
-const NODES = [130, 260, 390]
-const STAGES = ['draft', 'review', 'active'] as const
-const LOCK_Y = 334
-const STAMP = { cx: 316, cy: 418, r: 32 }
+const PAGE = { x: 30, y: 30, w: 360, h: 288 }
+const COLS = [48, 196, 290, 372]
+const HEAD_Y = 104
+const ROW_H = 26
+const ROWS = 4
+const ACTED = 1
+const rowY = (i: number) => HEAD_Y + 24 + i * ROW_H
+const PILL = { x: 300, y: 44, w: 72, h: 20 }
+const STAMP = { x: 302, y: 244, s: 60 }
 
-// A solid bar standing in for a line of text.
-function Bar ({ x, y, w, ink, width = 5, style }: { x: number, y: number, w: number, ink?: boolean, width?: number, style?: CSSProperties }) {
-  return <path d={`M${x} ${y}H${x + w}`} className={ink ? 'dg-line' : 'dg-edge'} style={{ strokeWidth: width, ...style }} />
-}
+const CARD = { x: 420, w: 190, h: 56 }
+const cardY = (i: number) => 30 + i * 72
+const STEPS = [
+  { text: 'set active', at: 0.2 },
+  { text: 'role guard', at: 0.32 },
+  { text: 'upload', at: 0.44 },
+] as const
+const TOAST_AT = 0.88
 
-// The table grid as one hairline path.
-const GRID = [
-  ...ROWS.map((y) => `M${COLS[0]} ${y}H${COLS[COLS.length - 1]}`),
-  ...COLS.map((x) => `M${x} ${ROWS[0]}V${ROWS[ROWS.length - 1]}`),
-].join('')
+// The stack strip: label / main tech per layer of the config, in the order the action touches them.
+const CELL = { y: 356, w: 100, h: 56, gap: 16 }
+const cellX = (i: number) => 38 + i * (CELL.w + CELL.gap)
+const LAYERS = [
+  { label: 'ui', tech: 'React 19', at: 0.2 },
+  { label: 'routes', tech: 'React Router', at: 0.32 },
+  { label: 'forms', tech: 'Zod 4', at: 0.44 },
+  { label: 'data', tech: 'TanStack Query', at: 0.56 },
+  { label: 'api', tech: 'Axios', at: 0.68 },
+] as const
+const RUN: [number, number] = [0.2, 0.78]
+
+const CMD = '$ npx vite build'
+const CMD_X = 38
+const CMD_Y = 460
+const CMD_W = CMD.length * 6.6
+
+// Everything drawn at p=0 is a ghost (0.3) that comes to full strength over the first beat.
+const GHOST: CSSProperties = { opacity: `calc(0.3 + 0.7 * ${seg(0, 0.18)})` }
+const bar = (w: number): CSSProperties => ({ strokeWidth: w })
+const SMALL: CSSProperties = { fontSize: 10 }
 
 export function EofficeDiagram () {
   return (
-    <svg viewBox='0 0 640 520' role='img' aria-label='E-Office: a document page wireframe with a title, text lines and a table; a three-step approval track draft, review, active with a lock before the last step; the status block walks the track, the lock opens and a stamp lands on the page' className='dg'>
-      {/* ---- the page ---- */}
-      <rect x={PAGE.x} y={PAGE.y} width={PAGE.w} height={PAGE.h} pathLength={1} className='dg-fill' style={{ ...draw(0, 0.12), fillOpacity: `${seg(0.1, 0.16)}` }} />
-      <Bar x={96} y={84} w={150} ink width={6} style={fade(0.08, 0.14)} />
-      <Bar x={96} y={100} w={90} width={3} style={fade(0.1, 0.16)} />
-      <rect x={304} y={78} width={48} height={12} className='dg-edge' style={fade(0.1, 0.16)} />
-      <rect x={304} y={78} width={48} height={12} className='dg-solid' style={fade(0.9, 0.95)} />
-      {[136, 152, 168, 184].map((y, i) => (
-        <Bar key={y} x={96} y={y} w={[256, 232, 256, 176][i] ?? 200} style={fade(0.12 + i * 0.02, 0.18 + i * 0.02)} />
-      ))}
-      <path d={GRID} pathLength={1} className='dg-edge' style={draw(0.16, 0.26)} />
-      {ROWS.slice(0, -1).map((y, i) => (
-        <g key={y} style={fade(0.2 + i * 0.015, 0.26 + i * 0.015)}>
-          <Bar x={COLS[0] + 12} y={y + 15} w={36} width={4} />
-          <Bar x={COLS[1] + 12} y={y + 15} w={24} width={4} />
-          <Bar x={COLS[2] + 12} y={y + 15} w={30} width={4} />
-          <rect x={COLS[3] + 28} y={y + 11} width={8} height={8} className='dg-edge' />
-        </g>
-      ))}
-      {/* the approved row's status cell */}
-      <rect x={COLS[3] + 28} y={ROWS[1] + 11} width={8} height={8} className='dg-solid' style={fade(0.88, 0.93)} />
-      <Bar x={96} y={364} w={200} style={fade(0.22, 0.28)} />
-      <Bar x={96} y={380} w={140} style={fade(0.24, 0.3)} />
+    <svg
+      viewBox='0 0 640 520'
+      role='img'
+      aria-label='E-Office: a document page with a name, status and rev table; the set active menu item, a role guard lock, a file upload and a status updated toast; the status pill flips from draft to active and a stamp lands; below, the stack cells ui, routes, forms, data and api light up in turn'
+      className='dg'
+    >
+      <g style={GHOST}>
+        {/* ---- the document page ---- */}
+        <rect x={PAGE.x} y={PAGE.y} width={PAGE.w} height={PAGE.h} className='dg-fill' />
+        <text x={48} y={54} className='dg-dim'>documents/:id</text>
+        <path d='M48 78H214' className='dg-line' style={bar(6)} />
+        <rect x={PILL.x} y={PILL.y} width={PILL.w} height={PILL.h} className='dg-fill' />
+        <text x={PILL.x + PILL.w / 2} y={PILL.y + PILL.h / 2} textAnchor='middle' style={{ opacity: `calc(1 - ${seg(0.82, 0.86)})` }}>draft</text>
+        {/* the table: header row with its real columns, then rows of bars */}
+        <path d={`M${COLS[0]} ${HEAD_Y}H${COLS[3]}M${COLS[0]} ${HEAD_Y + 24}H${COLS[3]}`} className='dg-line' />
+        <path d={`${[1, 2].map((i) => `M${COLS[i]} ${HEAD_Y}V${rowY(ROWS)}`).join('')}${Array.from({ length: ROWS }, (_, i) => `M${COLS[0]} ${rowY(i + 1)}H${COLS[3]}`).join('')}`} className='dg-edge' />
+        <text x={COLS[0] + 10} y={HEAD_Y + 12}>name</text>
+        <text x={COLS[1] + 10} y={HEAD_Y + 12}>status</text>
+        <text x={COLS[2] + 10} y={HEAD_Y + 12}>rev</text>
+        {Array.from({ length: ROWS }, (_, i) => (
+          <g key={i}>
+            <path d={`M${COLS[0] + 10} ${rowY(i) + 13}H${COLS[0] + [120, 96, 110, 76][i]}`} className='dg-edge' style={bar(5)} />
+            <rect x={COLS[1] + 12} y={rowY(i) + 9} width={8} height={8} className='dg-edge' />
+            <path d={`M${COLS[2] + 10} ${rowY(i) + 13}H${COLS[2] + [30, 24, 40, 24][i]}`} className='dg-edge' style={bar(5)} />
+          </g>
+        ))}
+        <path d='M48 256H200M48 272H160' className='dg-edge' style={bar(5)} />
 
-      {/* ---- the stamp lands ---- */}
-      <g style={{ ...fade(0.78, 0.86), transformBox: 'fill-box', transformOrigin: 'center', transform: `rotate(-12deg) scale(calc(1.8 - 0.8 * ${seg(0.78, 0.88)}))` }}>
-        <rect x={STAMP.cx - STAMP.r} y={STAMP.cy - STAMP.r} width={STAMP.r * 2} height={STAMP.r * 2} className='dg-accent' style={{ strokeWidth: 2.5 }} />
-        <rect x={STAMP.cx - STAMP.r + 7} y={STAMP.cy - STAMP.r + 7} width={STAMP.r * 2 - 14} height={STAMP.r * 2 - 14} className='dg-wash dg-accent' />
-        <path d={`M${STAMP.cx - 16} ${STAMP.cy}H${STAMP.cx + 16}`} className='dg-accent' style={{ strokeWidth: 6 }} />
+        {/* ---- the right column: the three steps and the toast ---- */}
+        {STEPS.map((s, i) => (
+          <g key={s.text}>
+            <rect x={CARD.x} y={cardY(i)} width={CARD.w} height={CARD.h} className='dg-fill' />
+            <text x={CARD.x + 60} y={cardY(i) + CARD.h / 2}>{s.text}</text>
+          </g>
+        ))}
+        <rect x={CARD.x} y={cardY(3)} width={CARD.w} height={CARD.h} className='dg-edge dg-dash' />
+        {/* the menu bullet, the lock, the upload tray */}
+        <rect x={CARD.x + 22} y={cardY(0) + 22} width={12} height={12} className='dg-edge' />
+        <rect x={CARD.x + 18} y={cardY(1) + 24} width={20} height={16} className='dg-fill' style={{ stroke: 'currentColor' }} />
+        <path d={`M${CARD.x + 22} ${cardY(1) + 24}V${cardY(1) + 15}H${CARD.x + 34}V${cardY(1) + 24}`} className='dg-line' style={{ ...travel(0.34, 0.42, 0, -7), strokeWidth: 1.5 }} />
+        <path d={`M${CARD.x + 16} ${cardY(2) + 34}v8h24v-8`} className='dg-line' />
+        <path d={`M${CARD.x + 28} ${cardY(2) + 36}V${cardY(2) + 16}m-6 6l6 -6l6 6`} className='dg-line' style={{ ...travel(0.46, 0.54, 0, -6), strokeWidth: 1.5 }} />
+
+        {/* ---- the stack strip ---- */}
+        {LAYERS.map((l, i) => (
+          <g key={l.label}>
+            <rect x={cellX(i)} y={CELL.y} width={CELL.w} height={CELL.h} className='dg-fill' />
+            <text x={cellX(i) + CELL.w / 2} y={CELL.y + 18} textAnchor='middle' className='dg-dim' style={SMALL}>{l.label}</text>
+            <text x={cellX(i) + CELL.w / 2} y={CELL.y + 38} textAnchor='middle' style={SMALL}>{l.tech}</text>
+          </g>
+        ))}
+        <text x={CMD_X} y={CMD_Y} textLength={CMD_W} lengthAdjust='spacing'>{CMD}</text>
       </g>
 
-      {/* ---- the approval track ---- */}
-      <path d={`M${TRACK_X} ${NODES[0]}V${NODES[1]}`} pathLength={1} className='dg-edge' style={draw(0.06, 0.14)} />
-      <path d={`M${TRACK_X} ${NODES[1]}V${NODES[2]}`} pathLength={1} className='dg-edge dg-dash' style={draw(0.14, 0.22)} />
-      <path d={`M${TRACK_X} ${NODES[1]}V${NODES[2]}`} pathLength={1} className='dg-accent' style={draw(0.6, 0.66)} />
-      {NODES.map((y, i) => (
-        <g key={y} style={fade(0.04 + i * 0.06, 0.1 + i * 0.06)}>
-          <rect x={TRACK_X - 11} y={y - 11} width={22} height={22} className='dg-fill' />
-          <text x={TRACK_X + 26} y={y}>{STAGES[i]}</text>
+      {/* ---- the action: each step and its layer light up in turn ---- */}
+      {STEPS.map((s, i) => (
+        <rect key={s.text} x={CARD.x} y={cardY(i)} width={CARD.w} height={CARD.h} className='dg-wash' style={pulse(s.at, s.at + 0.12, 0.03)} />
+      ))}
+      <rect x={CARD.x + 18} y={cardY(1) + 24} width={20} height={16} className='dg-wash' style={fade(0.4, 0.44)} />
+      <rect x={COLS[0] + 2} y={rowY(ACTED) + 1} width={COLS[3] - COLS[0] - 4} height={ROW_H - 2} className='dg-wash' style={pulse(0.56, 0.68, 0.03)} />
+      {LAYERS.map((l, i) => (
+        <g key={l.label}>
+          <rect x={cellX(i)} y={CELL.y} width={CELL.w} height={CELL.h} className='dg-wash' style={pulse(l.at, l.at + 0.12, 0.03)} />
+          <rect x={cellX(i)} y={CELL.y} width={CELL.w} height={CELL.h} className='dg-accent' style={pulse(l.at + 0.02, l.at + 0.1, 0.02)} />
         </g>
       ))}
-      {/* the lock before `active`: its shackle lifts once the request is reviewed */}
-      <g style={fade(0.18, 0.24)}>
-        <path d={`M${TRACK_X - 6} ${LOCK_Y - 6}V${LOCK_Y - 15}H${TRACK_X + 6}V${LOCK_Y - 6}`} className='dg-line' style={{ ...travel(0.5, 0.58, 0, -7), strokeWidth: 1.5 }} />
-        <rect x={TRACK_X - 10} y={LOCK_Y - 6} width={20} height={16} className='dg-fill' style={{ stroke: 'currentColor' }} />
-        <rect x={TRACK_X - 10} y={LOCK_Y - 6} width={20} height={16} className='dg-wash' style={fade(0.56, 0.6)} />
+      {/* the packet rides the top of the strip, cell to cell, under the action */}
+      <rect x={cellX(0) + CELL.w / 2 - 5} y={CELL.y - 16} width={10} height={10} className='dg-solid' style={{ ...travel(RUN[0], RUN[1], 4 * (CELL.w + CELL.gap)), ...pulse(RUN[0] - 0.02, RUN[1] + 0.02) }} />
+
+      {/* ---- the result: the row and the pill turn active, the stamp lands, the toast ---- */}
+      <rect x={COLS[1] + 12} y={rowY(ACTED) + 9} width={8} height={8} className='dg-solid' style={fade(0.8, 0.84)} />
+      <rect x={PILL.x} y={PILL.y} width={PILL.w} height={PILL.h} className='dg-solid' style={fade(0.82, 0.86)} />
+      <text x={PILL.x + PILL.w / 2} y={PILL.y + PILL.h / 2} textAnchor='middle' className='dg-on' style={fade(0.84, 0.88)}>active</text>
+      <g style={{ ...fade(0.84, 0.9), transformBox: 'fill-box', transformOrigin: 'center', transform: `rotate(-10deg) scale(calc(1.6 - 0.6 * ${seg(0.84, 0.92)}))` }}>
+        <rect x={STAMP.x} y={STAMP.y} width={STAMP.s} height={STAMP.s} className='dg-accent' style={bar(2.5)} />
+        <rect x={STAMP.x + 6} y={STAMP.y + 6} width={STAMP.s - 12} height={STAMP.s - 12} className='dg-wash dg-accent' />
+        <text x={STAMP.x + STAMP.s / 2} y={STAMP.y + STAMP.s / 2} textAnchor='middle' style={{ fill: 'hsl(var(--primary))' }}>active</text>
       </g>
-      {/* the status block walks the track */}
-      <g style={travel(0.3, 0.44, 0, NODES[1] - NODES[0])}>
-        <g style={travel(0.62, 0.76, 0, NODES[2] - NODES[1])}>
-          <rect x={TRACK_X - 7} y={NODES[0] - 7} width={14} height={14} className='dg-solid' style={fade(0.24, 0.3)} />
-        </g>
+      <g style={rise(TOAST_AT, TOAST_AT + 0.06, 0, 10)}>
+        <rect x={CARD.x} y={cardY(3)} width={CARD.w} height={CARD.h} className='dg-fill' style={{ stroke: 'hsl(var(--primary))' }} />
+        <rect x={CARD.x + 22} y={cardY(3) + 22} width={12} height={12} className='dg-solid' />
+        <text x={CARD.x + 48} y={cardY(3) + CARD.h / 2}>status updated</text>
       </g>
+
+      {/* the block cursor rides the typed line */}
+      <rect x={CMD_X - 1} y={CMD_Y - 8} width={CMD_W + 2} height={16} style={{ fill: 'hsl(var(--card))', transform: `translate(calc(${seg(0.2, 0.3)} * ${CMD_W + 2}px), 0)` }} />
+      <rect x={CMD_X} y={CMD_Y - 7} width={6} height={14} className='dg-ink' style={travel(0.2, 0.3, CMD_W)} />
     </svg>
   )
 }
