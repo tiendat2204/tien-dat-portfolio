@@ -1,26 +1,53 @@
-// Geometry of the AgriTA figure: the land lots on the TA Farm map and the QR matrix. All numbers are viewBox units (640 x 520).
+// Geometry and words of the AgriTA figure. All numbers are viewBox units (640 x 520).
 
-// --- The map: land lot polygons, the second one being the lot in edit mode ---------------------------------------------
+// --- The TA Farm map (y 24..140): land lot polygons, the first one being the lot picked for editing -------------------
 
+export const MAP = { x: 24, y: 24, w: 592, h: 116 }
 export const LOTS = [
-  'M48 62L150 50L168 112L62 126Z',
-  'M184 54L300 46L322 118L206 130Z',
-  'M338 50L440 56L452 124L350 130Z',
-  'M470 60L590 54L584 128L478 134Z',
-  'M72 140L196 134L206 180L84 184Z',
-  'M228 144L352 140L360 182L238 186Z',
+  'M40 65L145 58L164 92L54 99Z',
+  'M180 60L300 56L323 95L203 102Z',
+  'M340 58L445 61L457 98L352 102Z',
+  'M476 64L600 60L594 100L484 104Z',
+  'M65 107L193 104L203 129L77 131Z',
+  'M226 109L354 107L362 130L236 132Z',
 ]
-export const ACTIVE_LOT = 1
-export const LOT_VERTICES: [number, number][] = [[184, 54], [300, 46], [322, 118], [206, 130]]
+export const ACTIVE_LOT = 0
+export const LOT_VERTICES: [number, number][] = [[40, 65], [145, 58], [164, 92], [54, 99]]
+export const LOT_LABEL: [number, number] = [100, 79]
 // The same lot as a thumbnail on the trace page.
-export const LOT_THUMB = 'M548 348L592 345L600 374L556 378Z'
+export const LOT_THUMB = 'M392 266L462 262L472 300L400 306Z'
+
+// --- The data chain (y 160..196): five blocks, one per entity of the chain ---------------------------------------------
+
+export const CHAIN = ['land lot', 'season', 'harvest', 'stock', 'product']
+export const BLOCK = { y: 160, w: 96, h: 36, step: 124 }
+export const blockX = (i: number) => 24 + i * BLOCK.step
+
+// --- The product QR (right, y 220..332) and the public trace page on TA Market (left) ----------------------------------
+
+export const QR_FRAME = { x: 512, y: 220, w: 104, h: 112 }
+export const PAGE = { x: 24, y: 220, w: 464, h: 112 }
+export const TRACE = [...CHAIN].reverse()
+export const rowY = (i: number) => 255 + i * 17
+
+// --- The stack strip (y 360..444): one cell per layer of src/components/iso/figures/agrita/config.ts ------------------
+
+export const STACK: { label: string, tech: string, lit: [number, number] }[] = [
+  { label: 'ui', tech: 'React 19', lit: [0.18, 0.32] },
+  { label: 'routes', tech: 'TanStack Router', lit: [0.76, 0.94] },
+  { label: 'data', tech: 'TanStack Query', lit: [0.42, 0.58] },
+  { label: 'forms', tech: 'React Hook Form', lit: [0.32, 0.42] },
+  { label: 'api', tech: 'Axios', lit: [0.58, 0.74] },
+]
+export const CELL = { y: 360, w: 104, h: 84, step: 122 }
+export const cellX = (i: number) => 24 + i * CELL.step
 
 // --- The QR matrix: version 2 layout (25 modules), finders, timing rows, one alignment pattern, seeded data ---------------
 
 export const QR_N = 25
-export const QR_CELL = 7.2
-export const QR_X = 24
-export const QR_Y = 310
+export const QR_CELL = 3.84
+export const QR_X = 516
+export const QR_Y = 228
 export const QR_SIZE = QR_N * QR_CELL
 export const QR_FINDERS: [number, number][] = [[0, 0], [0, QR_N - 7], [QR_N - 7, 0]]
 const ALIGN = 18
