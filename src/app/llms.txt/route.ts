@@ -1,5 +1,6 @@
 import { getAllComponents, getAllPosts } from '@/data/blog'
 import { SITE_INFO } from '@/data/config'
+import { buildProjectSections } from '@/data/projects-page'
 import { DATA } from '@/data/resume'
 
 // llms.txt (https://llmstxt.org): a plain-text summary of the site for AI agents,
@@ -21,6 +22,7 @@ export function GET () {
     '## Pages',
     `- [Home](${base}/): profile, skills, experience, projects and awards`,
     `- [Blog](${base}/blog): articles on frontend work and life as a developer`,
+    `- [Projects](${base}/projects): selected projects with the stack behind each one`,
     `- [Uses](${base}/uses): how I build with AI coding agents (Claude Code, Codex, GitHub Copilot) and my tools`,
     `- [Components](${base}/components): open-source React components, installable with the shadcn CLI`,
     '',
@@ -43,6 +45,9 @@ export function GET () {
     '',
     '## Awards',
     ...DATA.awards.map((a) => `- ${a.title} (${a.dates}, ${a.location})`),
+    '',
+    '## Projects',
+    ...buildProjectSections().map((p) => `- [${p.title}](${base}/projects#${p.id}): ${p.summary[0]}`),
     '',
     '## Blog posts',
     ...getAllPosts().map((p) => `- [${p.metadata.title}](${base}/blog/${p.slug}): ${p.metadata.description ?? ''}`.trimEnd()),

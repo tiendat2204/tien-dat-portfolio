@@ -10,6 +10,7 @@ import { ProjectsScroller } from '@/components/projects/projects-scroller'
 import { SITE_INFO } from '@/data/config'
 import { buildProjectSections } from '@/data/projects-page'
 import { SEO_PROFILE } from '@/data/seo'
+import { buildBreadcrumbJsonLd, buildProjectsCollectionJsonLd } from '@/lib/seo/jsonld'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 
 export const metadata = buildPageMetadata({
@@ -50,8 +51,16 @@ const monogram = (name: string) => {
 
 export default function ProjectsPage () {
   const sections = buildProjectSections()
+  const jsonLd = [
+    buildBreadcrumbJsonLd(SITE_INFO.url, [{ name: 'Home', path: '/' }, { name: 'Projects', path: '/projects' }]),
+    buildProjectsCollectionJsonLd(SITE_INFO.url, sections.map(section => ({ id: section.id, title: section.title, description: section.summary[0] }))),
+  ]
   return (
     <main className='mx-auto w-full max-w-3xl border-x pb-24 lg:max-w-[1360px] 2xl:max-w-[1600px]'>
+      <script
+        type='application/ld+json'
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
       <section id='projects-header' className='relative screen-line-after'>
         <Icon className='absolute -bottom-3 -left-3 z-20 size-6 text-black dark:text-white' />
         <Icon className='absolute -right-3 -bottom-3 z-20 size-6 text-black dark:text-white' />

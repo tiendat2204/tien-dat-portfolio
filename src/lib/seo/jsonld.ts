@@ -1,6 +1,7 @@
 import type {
   BlogPosting,
   BreadcrumbList,
+  CollectionPage,
   Person,
   ProfilePage,
   SoftwareSourceCode,
@@ -197,5 +198,30 @@ export function buildComponentJsonLd (
     runtimePlatform: 'React',
     ...(publishedDate !== undefined ? { datePublished: publishedDate } : {}),
     author: { '@id': personId(safeSiteUrl) },
+  }
+}
+
+// The /projects page: a CollectionPage whose ItemList names each project and links to its section anchor.
+export function buildProjectsCollectionJsonLd (
+  siteUrl: string,
+  projects: { id: string; title: string; description: string }[]
+): WithContext<CollectionPage> {
+  const safeSiteUrl = getSafeSiteUrl(siteUrl)
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Projects',
+    url: buildCanonicalUrl(safeSiteUrl, '/projects'),
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: projects.map((project, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: project.title,
+        description: project.description,
+        url: `${buildCanonicalUrl(safeSiteUrl, '/projects')}#${project.id}`,
+      })),
+    },
   }
 }

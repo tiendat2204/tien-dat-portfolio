@@ -6,6 +6,7 @@ import {
   buildBreadcrumbJsonLd,
   buildComponentJsonLd,
   buildProfilePageJsonLd,
+  buildProjectsCollectionJsonLd,
   buildWebSiteJsonLd,
 } from '../../src/lib/seo/jsonld'
 
@@ -164,4 +165,16 @@ test('buildComponentJsonLd describes a SoftwareSourceCode page under /components
   assert.equal(r.datePublished, '2024-12-06T00:00:00.000Z')
   assert.deepEqual(r.author, { '@id': 'https://tiendat.work/#person' })
   assert.equal(r.programmingLanguage, 'TypeScript')
+})
+
+test('buildProjectsCollectionJsonLd lists each project with its section anchor', () => {
+  const result = buildProjectsCollectionJsonLd('https://tiendat.work', [
+    { id: 'agrita', title: 'AgriTA', description: 'Agricultural SaaS' },
+    { id: 'eoffice', title: 'E-Office', description: 'Approval workflow' },
+  ])
+  const items = (result.mainEntity as unknown as { itemListElement: { position: number; url: string }[] }).itemListElement
+
+  assert.equal(result['@type'], 'CollectionPage')
+  assert.deepEqual(items.map(item => item.position), [1, 2])
+  assert.match(items[0].url, /\/projects\/?#agrita$/)
 })
