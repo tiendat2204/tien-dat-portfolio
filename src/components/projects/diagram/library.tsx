@@ -223,7 +223,7 @@ export function LibraryDiagram () {
       {/* the terminal line and the title block */}
       <defs>
         <mask id='lib-typed' maskUnits='userSpaceOnUse'>
-          <rect x={24} y={448} height={20} fill='#fff' style={typed(0.92, 0.975, COMMAND.length, CH)} />
+          <rect x={24 + 2 * CH} y={448} height={20} fill='#fff' style={typed(0.92, 0.975, COMMAND.length, CH)} />
         </mask>
       </defs>
       <g style={fade(0.9, 0.93)}>
