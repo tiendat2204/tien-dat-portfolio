@@ -61,7 +61,6 @@ export function TangniDiagram () {
         <circle cx={528} cy={88} r={14} className='dg-wash dg-accent' />
         <path d='M521 88L526 93L536 82' className='dg-accent' />
       </g>
-      <text x={528} y={118} textAnchor='middle' className='dg-small' style={fade(0.82, 0.88)} />
 
       {/* public lookup */}
       <text x={24} y={304} className='dg-dim dg-small' style={fade(0.64, 0.7)}>public · lookup</text>
