@@ -1,245 +1,123 @@
 import { draw, fade, pulse, rise, seg, travel } from '@/components/projects/diagram/anim'
-import {
-  between,
-  crosshairs,
-  dimDuring,
-  explode,
-  FACE_TEXT,
-  FRONT,
-  grow,
-  LAYERS,
-  LEFT,
-  lift,
-  RIGHT,
-  round,
-  SLAB,
-  SLAB_INSET,
-  TOP,
-} from '@/components/projects/diagram/agrita-mobile-parts'
 
-// AgriTA Mobile, as a spec sheet. Left: the field worker's phone (home dashboard with the weather, today's tasks,
-// the camera journal, the sync center). Right: the app's six layers as an exploded axonometric stack with numbered
-// balloons, three of which also point at the part of the screen they draw. Over scroll: `flutter run` and the
-// phone (0-0.2), the stack opens (0.2-0.52), a camera journal entry is written while the signal is gone and parks in
-// the outbox on the sync layer (0.54-0.8), the signal returns and the queue rides the bus up to the external AgriTA
-// API (0.8-1). Progress 0..1 (see anim.ts); geometry in agrita-mobile-parts.ts.
+// AgriTA Mobile, wireframed: the field worker's phone (status bar, weather, today's tasks, the camera journal, the tab
+// bar), a queue of journal cards and the server. Over scroll: the wireframe draws itself (0-0.25); a journal entry is
+// captured, the signal drops and the entry waits in the offline queue with two more (0.25-0.75); the signal returns
+// and the queue flushes to the server (0.75-0.95). Progress 0..1 is `--p` (see anim.ts).
 
-const DOTO = { fontFamily: 'var(--font-doto)' } as const
+// `--p`-driven opacity that dips to `low` between a and b (the signal bars while offline).
+const dimDuring = (a: number, b: number, low: number) => ({
+  opacity: `calc(1 - ${1 - low} * min(${seg(a, a + 0.03)}, 1 - ${seg(b - 0.03, b)}))`,
+})
 
-const TASKS = ['scout pests · area A', 'irrigation check', 'fertiliser log']
-const TABS: [string, number][] = [['tasks', 70], ['journal', 110], ['harvest', 154], ['sync', 192]]
-const SIDE = 'side · fl_chart · image_picker · speech_to_text · Sentry'
-// The terminal line is typed one character at a time (a tspan each, 6.6 px per mono character at 11 px).
 const COMMAND = 'flutter run'.split('')
 const TYPE_STEP = 0.1 / COMMAND.length
+const CHAR_W = 6.6
 
-// Balloon k sits in the gutter at the height of its open plate; three also lead to the phone.
-const BALLOON_X = 282
-const balloonY = (k: number) => round(LEFT[1] - lift(k))
-const TO_PHONE: Partial<Record<number, number>> = { 0: 104, 3: 258, 5: 336 }
+const TASKS = [164, 190, 216]
+const TABS = [82, 118, 154, 190]
+// The entry card is born in the viewfinder, parks in the queue, then flies to the server and dissolves into it.
+const BORN: [number, number] = [148, 300]
+const QUEUE: [number, number] = [388, 304]
+const SERVER: [number, number] = [548, 128]
 
-// The journal entry card: born in the viewfinder, parked on the sync plate, then flown up the bus to the API.
-const CARD_W = 40
-const CARD_H = 20
-const CARD_AT: [number, number] = [126, 280]
-const PARK: [number, number] = [round(TOP[0]), round(TOP[1] - 4)]
-const BUS_X = 600
-const BUS_Y = round(FRONT[1] - 44)
-const API_AT: [number, number] = [BUS_X, 58]
-// The dashed centerline grows up from under the sync plate.
-const AXIS_FOOT = round(FRONT[1] + 12)
-
-const PITCH_LIFT = (k: number) => lift(k)
-
-function Plate ({ k }: { k: number }) {
-  const layer = LAYERS[k]
-  const a = 0.2 + (LAYERS.length - 1 - k) * 0.012
-  return (
-    <g style={{ ...explode(k, 0.3, 0.42), opacity: seg(a, a + 0.05) }}>
-      <path className='iso-fill' d={SLAB.fill} />
-      {SLAB.shades.map((d, shade) => d && <path key={shade} className='iso-shade' data-shade={shade} d={d} />)}
-      <path className='iso-top' d={SLAB.top} />
-      <path className='iso-line' data-tone='faint' strokeWidth={0.7} d={SLAB.crease} />
-      {SLAB.bevel && <path className='iso-line' data-tone='faint' strokeWidth={0.7} d={SLAB.bevel} />}
-      <path className='iso-line' data-tone='faint' strokeWidth={0.7} d={SLAB_INSET} />
-      <path className='iso-line' data-tone='mid' strokeWidth={0.9} d={SLAB.outline} />
-      <text transform={FACE_TEXT} className='dg-dim' style={{ fontSize: 9 }}>{layer.tech}</text>
-      {k === 5 && <path d={`M${TOP[0] - 30} ${TOP[1]}l14 7l30 -15l-14 -7z`} className='dg-edge dg-dash' />}
-    </g>
-  )
-}
-
-function Balloon ({ k }: { k: number }) {
-  const y = balloonY(k)
-  const a = 0.42 + k * 0.016
-  const phoneY = TO_PHONE[k]
+function Card () {
   return (
     <g>
-      <path d={`M${BALLOON_X + 8} ${y}L${round(LEFT[0])} ${y}`} pathLength={1} className='dg-line' strokeWidth={0.8} style={draw(a, a + 0.04)} />
-      <circle cx={round(LEFT[0])} cy={y} r={1.4} className='dg-ink' style={fade(a + 0.03, a + 0.05)} />
-      {phoneY !== undefined && (
-        <path d={`M${BALLOON_X - 8} ${y}L${236} ${phoneY}H216`} pathLength={1} className='dg-accent' strokeWidth={0.8} style={draw(0.5, 0.56)} />
-      )}
-      <g style={rise(a + 0.02, a + 0.06, 0, 4)}>
-        <circle cx={BALLOON_X} cy={y} r={8} className='dg-fill' />
-        <text x={BALLOON_X} y={y} textAnchor='middle' style={{ fontSize: 10 }}>{k + 1}</text>
-        <text x={546} y={round(RIGHT[1] - PITCH_LIFT(k) - 7)} style={{ fontSize: 10 }}>{LAYERS[k].id}</text>
-      </g>
-    </g>
-  )
-}
-
-function EntryCard ({ check = false }: { check?: boolean }) {
-  return (
-    <g>
-      <rect x={-CARD_W / 2} y={-CARD_H / 2} width={CARD_W} height={CARD_H} className='dg-fill' />
-      <rect x={-CARD_W / 2 + 3} y={-CARD_H / 2 + 3} width={14} height={14} className='dg-edge' />
-      <path d={`M${-CARD_W / 2 + 4.5} ${CARD_H / 2 - 4.5}l4 -5l3 3l2 -2l3 4`} className='dg-line' strokeWidth={0.8} />
-      <path d={`M${-CARD_W / 2 + 20} ${-4}h14M${-CARD_W / 2 + 20} ${1}h10`} className='dg-edge' />
-      {check && <path d={`M${CARD_W / 2 - 10} 5l2.5 2.5l5 -5.5`} pathLength={1} className='dg-accent' strokeWidth={1.4} style={draw(0.96, 1)} />}
+      <rect x={-30} y={-17} width={60} height={34} className='dg-fill' style={{ stroke: 'currentColor' }} />
+      <rect x={-23} y={-9} width={18} height={18} className='dg-wash' />
+      <path d='M4 -6h18M4 4h12' className='dg-edge' strokeWidth={4} />
     </g>
   )
 }
 
 export function AgritaMobileDiagram () {
   return (
-    <svg viewBox='0 0 640 520' role='img' aria-label='AgriTA Mobile spec sheet: the field worker phone with the weather, tasks, camera journal and sync center; the app exploded into its ui, routes, state, forms, client and sync layers; a journal entry written offline waits in the outbox and syncs to the AgriTA API when the signal returns' className='dg'>
+    <svg viewBox='0 0 640 520' role='img' aria-label='AgriTA Mobile: a phone with tasks and a camera journal; a journal entry captured offline waits in a queue and syncs to the server when the signal returns' className='dg'>
       {/* ---- the phone ---------------------------------------------------------------------------------------- */}
-      <rect x={36} y={36} width={180} height={384} pathLength={1} className='dg-fill' style={draw(0, 0.1)} />
-      <path d='M34.5 110v18M34.5 134v26M217.5 124v30' className='dg-line' style={fade(0.08, 0.12)} />
-      <rect x={46} y={46} width={160} height={364} className='dg-edge' style={fade(0.06, 0.1)} />
-      <circle cx={126} cy={57} r={3} className='dg-edge' style={fade(0.08, 0.12)} />
-      <rect x={110} y={412} width={32} height={2.4} className='dg-ink' opacity={0.5} style={fade(0.08, 0.12)} />
+      <rect x={48} y={44} width={200} height={420} pathLength={1} className='dg-fill' style={draw(0, 0.1)} />
+      <rect x={60} y={56} width={176} height={396} className='dg-edge' style={fade(0.08, 0.12)} />
 
-      {/* status bar: app name, the signal bars (dimmed with a slash while the signal is gone) */}
+      {/* status bar: app name bar and the signal, struck while offline */}
       <g style={fade(0.1, 0.14)}>
-        <text x={56} y={58} className='dg-dim dg-small'>AgriTA</text>
-        <g style={dimDuring(0.6, 0.82, 0.25)}>
-          <path d='M182 62v-3M186 62v-5M190 62v-7M194 62v-9' className='dg-line' strokeWidth={2} />
-        </g>
+        <rect x={72} y={68} width={28} height={5} className='dg-ink' />
+        <path d='M208 76v-4M213 76v-7M218 76v-10M223 76v-13' className='dg-line' strokeWidth={3} style={dimDuring(0.36, 0.8, 0.25)} />
       </g>
-      <path d='M180 64L198 52' className='dg-accent' strokeWidth={1.4} style={pulse(0.6, 0.82)} />
+      <path d='M203 79L228 60' className='dg-accent' strokeWidth={1.6} style={pulse(0.36, 0.8)} />
 
-      {/* home header and the notification bell */}
-      <g style={fade(0.12, 0.16)}>
-        <text x={56} y={76} style={{ fontSize: 10 }}>home</text>
-        <path d='M190 80h8M191 80v-5a3 3 0 0 1 6 0v5M193 82h2' className='dg-line' strokeWidth={0.9} />
-        <circle cx={198} cy={73} r={2} className='dg-solid' />
+      {/* weather card */}
+      <g style={rise(0.12, 0.17, 0, 6)}>
+        <rect x={72} y={92} width={152} height={56} className='dg-fill' />
+        <circle cx={94} cy={120} r={9} className='dg-line' />
+        <rect x={114} y={110} width={70} height={5} className='dg-ink' />
+        <path d='M114 128h46' className='dg-edge' strokeWidth={5} />
       </g>
 
-      {/* weather card: sun and a small fl_chart sparkline */}
-      <g style={rise(0.13, 0.18, 0, 6)}>
-        <rect x={54} y={86} width={144} height={38} className='dg-fill' />
-        <circle cx={72} cy={105} r={6} className='dg-line' />
-        <path d='M72 95v-3M72 115v3M62 105h-3M82 105h3M64.9 97.9l-2.1-2.1M79.1 112.1l2.1 2.1M79.1 97.9l2.1-2.1M64.9 112.1l-2.1 2.1' className='dg-line' strokeWidth={0.9} />
-        <text x={90} y={96} className='dg-dim dg-small'>weather · today</text>
-        <path d='M90 118h100' className='dg-edge' />
-      </g>
-      <path d='M90 114C100 104 108 116 118 108S134 100 146 106S162 114 172 104S186 110 190 108' pathLength={1} className='dg-accent' style={draw(0.16, 0.24)} />
-
-      {/* tasks list */}
-      <text x={56} y={136} className='dg-dim dg-small' style={fade(0.16, 0.2)}>tasks · today</text>
-      {TASKS.map((label, i) => {
-        const y = 143 + i * 19
-        const a = 0.17 + i * 0.02
-        return (
-          <g key={label}>
-            <g style={fade(a, a + 0.03)}>
-              <rect x={54} y={y} width={144} height={16} className='dg-fill' />
-              <rect x={59} y={y + 3} width={10} height={10} className='dg-edge' />
-              <text x={75} y={y + 8} className='dg-small'>{label}</text>
-            </g>
-            {i < 2 && <path d={`M61 ${y + 8}l2.5 2.5l5 -5.5`} pathLength={1} className='dg-accent' strokeWidth={1.3} style={draw(a + 0.03, a + 0.06)} />}
+      {/* today's tasks: rows with check squares */}
+      {TASKS.map((y, i) => (
+        <g key={y}>
+          <g style={rise(0.15 + i * 0.02, 0.19 + i * 0.02, 0, 6)}>
+            <rect x={72} y={y} width={152} height={20} className='dg-fill' />
+            <rect x={79} y={y + 5} width={10} height={10} className='dg-edge' />
+            <path d={`M98 ${y + 10}h${i === 1 ? 54 : 78}`} className='dg-edge' strokeWidth={5} />
           </g>
-        )
-      })}
-
-      {/* the camera journal: a viewfinder sub-panel with crosshairs, a plant in frame, the shutter */}
-      <text x={56} y={210} className='dg-dim dg-small' style={fade(0.19, 0.23)}>journal · camera</text>
-      <path d={crosshairs(54, 218, 144, 82)} className='dg-line' strokeWidth={0.8} style={fade(0.2, 0.24)} />
-      <rect x={54} y={218} width={144} height={82} className='dg-edge' style={fade(0.2, 0.24)} />
-      <rect x={54} y={218} width={144} height={82} className='dg-wash' style={pulse(0.54, 0.575, 0.01)} />
-      <g style={fade(0.21, 0.26)}>
-        <path d='M62 292C90 282 120 288 150 278S180 282 190 286' className='dg-line' strokeWidth={0.9} />
-        <path d='M118 290C118 270 116 256 112 246M118 274c-10-2-16-8-18-18 10 2 16 8 18 18zM118 264c10-2 16-8 18-18-10 2-16 8-18 18zM116 254c-8-4-10-10-10-16 8 4 10 10 10 16z' className='dg-line' strokeWidth={0.9} />
-        <path d='M86 230h-12v12M166 230h12v12M86 288h-12v-12M166 288h12v-12' className='dg-accent' strokeWidth={0.9} />
-      </g>
-      <circle cx={126} cy={310} r={7} className='dg-line' style={fade(0.22, 0.26)} />
-      <circle cx={126} cy={310} r={4} className='dg-solid' style={pulse(0.54, 0.6, 0.015)} />
-
-      {/* sync center strip, then its status: outbox count while offline, synced at the end */}
-      <g style={fade(0.23, 0.27)}>
-        <rect x={54} y={322} width={144} height={28} className='dg-fill' />
-        <text x={60} y={331} className='dg-dim dg-small'>sync center</text>
-        <path d='M60 343h132' className='dg-edge' />
-      </g>
-      <text x={192} y={331} textAnchor='end' className='dg-small' style={between(0.23, 0.7)}>idle</text>
-      <text x={192} y={331} textAnchor='end' className='dg-small' style={between(0.72, 0.94)}>outbox · 3</text>
-      <text x={192} y={331} textAnchor='end' className='dg-small' style={{ ...fade(0.96, 1), fill: 'hsl(var(--primary))' }}>synced</text>
-      <path d='M60 343h132' pathLength={1} className='dg-accent' strokeWidth={2} style={{ ...draw(0.88, 0.97), opacity: seg(0.86, 0.88) }} />
-
-      {/* tab bar */}
-      <path d='M46 386H206' className='dg-edge' style={fade(0.1, 0.14)} />
-      {TABS.map(([t, x]) => (
-        <text key={t} x={x} y={398} textAnchor='middle' className='dg-dim dg-small' style={fade(0.1, 0.14)}>{t}</text>
+          {i < 2 && <path d={`M81 ${y + 10}l2.5 2.5l5 -5.5`} pathLength={1} className='dg-accent' strokeWidth={1.6} style={draw(0.2 + i * 0.02, 0.24 + i * 0.02)} />}
+        </g>
       ))}
 
-      {/* ---- the exploded stack ------------------------------------------------------------------------------ */}
-      <path d={`M${TOP[0]} ${AXIS_FOOT}V28`} className='dg-line dg-dash' strokeWidth={0.8} style={grow(0.3, 0.42, AXIS_FOOT)} />
-      {LAYERS.map((_, i) => <Plate key={i} k={LAYERS.length - 1 - i} />)}
-      {LAYERS.map((_, k) => <Balloon key={k} k={k} />)}
+      {/* the camera journal: viewfinder and shutter */}
+      <g style={fade(0.2, 0.25)}>
+        <rect x={72} y={250} width={152} height={100} className='dg-edge' />
+        <path d='M84 274v-12h12M212 274v-12h-12M84 326v12h12M212 326v12h-12' className='dg-accent' strokeWidth={1.4} />
+        <circle cx={148} cy={372} r={9} className='dg-line' />
+      </g>
+      <rect x={72} y={250} width={152} height={100} className='dg-wash' style={pulse(0.27, 0.31, 0.01)} />
+      <circle cx={148} cy={372} r={5} className='dg-solid' style={pulse(0.27, 0.33, 0.015)} />
 
-      {/* the journal entry: appears in the viewfinder, flies to the outbox on the sync plate, then rides the bus */}
-      <g transform={`translate(${CARD_AT[0]} ${CARD_AT[1]})`}>
-        <g style={rise(0.56, 0.6, 0, 8)}>
-          <g style={travel(0.64, 0.72, PARK[0] - CARD_AT[0], PARK[1] - CARD_AT[1])}>
-            <g style={travel(0.86, 0.9, BUS_X - PARK[0], BUS_Y - PARK[1])}>
-              <g style={travel(0.9, 0.96, 0, API_AT[1] - BUS_Y)}>
-                <g transform='translate(6 -6)'><g style={fade(0.74, 0.77)}><EntryCard /></g></g>
-                <g transform='translate(3 -3)'><g style={fade(0.72, 0.75)}><EntryCard /></g></g>
-                <EntryCard check />
-              </g>
-            </g>
+      {/* tab bar */}
+      <g style={fade(0.1, 0.14)}>
+        <path d='M60 426H236' className='dg-edge' />
+        {TABS.map((x, i) => <rect key={x} x={x} y={436} width={20} height={4} className={i === 0 ? 'dg-ink' : 'dg-edge'} />)}
+      </g>
+
+      {/* ---- the route: phone to queue to server ----------------------------------------------------------------- */}
+      <path d={`M248 ${BORN[1]}H${QUEUE[0] - 44}M${QUEUE[0] + 44} ${QUEUE[1]}H${SERVER[0]}V${SERVER[1] + 56}`} className='dg-edge dg-dash' style={fade(0.18, 0.26)} />
+      <rect x={QUEUE[0] - 44} y={QUEUE[1] - 30} width={88} height={60} className='dg-edge dg-dash' style={fade(0.18, 0.26)} />
+      <path d={`M${QUEUE[0] + 40} ${QUEUE[1]}H${SERVER[0]}V${SERVER[1] + 56}`} pathLength={1} className='dg-accent' style={draw(0.8, 0.9)} />
+
+      {/* the server block: three slots, the last lights up once the queue has arrived */}
+      <g style={rise(0.2, 0.26, 0, -6)}>
+        <rect x={SERVER[0] - 52} y={SERVER[1] - 52} width={104} height={104} className='dg-fill' />
+        {[0, 1, 2].map((i) => (
+          <g key={i}>
+            <rect x={SERVER[0] - 38} y={SERVER[1] - 38 + i * 28} width={76} height={20} className='dg-edge' />
+            <circle cx={SERVER[0] - 26} cy={SERVER[1] - 28 + i * 28} r={3} className='dg-edge' />
+          </g>
+        ))}
+      </g>
+      <rect x={SERVER[0] - 38} y={SERVER[1] + 18} width={76} height={20} className='dg-solid' style={fade(0.9, 0.94)} />
+
+      {/* the journal entry and the two that follow it into the queue */}
+      <g transform={`translate(${BORN[0]} ${BORN[1]})`}>
+        <g style={travel(0.4, 0.5, QUEUE[0] - BORN[0], QUEUE[1] - BORN[1])}>
+          <g style={travel(0.8, 0.9, SERVER[0] - QUEUE[0], SERVER[1] + 28 - QUEUE[1])}>
+            <g transform='translate(12 -12)' style={pulse(0.62, 0.93, 0.04)}><Card /></g>
+            <g transform='translate(6 -6)' style={pulse(0.55, 0.93, 0.04)}><Card /></g>
+            <g style={pulse(0.29, 0.93, 0.04)}><g style={rise(0.29, 0.35, 0, 8)}><Card /></g></g>
           </g>
         </g>
       </g>
 
-      {/* the bus from the sync plate up to the API, and the status beside it */}
-      <path d={`M${round(RIGHT[0])} ${BUS_Y}H${BUS_X}V${API_AT[1] + CARD_H / 2 + 4}`} className='dg-accent dg-dash' strokeWidth={0.9} style={fade(0.8, 0.86)} />
-      <text x={BUS_X + 4} y={BUS_Y + 18} textAnchor='end' className='dg-small' style={between(0.62, 0.72)}>offline · queued</text>
-      <text x={BUS_X + 4} y={BUS_Y + 18} textAnchor='end' className='dg-small' style={between(0.74, 0.8)}>offline · 3 queued</text>
-      <text x={BUS_X + 4} y={BUS_Y + 18} textAnchor='end' className='dg-small' style={between(0.82, 0.94)}>online · flushing</text>
-      <text x={BUS_X + 4} y={BUS_Y + 18} textAnchor='end' className='dg-small' style={fade(0.96, 1)}>outbox empty</text>
-
-      {/* the external AgriTA API */}
-      <g style={rise(0.44, 0.5, 0, -6)}>
-        <rect x={540} y={12} width={88} height={60} className='dg-edge dg-dash' />
-        <path d={crosshairs(540, 12, 88, 60)} className='dg-line' strokeWidth={0.8} />
-        <text x={548} y={24} style={{ fontSize: 10 }}>AgriTA API</text>
-        <text x={548} y={35} className='dg-dim dg-small'>external</text>
-      </g>
-
-      {/* side modules */}
-      <text x={320} y={436} className='dg-dim dg-small' style={fade(0.5, 0.54)}>{SIDE}</text>
+      {/* the only two words */}
+      <text x={QUEUE[0]} y={QUEUE[1] + 44} textAnchor='middle' className='dg-dim' style={pulse(0.42, 0.78)}>offline</text>
+      <text x={SERVER[0] + 10} y={SERVER[1] + 72} style={{ ...fade(0.93, 0.97), fill: 'hsl(var(--primary))' }}>synced</text>
 
       {/* ---- terminal line ------------------------------------------------------------------------------------ */}
-      <text x={36} y={446} style={{ fontSize: 11 }}>$</text>
-      <text x={48} y={446} style={{ fontSize: 11 }}>
+      <text x={48} y={490}>$</text>
+      <text x={60} y={490}>
         {COMMAND.map((ch, i) => <tspan key={i} style={fade(0.02 + i * TYPE_STEP, 0.02 + (i + 1) * TYPE_STEP)}>{ch}</tspan>)}
       </text>
-      <rect x={48} y={440} width={6.6} height={12} className='dg-solid' style={travel(0.02, 0.02 + COMMAND.length * TYPE_STEP, 6.6 * COMMAND.length, 0)} />
-      <text x={36} y={464} className='dg-dim dg-small' style={fade(0.14, 0.18)}>launching on android · debug</text>
-
-      {/* ---- title block -------------------------------------------------------------------------------------- */}
-      <g style={fade(0, 0.04)}>
-        <rect x={20} y={478} width={600} height={28} className='dg-edge' />
-        <path d='M300 478v28M420 478v28M520 478v28' className='dg-edge' />
-        <text x={30} y={492} style={{ ...DOTO, fontSize: 14, fontWeight: 800 }}>AGRITA MOBILE</text>
-        <text x={166} y={492} className='dg-dim dg-small'>flutter field app</text>
-        <text x={310} y={492} className='dg-small'><tspan className='dg-dim'>sheet </tspan>5 / 8</text>
-        <text x={430} y={492} className='dg-small'><tspan className='dg-dim'>scale </tspan>1:1</text>
-        <text x={530} y={492} className='dg-small'><tspan className='dg-dim'>view </tspan>exploded</text>
-      </g>
+      <rect x={60} y={484} width={CHAR_W} height={12} className='dg-solid' style={travel(0.02, 0.12, CHAR_W * COMMAND.length)} />
     </svg>
   )
 }
