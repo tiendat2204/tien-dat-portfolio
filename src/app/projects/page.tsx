@@ -1,7 +1,8 @@
 import Image from 'next/image'
 
-import { FigureSlot } from '@/components/iso/figure-slot'
-import { ProjectsScroller } from '@/components/projects/projects-scroller'
+import { Reveal } from '@/components/projects/reveal'
+import { DIAGRAM_CONFIGS } from '@/components/projects/diagram-configs'
+import { StackDiagram } from '@/components/projects/stack-diagram'
 import { SITE_INFO } from '@/data/config'
 import { buildProjectSections } from '@/data/projects-page'
 import { SEO_PROFILE } from '@/data/seo'
@@ -18,41 +19,45 @@ export const metadata = buildPageMetadata({
 export default function ProjectsPage () {
   const sections = buildProjectSections()
   return (
-    <main className='mx-auto w-full max-w-3xl lg:max-w-7xl px-4 py-24'>
+    <main className='mx-auto w-full max-w-3xl px-4 py-24 lg:max-w-6xl'>
       <h1 className='font-doto text-4xl font-extrabold'>projects</h1>
-      <ProjectsScroller>
+      <p className='mt-2 text-sm text-muted-foreground'>Work I have shipped, each with the stack behind it.</p>
+      <div className='mt-10 grid border-l border-t border-border md:grid-cols-2'>
         {sections.map(section => (
-          <section key={section.id} id={section.id} className='mt-16 grid scroll-mt-24 gap-6 lg:min-h-[calc(100svh-6rem)] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-12'>
-            <div className='lg:flex lg:max-h-[calc(100svh-8rem)] lg:flex-col'>
-              <p className='text-xs tabular-nums text-muted-foreground'>{String(section.index).padStart(2, '0')}</p>
-              <h2 className='font-doto text-2xl font-extrabold'>{section.title}</h2>
-              <p className='text-sm text-muted-foreground'>{[section.role, section.company, section.period].filter(Boolean).join(' · ')}</p>
-              <ul className='mt-4 list-disc space-y-1 pl-5 text-sm lg:min-h-0 lg:overflow-hidden lg:pb-4 lg:[mask-image:linear-gradient(to_bottom,#000_calc(100%-1rem),transparent)] lg:[@media(max-height:760px)]:space-y-0.5 lg:[@media(max-height:760px)]:text-[13px] lg:[@media(max-height:760px)]:leading-snug'>
-                {section.summary.map(line => <li key={line}>{line}</li>)}
-              </ul>
-              <ul className='mt-4 flex flex-wrap gap-2 lg:mt-0'>
-                {section.technologies.map(tech => (
-                  <li key={tech.name} title={tech.name} className='text-xs'>
-                    {tech.icon == null && tech.name}
-                    {tech.icon != null && <Image src={`/icons/${tech.icon}`} alt={tech.name} width={24} height={24} className={tech.iconDark ? 'size-6 dark:hidden lg:[@media(max-height:760px)]:size-5' : 'size-6 lg:[@media(max-height:760px)]:size-5'} />}
-                    {tech.iconDark && <Image src={`/icons/${tech.iconDark}`} alt={tech.name} width={24} height={24} className='hidden size-6 dark:block lg:[@media(max-height:760px)]:size-5' />}
-                  </li>
-                ))}
-              </ul>
-              <ul className='mt-4 flex flex-wrap gap-4 text-sm'>
-                {section.links.map(link => (
-                  <li key={link.href}>
-                    <a href={link.href} target='_blank' rel='noreferrer' className='underline underline-offset-4'>{link.type}</a>
-                  </li>
-                ))}
-              </ul>
+          <Reveal key={section.id} id={section.id} className='flex scroll-mt-24 flex-col gap-4 border-b border-r border-border p-5 md:p-6'>
+            {section.figureId && (
+              <div className='rounded-lg border border-border bg-card/40 bg-[radial-gradient(hsl(var(--border))_1px,transparent_1px)] [background-size:14px_14px] p-3'>
+                <StackDiagram config={DIAGRAM_CONFIGS[section.figureId]} />
+              </div>
+            )}
+            <div className='flex min-h-0 flex-1 flex-col gap-2'>
+              <p className='text-xs text-muted-foreground'>
+                <span className='tabular-nums'>{String(section.index).padStart(2, '0')}</span>
+                {' · '}
+                {[section.role, section.company, section.period].filter(Boolean).join(' · ')}
+              </p>
+              <h2 className='font-doto text-3xl font-extrabold leading-tight'>{section.title}</h2>
+              <p className='line-clamp-3 text-sm text-muted-foreground'>{section.summary[0]}</p>
             </div>
-            <div className='min-w-0'>
-              <FigureSlot figureId={section.figureId} />
-            </div>
-          </section>
+            <ul className='flex flex-wrap items-center gap-3'>
+              {section.technologies.map(tech => (
+                <li key={tech.name} title={tech.name} className='text-xs'>
+                  {tech.icon == null && tech.name}
+                  {tech.icon != null && <Image src={`/icons/${tech.icon}`} alt={tech.name} width={20} height={20} className={tech.iconDark ? 'size-5 dark:hidden' : 'size-5'} />}
+                  {tech.iconDark && <Image src={`/icons/${tech.iconDark}`} alt={tech.name} width={20} height={20} className='hidden size-5 dark:block' />}
+                </li>
+              ))}
+            </ul>
+            <ul className='flex flex-wrap gap-4 text-sm'>
+              {section.links.map(link => (
+                <li key={link.href}>
+                  <a href={link.href} target='_blank' rel='noreferrer' className='underline underline-offset-4'>{link.type} →</a>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
         ))}
-      </ProjectsScroller>
+      </div>
     </main>
   )
 }
