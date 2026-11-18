@@ -64,7 +64,7 @@ function Balloon ({ x, y, n, small }: { x: number, y: number, n: string, small?:
 function Panel ({ x, y, w, h, title, tag, style, children }: { x: number, y: number, w: number, h: number, title: string, tag: string, style: CSSProperties, children: ReactNode }) {
   return (
     <g style={style}>
-      <rect x={x} y={y} width={w} height={h} rx={3} className='dg-fill' />
+      <rect x={x} y={y} width={w} height={h} className='dg-fill' />
       <Marks x={x} y={y} w={w} h={h} />
       <text x={x + 12} y={y + 16} className='dg-dim dg-small'>{title}</text>
       <Balloon x={x + w - 14} y={y + 16} n={tag} small />
@@ -162,13 +162,13 @@ export function LibraryDiagram () {
         <text x={36} y={428} className='dg-dim dg-small'>zxing-wasm · in the browser</text>
       </Panel>
       <g style={fade(0.48, 0.53)}>
-        <rect x={42} y={290} width={136} height={92} rx={2} className='dg-edge' style={{ fill: 'none' }} />
+        <rect x={42} y={290} width={136} height={92} className='dg-edge' style={{ fill: 'none' }} />
         <path d={BARS.map((o, i) => `M${50 + o * 2.6} 298h${i % 3 === 0 ? 4 : 2.4}v72h${i % 3 === 0 ? -4 : -2.4}z`).join('')} className='dg-ink' />
         <path d='M50 390V396M171 390V396M50 393H171' className='dg-edge' />
         <text x={110} y={404} textAnchor='middle' className='dg-dim dg-small'>EAN-13 · isbn</text>
       </g>
-      <rect x={42} y={290} width={136} height={92} rx={2} className='dg-wash' style={fade(0.6, 0.64)} />
-      <rect x={38} y={289} width={144} height={2} rx={1} className='dg-solid' style={{ ...travel(0.52, 0.62, 0, 90), ...pulse(0.5, 0.64) }} />
+      <rect x={42} y={290} width={136} height={92} className='dg-wash' style={fade(0.6, 0.64)} />
+      <rect x={38} y={289} width={144} height={2} className='dg-solid' style={{ ...travel(0.52, 0.62, 0, 90), ...pulse(0.5, 0.64) }} />
       <path d='M196 296H206M203 293L206 296L203 299' pathLength={1} className='dg-accent' style={draw(0.6, 0.64)} />
 
       {/* the entry form: the scan gives the isbn, the lookup fills the rest, the copy goes to its shelf */}
@@ -179,8 +179,8 @@ export function LibraryDiagram () {
           return (
             <g key={name}>
               <text x={226} y={y + 8} className='dg-small'>{name}</text>
-              <rect x={286} y={y} width={110} height={16} rx={2} className='dg-fill' />
-              <rect x={291} y={y + 5} height={6} rx={3} className='dg-solid' style={{ width: `calc(${seg(a, a + 0.04)} * ${len}px)` }} />
+              <rect x={286} y={y} width={110} height={16} className='dg-fill' />
+              <rect x={291} y={y + 5} height={6} className='dg-solid' style={{ width: `calc(${seg(a, a + 0.04)} * ${len}px)` }} />
             </g>
           )
         })}
@@ -197,9 +197,9 @@ export function LibraryDiagram () {
           return (
             <g key={name}>
               <text x={438} y={y + 8} className='dg-small'>{name}</text>
-              <rect x={498} y={y} width={104} height={16} rx={2} className={i === 1 ? 'dg-wash dg-accent' : 'dg-fill'} />
+              <rect x={498} y={y} width={104} height={16} className={i === 1 ? 'dg-wash dg-accent' : 'dg-fill'} />
               {[0, 1, 2].map(j => (
-                <rect key={j} x={504 + j * 32} y={y + 5} height={6} rx={3} className='dg-solid' style={{ width: `calc(${seg(a + j * 0.01, a + 0.02 + j * 0.01)} * ${j ? 14 : 26}px)` }} />
+                <rect key={j} x={504 + j * 32} y={y + 5} height={6} className='dg-solid' style={{ width: `calc(${seg(a + j * 0.01, a + 0.02 + j * 0.01)} * ${j ? 14 : 26}px)` }} />
               ))}
               {[1, 2].map(j => <text key={j} x={501 + j * 32} y={y + 8} textAnchor='middle' className='dg-dim dg-small'>·</text>)}
             </g>

@@ -30,8 +30,8 @@
 .dg .dg-edge,
 .dg .dg-accent {
   fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
   stroke-width: 1.2;
 }
 .dg .dg-line {

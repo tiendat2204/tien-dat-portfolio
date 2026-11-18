@@ -128,7 +128,7 @@ export function TangniDiagram () {
             <text x={x + 8} y={ST_Y + 12} className='dg-dim dg-small' style={{ ...fade(a + 0.06, a + 0.1), ...doto, fontSize: 11 }}>{s.n}</text>
             <text x={x + ST_W / 2 + 8} y={ST_Y + 12} textAnchor='middle' style={{ ...fade(a + 0.06, a + 0.1), fontSize: 10 }}>{s.who}</text>
             <g style={fade(i === 0 ? 0.12 : i === 1 ? 0.38 : 0.64, i === 0 ? 0.18 : i === 1 ? 0.44 : 0.7)}>
-              <rect x={x + 10} y={ST_Y + ST_H - 32} width={ST_W - 20} height={20} rx={4} className={i === 2 ? 'dg-wash dg-accent' : 'dg-fill'} />
+              <rect x={x + 10} y={ST_Y + ST_H - 32} width={ST_W - 20} height={20} className={i === 2 ? 'dg-wash dg-accent' : 'dg-fill'} />
               <text x={x + ST_W / 2} y={ST_Y + ST_H - 22} textAnchor='middle' className='dg-small'>{s.step}</text>
             </g>
           </g>
@@ -148,14 +148,14 @@ export function TangniDiagram () {
       </g>
 
       {/* where the card was: dashed ghosts left behind in 01 and 02 */}
-      <rect x={CARD.x} y={CARD.y} width={CARD.w} height={CARD.h} rx={4} className='dg-edge dg-dash' style={fade(0.28, 0.34)} />
-      <rect x={CARD.x + HOP} y={CARD.y} width={CARD.w} height={CARD.h} rx={4} className='dg-edge dg-dash' style={fade(0.54, 0.6)} />
+      <rect x={CARD.x} y={CARD.y} width={CARD.w} height={CARD.h} className='dg-edge dg-dash' style={fade(0.28, 0.34)} />
+      <rect x={CARD.x + HOP} y={CARD.y} width={CARD.w} height={CARD.h} className='dg-edge dg-dash' style={fade(0.54, 0.6)} />
 
       {/* the profile card: drafted in 01, carried to 02 and 03, stamped twice */}
       <g style={travel(0.26, 0.36, HOP)}>
         <g style={travel(0.52, 0.62, HOP)}>
           <g style={rise(0.08, 0.16, 0, 10)}>
-            <rect x={CARD.x} y={CARD.y} width={CARD.w} height={CARD.h} rx={4} className='dg-fill' />
+            <rect x={CARD.x} y={CARD.y} width={CARD.w} height={CARD.h} className='dg-fill' />
             <text x={CARD.x + 8} y={CARD.y + 10} className='dg-dim dg-small'>profile</text>
             <circle cx={CARD.x + 70} cy={CARD.y + 42} r={9} className='dg-line' />
             <path d={`M${CARD.x + 8} ${CARD.y + 40}H${CARD.x + 52}M${CARD.x + 8} ${CARD.y + 48}H${CARD.x + 40}`} className='dg-edge' />
@@ -163,11 +163,11 @@ export function TangniDiagram () {
           </g>
           {/* the badge: draft, pending, approved */}
           <g style={fade(0.1, 0.16)}>
-            <rect x={CARD.x + 8} y={CARD.y + 18} width={52} height={13} rx={3} className='dg-fill' />
+            <rect x={CARD.x + 8} y={CARD.y + 18} width={52} height={13} className='dg-fill' />
           </g>
           {BADGES.map(b => (
             <g key={b.text} style={pulse(b.from, b.to)}>
-              {b.on && <rect x={CARD.x + 8} y={CARD.y + 18} width={52} height={13} rx={3} className='dg-wash dg-accent' />}
+              {b.on && <rect x={CARD.x + 8} y={CARD.y + 18} width={52} height={13} className='dg-wash dg-accent' />}
               <text x={CARD.x + 34} y={CARD.y + 24.5} textAnchor='middle' className='dg-small'>{b.text}</text>
             </g>
           ))}
@@ -192,12 +192,12 @@ export function TangniDiagram () {
           </g>
           {/* stamps: the secretary's over the name, the admin's across the bottom rows */}
           <g style={stamp(0.38, 0.44, -8)}>
-            <rect x={CARD.x + 14} y={CARD.y + 34} width={54} height={16} rx={3} className='dg-fill' style={{ stroke: 'currentColor' }} />
+            <rect x={CARD.x + 14} y={CARD.y + 34} width={54} height={16} className='dg-fill' style={{ stroke: 'currentColor' }} />
             <text x={CARD.x + 41} y={CARD.y + 42} textAnchor='middle' style={{ ...doto, fontSize: 10, fontWeight: 800 }}>REVIEWED</text>
           </g>
           <g style={stamp(0.64, 0.7, -6)}>
-            <rect x={CARD.x + 8} y={CARD.y + 82} width={68} height={20} rx={3} className='dg-fill' />
-            <rect x={CARD.x + 8} y={CARD.y + 82} width={68} height={20} rx={3} className='dg-wash dg-accent' style={{ strokeWidth: 1.6 }} />
+            <rect x={CARD.x + 8} y={CARD.y + 82} width={68} height={20} className='dg-fill' />
+            <rect x={CARD.x + 8} y={CARD.y + 82} width={68} height={20} className='dg-wash dg-accent' style={{ strokeWidth: 1.6 }} />
             <text x={CARD.x + 42} y={CARD.y + 92} textAnchor='middle' style={{ ...doto, fontSize: 12, fontWeight: 800 }}>APPROVED</text>
           </g>
         </g>
@@ -207,21 +207,21 @@ export function TangniDiagram () {
       {/* public lookup: the approved profile is findable */}
       <text x={24} y={250} className='dg-dim dg-small' style={fade(0.74, 0.8)}>public · lookup</text>
       <g style={rise(0.76, 0.82, 0, 8)}>
-        <rect x={214} y={243} width={154} height={14} rx={3} className='dg-wash' />
+        <rect x={214} y={243} width={154} height={14} className='dg-wash' />
         <text x={291} y={250} textAnchor='middle' className='dg-small'>?q=…&amp;status=approved&amp;page=1</text>
       </g>
       <g style={rise(0.74, 0.82, 0, 10)}>
-        <rect x={24} y={262} width={344} height={26} rx={13} className='dg-fill' />
+        <rect x={24} y={262} width={344} height={26} className='dg-fill' />
         <circle cx={44} cy={274} r={5} className='dg-line' />
         <path d='M48 278L53 283' className='dg-line' />
       </g>
       <text x={60} y={275} clipPath='url(#tg-query)' style={{ fontSize: 10 }}>monastery · profile</text>
       <g style={rise(0.86, 0.92, 0, 10)}>
-        <rect x={24} y={298} width={344} height={30} rx={4} className='dg-fill' />
+        <rect x={24} y={298} width={344} height={30} className='dg-fill' />
         <circle cx={44} cy={313} r={7} className='dg-edge' />
         <text x={60} y={313} style={{ fontSize: 10 }}>profile</text>
         <text x={116} y={313} className='dg-dim dg-small'>· monastery · congregation</text>
-        <rect x={300} y={306} width={56} height={14} rx={3} className='dg-wash dg-accent' />
+        <rect x={300} y={306} width={56} height={14} className='dg-wash dg-accent' />
         <text x={328} y={313} textAnchor='middle' className='dg-small'>approved</text>
       </g>
 
@@ -252,7 +252,7 @@ export function TangniDiagram () {
         </g>
       ))}
       <g style={fade(0.02, 0.1)}>
-        <rect x={EXT.x} y={EXT.y} width={EXT.w} height={EXT.h} rx={3} className='dg-edge dg-dash' />
+        <rect x={EXT.x} y={EXT.y} width={EXT.w} height={EXT.h} className='dg-edge dg-dash' />
         <text x={EXT.x + EXT.w / 2} y={EXT.y + EXT.h / 2} textAnchor='middle' className='dg-dim dg-small'>external api</text>
       </g>
       {PLATES.map((pl, i) => {

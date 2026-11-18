@@ -114,7 +114,7 @@ export function Xn2Diagram () {
 
       {/* 02 · the records table with the between filter */}
       <g style={rise(0.26, 0.34, 0, 12)}>
-        <rect x={12} y={214} width={294} height={132} rx={4} className='dg-fill' />
+        <rect x={12} y={214} width={294} height={132} className='dg-fill' />
         <path d={crosshairs(18, 220, 282, 120)} className='dg-line' style={HAIR} />
         <text x={24} y={229} className='dg-dim dg-small'>02 · RECORDS</text>
         <text x={298} y={229} textAnchor='end' className='dg-dim dg-small'>filter operators</text>
@@ -130,7 +130,7 @@ export function Xn2Diagram () {
         const dim = row.match ? seg(a, a + 0.04) : `calc(${seg(a, a + 0.04)} * (1 - 0.7 * ${seg(0.78, 0.84)}))`
         return (
           <g key={row.code}>
-            {row.match && <rect x={20} y={y - 5.5} width={274} height={11} rx={2} className='dg-wash' style={fade(0.78 + i * 0.01, 0.84 + i * 0.01)} />}
+            {row.match && <rect x={20} y={y - 5.5} width={274} height={11} className='dg-wash' style={fade(0.78 + i * 0.01, 0.84 + i * 0.01)} />}
             <g style={{ opacity: dim }}>
               <text x={24} y={y} className='dg-small'>{row.code}</text>
               <path d={`M70 ${y}h${row.w}M236 ${y}h24`} className='dg-edge' style={{ strokeWidth: 4 }} />
@@ -141,30 +141,30 @@ export function Xn2Diagram () {
       })}
       {/* filter chips: field, operator, range */}
       <g style={rise(0.34, 0.42, -8, 0)}>
-        <rect x={22} y={236} width={46} height={16} rx={8} className='dg-fill' />
+        <rect x={22} y={236} width={46} height={16} className='dg-fill' />
         <text x={45} y={244} textAnchor='middle' className='dg-small'>signed</text>
-        <rect x={74} y={236} width={58} height={16} rx={8} className='dg-fill' />
+        <rect x={74} y={236} width={58} height={16} className='dg-fill' />
         <text x={103} y={244} textAnchor='middle' className='dg-small'>between</text>
-        <rect x={138} y={236} width={104} height={16} rx={8} className='dg-fill' />
+        <rect x={138} y={236} width={104} height={16} className='dg-fill' />
         <text x={190} y={244} textAnchor='middle' className='dg-small'>01/2024 — 12/2024</text>
       </g>
-      <rect x={74} y={236} width={58} height={16} rx={8} className='dg-wash dg-accent' style={fade(0.52, 0.56)} />
+      <rect x={74} y={236} width={58} height={16} className='dg-wash dg-accent' style={fade(0.52, 0.56)} />
       <circle cx={103} cy={244} r={11} className='dg-accent' style={{ ...pulse(0.52, 0.6), strokeDasharray: '2 2' }} />
       <Balloon n={6} from={[244, 244]} x={290} y={244} style={fade(0.6, 0.66)} />
       <text x={290} y={258} textAnchor='middle' className='dg-dim dg-small' style={fade(0.62, 0.68)}>tables</text>
 
       {/* 03 · the form-template editor */}
       <g style={rise(0.32, 0.4, 0, 12)}>
-        <rect x={12} y={358} width={294} height={82} rx={4} className='dg-fill' />
+        <rect x={12} y={358} width={294} height={82} className='dg-fill' />
         <path d={crosshairs(18, 364, 282, 70)} className='dg-line' style={HAIR} />
         <text x={24} y={373} className='dg-dim dg-small'>03 · TEMPLATE · Tiptap</text>
         {TOOLS.map((tool, i) => (
           <g key={tool}>
-            <rect x={150 + i * 22} y={365} width={18} height={16} rx={2} className={i === 3 ? 'dg-wash dg-accent' : 'dg-fill'} />
+            <rect x={150 + i * 22} y={365} width={18} height={16} className={i === 3 ? 'dg-wash dg-accent' : 'dg-fill'} />
             <text x={159 + i * 22} y={373} textAnchor='middle' className='dg-small'>{tool}</text>
           </g>
         ))}
-        <rect x={22} y={392} width={272} height={42} rx={3} className='dg-edge dg-dash' style={{ fill: 'none', ...HAIR }} />
+        <rect x={22} y={392} width={272} height={42} className='dg-edge dg-dash' style={{ fill: 'none', ...HAIR }} />
         <path d='M32 402h96M32 412h72M32 422h88' className='dg-edge' style={{ strokeWidth: 3 }} />
       </g>
       <Balloon n={7} from={[260, 373]} x={290} y={373} style={fade(0.62, 0.68)} />
@@ -185,7 +185,7 @@ export function Xn2Diagram () {
             <path d={plate.paths.top} className='dg-wash' style={pulse(hit - 0.012, hit + 0.05)} />
             <path d={plate.paths.crease} style={{ fill: 'none', stroke: 'var(--anatomy-faint)', strokeWidth: 0.6 }} />
             <path d={plate.glyph} className='dg-line' style={{ ...HAIR, opacity: seg(0.4, 0.5) }} />
-            <path d={plate.paths.outline} style={{ fill: 'none', stroke: 'var(--anatomy-hi)', strokeWidth: 0.7, strokeLinejoin: 'round' }} />
+            <path d={plate.paths.outline} style={{ fill: 'none', stroke: 'var(--anatomy-hi)', strokeWidth: 0.7, strokeLinejoin: 'miter' }} />
             <Balloon n={plate.n} from={plate.anchor} x={524} y={plate.anchor[1]} style={fade(0.5 + plate.index * 0.02, 0.56 + plate.index * 0.02)} />
             <g style={fade(0.52 + plate.index * 0.02, 0.58 + plate.index * 0.02)}>
               <text x={536} y={plate.anchor[1] - 5} style={{ fontSize: 10 }}>{plate.label}</text>
@@ -204,11 +204,11 @@ export function Xn2Diagram () {
         </g>
       </g>
       <g style={fade(0.64, 0.7)}>
-        <rect x={420} y={438} width={208} height={18} rx={3} className='dg-fill dg-dash' />
+        <rect x={420} y={438} width={208} height={18} className='dg-fill dg-dash' />
         <text x={430} y={447} className='dg-dim dg-small'>REST API · external</text>
       </g>
       <g style={rise(0.74, 0.78, 6, 0)}>
-        <rect x={590} y={440} width={34} height={14} rx={7} className='dg-wash dg-accent' />
+        <rect x={590} y={440} width={34} height={14} className='dg-wash dg-accent' />
         <text x={607} y={447} textAnchor='middle' fontSize={10} style={DOTO}>200</text>
       </g>
 

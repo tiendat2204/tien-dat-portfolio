@@ -35,7 +35,7 @@ function Solid ({ paths, wash }: { paths: SolidPaths, wash?: CSSProperties }) {
       {wash && <path d={paths.top} className='dg-wash' style={wash} />}
       {paths.crease && <path d={paths.crease} style={{ fill: 'none', stroke: 'var(--anatomy-faint)', strokeWidth: 0.8 }} />}
       {paths.bevel && <path d={paths.bevel} style={{ fill: 'none', stroke: 'var(--anatomy-faint)', strokeWidth: 0.6 }} />}
-      <path d={paths.outline} style={{ fill: 'none', stroke: 'var(--anatomy-hi)', strokeWidth: 0.9, strokeLinejoin: 'round', strokeLinecap: 'round' }} />
+      <path d={paths.outline} style={{ fill: 'none', stroke: 'var(--anatomy-hi)', strokeWidth: 0.9, strokeLinejoin: 'miter', strokeLinecap: 'butt' }} />
     </g>
   )
 }
@@ -90,25 +90,25 @@ export function EofficeDiagram () {
       </defs>
 
       {/* ---- product scene: the document page ---- */}
-      <rect x={24} y={28} width={276} height={304} rx={3} pathLength={1} className='dg-fill' style={draw(0, 0.1)} />
+      <rect x={24} y={28} width={276} height={304} pathLength={1} className='dg-fill' style={draw(0, 0.1)} />
       <Crosses x={24} y={28} w={276} h={304} style={fade(0.02, 0.08)} />
       <g style={fade(0.06, 0.12)}>
         <path d='M24 48H300' className='dg-edge' />
         <text x={36} y={38} className='dg-dim dg-small'>documents / :id</text>
-        <rect x={244} y={32} width={48} height={12} rx={6} className='dg-fill' />
+        <rect x={244} y={32} width={48} height={12} className='dg-fill' />
         <text x={268} y={38.5} textAnchor='middle' className='dg-small'>staff</text>
       </g>
       <path d='M36 62H150' pathLength={1} className='dg-line' style={{ ...draw(0.08, 0.14), strokeWidth: 6 }} />
       <path d='M36 73H110' pathLength={1} className='dg-edge' style={{ ...draw(0.1, 0.15), strokeWidth: 3 }} />
 
       {/* status pill: draft, then active */}
-      <rect x={212} y={52} width={80} height={20} rx={10} className='dg-fill' style={fade(0.1, 0.15)} />
-      <rect x={212} y={52} width={80} height={20} rx={10} className='dg-wash dg-accent' style={fade(0.88, 0.93)} />
+      <rect x={212} y={52} width={80} height={20} className='dg-fill' style={fade(0.1, 0.15)} />
+      <rect x={212} y={52} width={80} height={20} className='dg-wash dg-accent' style={fade(0.88, 0.93)} />
       <text x={252} y={62.5} textAnchor='middle' className='dg-small' style={{ opacity: `calc(min(${seg(0.1, 0.15)}, 1 - ${seg(0.88, 0.92)}))` }}>draft</text>
       <text x={252} y={62.5} textAnchor='middle' className='dg-small' style={{ ...fade(0.9, 0.94), fontWeight: 600 }}>active</text>
 
       {/* PDF preview */}
-      <rect x={36} y={82} width={104} height={138} rx={2} pathLength={1} className='dg-edge' style={draw(0.1, 0.16)} />
+      <rect x={36} y={82} width={104} height={138} pathLength={1} className='dg-edge' style={draw(0.1, 0.16)} />
       <g style={fade(0.12, 0.18)}>
         <rect x={48} y={92} width={80} height={104} className='dg-fill' />
         <path d='M56 102H102M56 110H118M56 118H112M56 126H120M56 134H98M56 148H118M56 156H110M56 164H120M56 172H90' className='dg-edge' style={{ strokeWidth: 2.4 }} />
@@ -122,7 +122,7 @@ export function EofficeDiagram () {
       </g>
 
       {/* documents table */}
-      <rect x={152} y={82} width={136} height={138} rx={2} pathLength={1} className='dg-edge' style={draw(0.12, 0.18)} />
+      <rect x={152} y={82} width={136} height={138} pathLength={1} className='dg-edge' style={draw(0.12, 0.18)} />
       <g style={fade(0.14, 0.2)}>
         <rect x={152} y={82} width={136} height={18} className='dg-wash' />
         <text x={160} y={91} className='dg-small' style={{ fontWeight: 600 }}>name</text>
@@ -149,26 +149,26 @@ export function EofficeDiagram () {
 
       {/* confirm form: comment + approve */}
       <g style={rise(0.18, 0.24, 0, 6)}>
-        <rect x={36} y={240} width={164} height={24} rx={3} className='dg-fill' />
+        <rect x={36} y={240} width={164} height={24} className='dg-fill' />
         <text x={44} y={252} className='dg-dim dg-small'>comment</text>
-        <rect x={210} y={240} width={78} height={24} rx={3} className='dg-ink' />
+        <rect x={210} y={240} width={78} height={24} className='dg-ink' />
         <text x={249} y={252} textAnchor='middle' className='dg-small dg-on' style={{ fontWeight: 600 }}>approve</text>
       </g>
       <path d='M44 258H136' pathLength={1} className='dg-line' style={{ ...draw(0.56, 0.62), strokeWidth: 1.6 }} />
-      <rect x={210} y={240} width={78} height={24} rx={3} className='dg-wash dg-accent' style={pulse(0.6, 0.68)} />
+      <rect x={210} y={240} width={78} height={24} className='dg-wash dg-accent' style={pulse(0.6, 0.68)} />
 
       {/* file upload dropzone */}
       <g style={rise(0.2, 0.26, 0, 6)}>
-        <rect x={36} y={280} width={252} height={32} rx={3} className='dg-fill dg-dash' />
+        <rect x={36} y={280} width={252} height={32} className='dg-fill dg-dash' />
         <path d='M48 288H56L60 292V304H48Z M56 288V292H60' className='dg-line' style={{ strokeWidth: 0.9 }} />
         <text x={68} y={290} className='dg-small'>drop file · upload</text>
       </g>
-      <rect x={68} y={299} width={200} height={4} rx={2} className='dg-edge' style={{ fill: 'none', ...fade(0.22, 0.26) }} />
+      <rect x={68} y={299} width={200} height={4} className='dg-edge' style={{ fill: 'none', ...fade(0.22, 0.26) }} />
       <path d='M70 301H266' pathLength={1} className='dg-accent' style={{ ...draw(0.62, 0.74), strokeWidth: 2.4 }} />
 
       {/* toast */}
       <g style={rise(0.94, 1, 0, 12)}>
-        <rect x={150} y={302} width={138} height={22} rx={4} className='dg-fill dg-accent' />
+        <rect x={150} y={302} width={138} height={22} className='dg-fill dg-accent' />
         <circle cx={163} cy={313} r={6} className='dg-solid' />
         <path d='M160 313L162.4 315.4L166.5 310.8' className='dg-line' style={{ stroke: 'hsl(var(--primary-foreground))', strokeWidth: 1.4 }} />
         <text x={176} y={313.5} className='dg-small'>status updated</text>
@@ -177,8 +177,8 @@ export function EofficeDiagram () {
       {/* the stamp lands on the preview */}
       <g transform='translate(88 150)'>
         <g style={{ opacity: seg(0.86, 0.9), transform: `rotate(-14deg) scale(calc(1.7 - 0.7 * ${seg(0.86, 0.92)}))` }}>
-          <rect x={-34} y={-13} width={68} height={26} rx={3} className='dg-accent' style={{ fill: 'hsl(var(--background))', strokeWidth: 1.6 }} />
-          <rect x={-30} y={-9} width={60} height={18} rx={2} className='dg-accent' style={{ strokeWidth: 0.6 }} />
+          <rect x={-34} y={-13} width={68} height={26} className='dg-accent' style={{ fill: 'hsl(var(--background))', strokeWidth: 1.6 }} />
+          <rect x={-30} y={-9} width={60} height={18} className='dg-accent' style={{ strokeWidth: 0.6 }} />
           <text x={0} y={0.5} textAnchor='middle' style={{ ...DOTO, fontSize: 13, fill: 'hsl(var(--primary))' }}>ACTIVE</text>
         </g>
       </g>
@@ -199,8 +199,8 @@ export function EofficeDiagram () {
       <text x={24} y={352} className='dg-dim dg-small' style={fade(0.44, 0.5)}>status flow</text>
       {/* role guard lock on the way to review */}
       <g style={fade(0.5, 0.54)}>
-        <rect x={110} y={364} width={16} height={16} rx={2} style={{ fill: 'hsl(var(--background))' }} />
-        <rect x={112} y={371} width={12} height={9} rx={1.5} className='dg-ink' />
+        <rect x={110} y={364} width={16} height={16} style={{ fill: 'hsl(var(--background))' }} />
+        <rect x={112} y={371} width={12} height={9} className='dg-ink' />
         <path d='M114.5 371V367.5A3.5 3.5 0 0 1 121.5 367.5V371' className='dg-line' style={{ strokeWidth: 1.2 }} />
       </g>
       <path d='M114.5 371V367.5A3.5 3.5 0 0 1 121.5 367.5V368.6' pathLength={1} className='dg-accent' style={{ ...fade(0.66, 0.7), strokeWidth: 1.2 }} />
@@ -236,21 +236,21 @@ export function EofficeDiagram () {
         <text x={322} y={AXIS_TOP + 6} textAnchor='middle' className='dg-dim dg-small'>z</text>
       </g>
       {/* the request rides the centreline down to the API and the response lights the base */}
-      <rect x={AXIS_X - 4} y={AXIS_TOP - 4} width={8} height={8} rx={1} className='dg-solid' style={{ ...travel(0.58, 0.8, 0, apiY - AXIS_TOP), ...pulse(0.56, 0.82) }} />
+      <rect x={AXIS_X - 4} y={AXIS_TOP - 4} width={8} height={8} className='dg-solid' style={{ ...travel(0.58, 0.8, 0, apiY - AXIS_TOP), ...pulse(0.56, 0.82) }} />
       <path d={`M${AXIS_X} ${AXIS_BASE}V${apiY - 16}`} className='dg-accent dg-dash' style={fade(0.76, 0.8)} />
       <g style={fade(0.5, 0.56)}>
-        <rect x={376} y={apiY - 16} width={120} height={32} rx={3} className='dg-fill dg-dash' />
+        <rect x={376} y={apiY - 16} width={120} height={32} className='dg-fill dg-dash' />
         <text x={436} y={apiY - 5} textAnchor='middle' className='dg-small' style={{ fontWeight: 600 }}>REST API</text>
         <text x={436} y={apiY + 7} textAnchor='middle' className='dg-dim dg-small'>separate backend</text>
       </g>
-      <rect x={376} y={apiY - 16} width={120} height={32} rx={3} className='dg-wash dg-accent' style={pulse(0.8, 0.9)} />
+      <rect x={376} y={apiY - 16} width={120} height={32} className='dg-wash dg-accent' style={pulse(0.8, 0.9)} />
       <text x={504} y={apiY - 5} className='dg-small' style={fade(0.82, 0.86)}>PATCH status</text>
       <text x={504} y={apiY + 7} className='dg-small' style={{ ...fade(0.86, 0.9), fill: 'hsl(var(--primary))', fontWeight: 600 }}>200</text>
       {/* the response comes back up to the data board: invalidate */}
-      <rect x={AXIS_X - 3} y={apiY - 19} width={6} height={6} rx={1} className='dg-solid' style={{ ...travel(0.86, 0.94, 0, (BOARDS[2]?.cy ?? 0) - (apiY - 16)), ...pulse(0.85, 0.95) }} />
+      <rect x={AXIS_X - 3} y={apiY - 19} width={6} height={6} className='dg-solid' style={{ ...travel(0.86, 0.94, 0, (BOARDS[2]?.cy ?? 0) - (apiY - 16)), ...pulse(0.85, 0.95) }} />
 
       {/* ---- terminal ---- */}
-      <rect x={24} y={416} width={592} height={56} rx={3} className='dg-fill' style={fade(0.52, 0.56)} />
+      <rect x={24} y={416} width={592} height={56} className='dg-fill' style={fade(0.52, 0.56)} />
       <Crosses x={24} y={416} w={592} h={56} style={fade(0.52, 0.56)} />
       <text x={34} y={431} style={{ ...fade(0.52, 0.56), fill: 'hsl(var(--primary))', fontWeight: 700 }}>$</text>
       <g clipPath='url(#eo-type)'>

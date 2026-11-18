@@ -85,7 +85,7 @@ export function AgritaDiagram () {
 
       {/* ---- TA Farm: the map panel, land lots as polygons, lot B in Geoman edit mode ---- */}
       <g>
-        <rect x={20} y={20} width={310} height={180} rx={4} pathLength={1} className='dg-fill' style={draw(0, 0.08)} />
+        <rect x={20} y={20} width={310} height={180} pathLength={1} className='dg-fill' style={draw(0, 0.08)} />
         <Crosshairs x={26} y={26} w={298} h={168} a={0.06} b={0.12} />
         <text x={36} y={36} style={{ ...fade(0.04, 0.1), fontSize: 10 }}>TA Farm · land lots</text>
         <text x={306} y={36} textAnchor='end' className='dg-dim dg-small' style={fade(0.04, 0.1)}>map</text>
@@ -95,11 +95,11 @@ export function AgritaDiagram () {
         <path d='M26 130H324M130 26V194' className='dg-edge' style={{ ...fade(0.06, 0.12), strokeWidth: 0.5 }} />
         {/* Geoman toolbar: draw polygon, edit vertices, cut; zoom control */}
         <g style={fade(0.08, 0.14)}>
-          <rect x={30} y={48} width={16} height={46} rx={3} className='dg-fill' />
+          <rect x={30} y={48} width={16} height={46} className='dg-fill' />
           <path d='M34 58L42 55L43 61L36 63Z' className='dg-line' style={{ strokeWidth: 0.9 }} />
           <path d='M34 72H42V78H34Z' className='dg-line' style={{ strokeWidth: 0.9 }} />
           <path d='M34 88L42 90M42 88L34 90' className='dg-line' style={{ strokeWidth: 0.9 }} />
-          <rect x={302} y={48} width={14} height={28} rx={3} className='dg-fill' />
+          <rect x={302} y={48} width={14} height={28} className='dg-fill' />
           <path d='M306 55H312M309 52V58M306 69H312' className='dg-line' style={{ strokeWidth: 0.9 }} />
         </g>
         {LOTS.map((d, i) => (
@@ -166,10 +166,10 @@ export function AgritaDiagram () {
           return (
             <g key={label}>
               <g style={rise(a, a + 0.05, 0, 6)}>
-                <rect x={x} y={CHIP_Y} width={CHIP_W} height={CHIP_H} rx={4} className='dg-fill' />
+                <rect x={x} y={CHIP_Y} width={CHIP_W} height={CHIP_H} className='dg-fill' />
                 <text x={x + CHIP_W / 2} y={CHIP_Y + CHIP_H / 2} textAnchor='middle'>{label}</text>
               </g>
-              <rect x={x} y={CHIP_Y} width={CHIP_W} height={CHIP_H} rx={4} className='dg-wash dg-accent' style={pulse(passAt(i) - 0.03, passAt(i) + 0.06, 0.02)} />
+              <rect x={x} y={CHIP_Y} width={CHIP_W} height={CHIP_H} className='dg-wash dg-accent' style={pulse(passAt(i) - 0.03, passAt(i) + 0.06, 0.02)} />
               {i < CHAIN.length - 1
                 ? <path d={`M${x + CHIP_W} ${CHIP_Y + CHIP_H / 2}H${x + CHIP_GAP}M${x + CHIP_GAP - 4} ${CHIP_Y + CHIP_H / 2 - 3}L${x + CHIP_GAP} ${CHIP_Y + CHIP_H / 2}L${x + CHIP_GAP - 4} ${CHIP_Y + CHIP_H / 2 + 3}`} pathLength={1} className='dg-accent' style={draw(a + 0.03, a + 0.08)} />
                 : null}
@@ -183,15 +183,15 @@ export function AgritaDiagram () {
 
       {/* ---- The product label with its QR code ---- */}
       <g>
-        <rect x={20} y={310} width={180} height={166} rx={3} className='dg-edge dg-dash' style={fade(0.56, 0.62)} fill='none' />
-        <rect x={25} y={315} width={170} height={156} rx={2} pathLength={1} className='dg-fill' style={draw(0.56, 0.64)} />
+        <rect x={20} y={310} width={180} height={166} className='dg-edge dg-dash' style={fade(0.56, 0.62)} fill='none' />
+        <rect x={25} y={315} width={170} height={156} pathLength={1} className='dg-fill' style={draw(0.56, 0.64)} />
         <text x={34} y={326} style={{ ...fade(0.6, 0.66), fontSize: 10 }}>product label</text>
         <text x={186} y={326} textAnchor='end' className='dg-dim dg-small' style={fade(0.6, 0.66)}>lot</text>
         {/* label fields: name, lot, origin as hatched bars (no real data) */}
         {['name', 'lot', 'origin'].map((f, i) => (
           <g key={f} style={fade(0.62 + i * 0.02, 0.68 + i * 0.02)}>
             <text x={136} y={344 + i * 26} className='dg-dim dg-small'>{f}</text>
-            <rect x={136} y={349 + i * 26} width={52 - i * 10} height={5} rx={1.5} className='dg-edge' fill='hsl(var(--border))' />
+            <rect x={136} y={349 + i * 26} width={52 - i * 10} height={5} className='dg-edge' fill='hsl(var(--border))' />
           </g>
         ))}
         <text x={136} y={430} className='dg-dim dg-small' style={fade(0.68, 0.74)}>scan to</text>
@@ -212,7 +212,7 @@ export function AgritaDiagram () {
         <text x={QR_X} y={448} className='dg-dim dg-small' style={fade(0.7, 0.76)}>qr · trace code</text>
         <text x={QR_X} y={460} className='dg-dim dg-small' style={fade(0.7, 0.76)}>from the harvest lot</text>
         {/* the scan: a beam sweeps the matrix while the phone looks at it */}
-        <rect x={QR_X - 4} y={QR_Y} width={QR_SIZE + 8} height={2} rx={1} className='dg-solid' style={{ ...travel(0.76, 0.86, 0, QR_SIZE - 2), ...pulse(0.76, 0.88) }} />
+        <rect x={QR_X - 4} y={QR_Y} width={QR_SIZE + 8} height={2} className='dg-solid' style={{ ...travel(0.76, 0.86, 0, QR_SIZE - 2), ...pulse(0.76, 0.88) }} />
       </g>
 
       {/* ---- The phone that scans the label ---- */}
@@ -220,8 +220,8 @@ export function AgritaDiagram () {
         <path d={`M224 393L${QR_X + QR_SIZE + 4} ${QR_Y}L${QR_X + QR_SIZE + 4} ${QR_Y + QR_SIZE}Z`} className='dg-wash' style={pulse(0.74, 0.88)} />
         <path d={`M224 393L${QR_X + QR_SIZE + 4} ${QR_Y}M224 393L${QR_X + QR_SIZE + 4} ${QR_Y + QR_SIZE}`} className='dg-accent dg-dash' style={{ ...pulse(0.74, 0.88), strokeWidth: 0.8 }} />
         <text x={176} y={386} textAnchor='middle' className='dg-small' style={{ ...pulse(0.76, 0.88), ...ACCENT_TEXT }}>scan</text>
-        <rect x={218} y={310} width={80} height={166} rx={10} pathLength={1} className='dg-fill' style={draw(0.7, 0.78)} />
-        <rect x={224} y={322} width={68} height={142} rx={3} className='dg-edge' fill='none' style={fade(0.74, 0.8)} />
+        <rect x={218} y={310} width={80} height={166} pathLength={1} className='dg-fill' style={draw(0.7, 0.78)} />
+        <rect x={224} y={322} width={68} height={142} className='dg-edge' fill='none' style={fade(0.74, 0.8)} />
         <path d='M250 316H266' className='dg-line' style={{ ...fade(0.74, 0.8), strokeWidth: 1.4 }} />
         <text x={258} y={474} textAnchor='middle' className='dg-dim dg-small' style={fade(0.74, 0.8)}>phone</text>
         {/* viewfinder brackets during the scan */}
@@ -229,11 +229,11 @@ export function AgritaDiagram () {
         <path d='M242 393H280' className='dg-accent' style={pulse(0.76, 0.88)} />
         {/* the trace page on the phone, then blown up into the panel on the right */}
         <g style={fade(0.86, 0.92)}>
-          <rect x={229} y={328} width={58} height={6} rx={1.5} className='dg-solid' />
+          <rect x={229} y={328} width={58} height={6} className='dg-solid' />
           {[0, 1, 2, 3, 4].map((i) => (
             <g key={i}>
               <circle cx={234} cy={348 + i * 18} r={2.2} className='dg-fill dg-accent' />
-              <rect x={241} y={345 + i * 18} width={38 - i * 5} height={5} rx={1.5} fill='hsl(var(--border))' />
+              <rect x={241} y={345 + i * 18} width={38 - i * 5} height={5} fill='hsl(var(--border))' />
             </g>
           ))}
         </g>
@@ -243,10 +243,10 @@ export function AgritaDiagram () {
       {/* ---- The public trace page on TA Market, walking the chain back to the land lot ---- */}
       <g>
         <g style={rise(0.84, 0.9, 0, 10)}>
-          <rect x={316} y={310} width={312} height={166} rx={4} className='dg-fill' />
+          <rect x={316} y={310} width={312} height={166} className='dg-fill' />
           <path d='M316 328H628' className='dg-edge' />
           {[328, 338, 348].map((cx) => <circle key={cx} cx={cx} cy={319} r={2.4} className='dg-edge' fill='none' />)}
-          <rect x={360} y={313} width={256} height={12} rx={6} className='dg-fill' />
+          <rect x={360} y={313} width={256} height={12} className='dg-fill' />
           <text x={488} y={319.5} textAnchor='middle' className='dg-dim dg-small'>ta market · public trace page · no sign-in</text>
         </g>
         <Crosshairs x={322} y={334} w={300} h={136} a={0.88} b={0.94} />
@@ -254,7 +254,7 @@ export function AgritaDiagram () {
         <text x={382} y={347} className='dg-dim dg-small' style={fade(0.88, 0.94)}>walk the chain back</text>
         <Balloon x={534} y={346} n={1} a={0.9} b={0.96} accent />
         <g style={fade(0.9, 0.96)}>
-          <rect x={548} y={338} width={68} height={50} rx={2} className='dg-fill' />
+          <rect x={548} y={338} width={68} height={50} className='dg-fill' />
           <path d={LOT_THUMB} className='dg-accent' />
           <path d={LOT_THUMB} className='dg-wash' />
           <text x={582} y={395} textAnchor='middle' className='dg-dim dg-small'>land lot</text>

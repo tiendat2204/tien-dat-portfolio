@@ -124,11 +124,11 @@ export function PortfolioDiagram () {
   return (
     <svg viewBox='0 0 640 520' role='img' aria-label='Portfolio: a browser window with the site, its five layers (ui, content, app, registry, deploy) exploded as axonometric plates with numbered balloons, pnpm build typed in a terminal, an mdx file rendered as a blog post, a light and dark theme sweep and the static build result' className='dg'>
       {/* ---- product: the browser window ---- */}
-      <rect x={20} y={24} width={296} height={300} rx={6} pathLength={1} className='dg-fill' style={draw(0, 0.08)} />
+      <rect x={20} y={24} width={296} height={300} pathLength={1} className='dg-fill' style={draw(0, 0.08)} />
       <g style={fade(0.05, 0.11)}>
         <path d='M20 48H316' className='dg-edge' />
         {[34, 46, 58].map(x => <circle key={x} cx={x} cy={36} r={3} className='dg-edge' />)}
-        <rect x={76} y={29.5} width={170} height={13} rx={6.5} className='dg-fill' />
+        <rect x={76} y={29.5} width={170} height={13} className='dg-fill' />
         <text x={86} y={36} className='dg-dim dg-small'>tiendat.work/blog/hello</text>
         <circle cx={300} cy={36} r={6.5} className='dg-fill' />
       </g>
@@ -141,7 +141,7 @@ export function PortfolioDiagram () {
         <path d='M250 149H290' className='dg-accent' />
       </g>
       {/* the empty post panel: app/blog/[slug] before the build */}
-      <rect x={40} y={154} width={256} height={156} rx={3} pathLength={1} className='dg-edge dg-dash' style={draw(0.18, 0.24)} />
+      <rect x={40} y={154} width={256} height={156} pathLength={1} className='dg-edge dg-dash' style={draw(0.18, 0.24)} />
       <path d={PANEL_CROSSES} className='dg-line' style={{ ...fade(0.2, 0.24), ...HAIR }} />
       <text x={56} y={166} className='dg-dim dg-small' style={fade(0.2, 0.24)}>app/blog/[slug]</text>
       <path d='M246 36H254' className='dg-line' style={{ ...fade(0.44, 0.48), ...HAIR }} />
@@ -158,7 +158,7 @@ export function PortfolioDiagram () {
       <text x={450} y={bottomEdge + 24} textAnchor='middle' className='dg-dim dg-small' style={fade(0.44, 0.5)}>assembly · axonometric</text>
       {/* the side module (config.side): the motion libraries, this page's scroll among them */}
       <g style={rise(0.46, 0.52, 0, 6)}>
-        <rect x={40} y={344} width={236} height={24} rx={3} className='dg-edge dg-dash' />
+        <rect x={40} y={344} width={236} height={24} className='dg-edge dg-dash' />
         <path d='M136 344V324' className='dg-edge dg-dash' />
         <text x={52} y={356} style={{ fontSize: 10, fontWeight: 500 }}>motion</text>
         <text x={100} y={356} className='dg-dim dg-small'>GSAP · Motion · Lenis</text>
@@ -179,19 +179,19 @@ export function PortfolioDiagram () {
       {/* the rendered post */}
       <text x={52} y={186} style={{ fontSize: 14, fontWeight: 700, ...fade(0.68, 0.72) }}>Hello</text>
       <g style={fade(0.69, 0.73)}>
-        <rect x={238} y={174} width={46} height={32} rx={2} className='dg-fill' />
+        <rect x={238} y={174} width={46} height={32} className='dg-fill' />
         <circle cx={271} cy={183} r={3} className='dg-edge' />
         <path d='M238 206L252 190L261 199L268 193L284 206' className='dg-edge' />
         <text x={261} y={213} textAnchor='middle' className='dg-dim' style={{ fontSize: 8 }}>next/image</text>
       </g>
       <path d='M52 200H226M52 210H200' pathLength={1} className='dg-edge' style={{ ...draw(0.68, 0.74), strokeWidth: 3 }} />
       <g style={rise(0.72, 0.77, 0, 6)}>
-        <rect x={52} y={220} width={216} height={22} rx={3} className='dg-wash' />
+        <rect x={52} y={220} width={216} height={22} className='dg-wash' />
         <path d='M53.5 222V240' className='dg-accent' style={{ strokeWidth: 2.5 }} />
         <text x={64} y={231} className='dg-small'>Callout · written in MDX</text>
       </g>
       <g style={rise(0.75, 0.8, 0, 6)}>
-        <rect x={52} y={250} width={216} height={46} rx={3} className='dg-fill' />
+        <rect x={52} y={250} width={216} height={46} className='dg-fill' />
         <text x={60} y={259} className='dg-dim' style={{ fontSize: 8 }}>tsx</text>
       </g>
       <path d='M64 270H140M76 280H200M76 290H150' pathLength={1} className='dg-accent' style={{ ...draw(0.77, 0.83), strokeWidth: 3 }} />
@@ -208,7 +208,7 @@ export function PortfolioDiagram () {
       <path d='M301.5 31A5 5 0 1 0 302.5 41A4 4 0 0 1 301.5 31Z' className='dg-solid' style={fade(0.86, 0.92)} />
 
       {/* ---- terminal: the build and its result ---- */}
-      <rect x={20} y={402} width={600} height={66} rx={4} pathLength={1} className='dg-fill' style={draw(0.4, 0.46)} />
+      <rect x={20} y={402} width={600} height={66} pathLength={1} className='dg-fill' style={draw(0.4, 0.46)} />
       <path d={[cross(28, 410), cross(612, 410), cross(28, 460), cross(612, 460)].join('')} className='dg-line' style={{ ...fade(0.44, 0.48), ...HAIR }} />
       <text x={CMD_X} y={CMD_Y} textLength={CMD_W} lengthAdjust='spacing' style={fade(0.44, 0.46)}>{CMD}</text>
       <rect x={CMD_X - 1} y={CMD_Y - 8} width={CMD_W + 2} height={16} style={{ ...PAPER, transform: `translate(calc(${seg(0.46, 0.54)} * ${CMD_W + 2}px), 0)` }} />

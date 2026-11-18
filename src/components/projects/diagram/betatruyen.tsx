@@ -97,17 +97,17 @@ export function BetatruyenDiagram () {
   return (
     <svg viewBox='0 0 640 520' role='img' aria-label='BetaTruyen spec sheet: the forum with a story thread, a wallet of lục bảo and uy khí with a nạp button, the item collection and the truyenyy link module, beside the exploded stack of its frontend layers (ui, hooks, data, auth, api) with numbered balloons, a terminal line and a title block' className='dg'>
       {/* ---- the forum window ---------------------------------------------------------------------------------- */}
-      <rect x={WIN.x} y={WIN.y} width={WIN.w} height={WIN.h} rx={4} pathLength={1} className='dg-fill' style={draw(0, 0.1)} />
+      <rect x={WIN.x} y={WIN.y} width={WIN.w} height={WIN.h} pathLength={1} className='dg-fill' style={draw(0, 0.1)} />
       <path d={`M${WIN.x} 48H${WIN.x + WIN.w}`} pathLength={1} className='dg-edge' style={draw(0.04, 0.1)} />
       <g style={fade(0.06, 0.12)}>
         {[24, 34, 44].map(x => <circle key={x} cx={x} cy={38} r={2.4} className='dg-edge' />)}
-        <rect x={60} y={32} width={150} height={12} rx={6} className='dg-edge' />
+        <rect x={60} y={32} width={150} height={12} className='dg-edge' />
         <text x={68} y={38} className='dg-dim dg-small'>betatruyen · diễn đàn truyện</text>
       </g>
       {/* header: wordmark, nav, account */}
       <g style={fade(0.1, 0.16)}>
         <text x={22} y={62} style={{ ...DOTO, fontSize: 14 }}>BetaTruyen</text>
-        {[126, 158, 190].map(x => <rect key={x} x={x} y={57} width={24} height={9} rx={4.5} className='dg-edge' />)}
+        {[126, 158, 190].map(x => <rect key={x} x={x} y={57} width={24} height={9} className='dg-edge' />)}
         <circle cx={270} cy={61} r={7} className='dg-line' />
         <path d='M266 65Q270 60 274 65M268 59A2 2 0 1 0 272 59A2 2 0 1 0 268 59' className='dg-line' style={{ strokeWidth: 0.9 }} />
         <path d={`M${WIN.x} 74H${WIN.x + WIN.w}`} className='dg-edge' />
@@ -117,7 +117,7 @@ export function BetatruyenDiagram () {
       <g style={fade(0.12, 0.2)}>
         <path d={chevrons(30, 90)} className='dg-line' />
         <path d='M44 86H126' className='dg-line' style={{ strokeWidth: 3 }} />
-        <rect x={136} y={80} width={30} height={12} rx={6} className='dg-wash dg-accent' style={{ strokeWidth: 0.9 }} />
+        <rect x={136} y={80} width={30} height={12} className='dg-wash dg-accent' style={{ strokeWidth: 0.9 }} />
         <text x={151} y={86} textAnchor='middle' className='dg-small'>rank</text>
         <path d='M44 98H160M44 106H120' className='dg-edge' style={{ strokeWidth: 3 }} />
         <circle cx={34} cy={128} r={5} className='dg-edge' />
@@ -127,7 +127,7 @@ export function BetatruyenDiagram () {
         const y = 140 + i * 28
         return (
           <g key={i} style={rise(0.16 + i * 0.03, 0.22 + i * 0.03, 0, 6)}>
-            <rect x={46} y={y} width={120} height={20} rx={4} className='dg-fill' />
+            <rect x={46} y={y} width={120} height={20} className='dg-fill' />
             <circle cx={56} cy={y + 10} r={4} className='dg-edge' />
             <path d={`M66 ${y + 7}H${140 - i * 24}M66 ${y + 13}H${118 + i * 10}`} className='dg-edge' style={{ strokeWidth: 3 }} />
           </g>
@@ -135,7 +135,7 @@ export function BetatruyenDiagram () {
       })}
       {/* the reader's own reply lands in phase 4 */}
       <g style={rise(0.88, 0.94, 0, 8)}>
-        <rect x={46} y={196} width={120} height={20} rx={4} className='dg-wash dg-accent' style={{ strokeWidth: 0.9 }} />
+        <rect x={46} y={196} width={120} height={20} className='dg-wash dg-accent' style={{ strokeWidth: 0.9 }} />
         <circle cx={56} cy={206} r={4} className='dg-accent' />
         <path d='M66 203H150M66 209H104' className='dg-accent' style={{ strokeWidth: 3, opacity: 0.5 }} />
       </g>
@@ -150,18 +150,18 @@ export function BetatruyenDiagram () {
       ))}
       <g style={fade(0.24, 0.3)}>
         <path d='M22 312H166' className='dg-edge' />
-        <rect x={64} y={322} width={60} height={14} rx={7} className='dg-edge dg-dash' />
+        <rect x={64} y={322} width={60} height={14} className='dg-edge dg-dash' />
         <text x={94} y={329} textAnchor='middle' className='dg-dim dg-small'>tải thêm</text>
       </g>
       {/* comment box */}
       <g style={fade(0.26, 0.32)}>
-        <rect x={22} y={352} width={144} height={42} rx={4} className='dg-fill' />
+        <rect x={22} y={352} width={144} height={42} className='dg-fill' />
         <text x={30} y={364} className='dg-dim dg-small'>bình luận…</text>
       </g>
       <path d='M30 384H120' pathLength={1} className='dg-accent' style={{ ...draw(0.82, 0.88), strokeWidth: 3, opacity: 0.6 }} />
 
       {/* ---- wallet: two in-forum currencies and nạp ---------------------------------------------------------- */}
-      <rect x={WALLET.x} y={WALLET.y} width={WALLET.w} height={WALLET.h} rx={3} pathLength={1} className='dg-fill' style={draw(0.08, 0.16)} />
+      <rect x={WALLET.x} y={WALLET.y} width={WALLET.w} height={WALLET.h} pathLength={1} className='dg-fill' style={draw(0.08, 0.16)} />
       <Crosshairs x={WALLET.x} y={WALLET.y} w={WALLET.w} h={WALLET.h} style={fade(0.14, 0.18)} />
       <text x={WALLET.x + 8} y={WALLET.y + 10} className='dg-dim dg-small' style={fade(0.14, 0.2)}>ví · nạp</text>
       {[
@@ -172,30 +172,30 @@ export function BetatruyenDiagram () {
           <g style={fade(0.16 + i * 0.03, 0.22 + i * 0.03)}>
             <path d={icon} className='dg-accent' style={{ strokeWidth: 1 }} />
             <text x={202} y={y} className='dg-small'>{label}</text>
-            <rect x={BAR.x} y={y + 8} width={BAR.w} height={5} rx={2.5} className='dg-edge' />
+            <rect x={BAR.x} y={y + 8} width={BAR.w} height={5} className='dg-edge' />
           </g>
-          <rect x={BAR.x} y={y + 8} width={BAR.w} height={5} rx={2.5} className='dg-solid' style={{ ...fade(0.16 + i * 0.03, 0.22 + i * 0.03), transformOrigin: `${BAR.x}px ${y + 10.5}px`, transform: `scaleX(calc(${rest} + ${1 - rest - 0.12 * i} * ${seg(a, a + 0.06)}))` }} />
+          <rect x={BAR.x} y={y + 8} width={BAR.w} height={5} className='dg-solid' style={{ ...fade(0.16 + i * 0.03, 0.22 + i * 0.03), transformOrigin: `${BAR.x}px ${y + 10.5}px`, transform: `scaleX(calc(${rest} + ${1 - rest - 0.12 * i} * ${seg(a, a + 0.06)}))` }} />
         </g>
       ))}
       <g style={fade(0.2, 0.26)}>
-        <rect x={238} y={88} width={36} height={14} rx={7} className='dg-fill dg-accent' />
+        <rect x={238} y={88} width={36} height={14} className='dg-fill dg-accent' />
         <text x={256} y={95} textAnchor='middle' className='dg-small'>nạp</text>
       </g>
-      <rect x={236} y={86} width={40} height={18} rx={9} className='dg-accent' style={{ ...pulse(0.54, 0.62), strokeWidth: 1.6 }} />
+      <rect x={236} y={86} width={40} height={18} className='dg-accent' style={{ ...pulse(0.54, 0.62), strokeWidth: 1.6 }} />
       <text x={BAR.x} y={WALLET.y + WALLET.h - 10} className='dg-dim dg-small' style={fade(0.8, 0.85)}>đã nạp ✓</text>
 
       {/* ---- item collection -------------------------------------------------------------------------------- */}
-      <rect x={ITEMS.x} y={ITEMS.y} width={ITEMS.w} height={ITEMS.h} rx={3} pathLength={1} className='dg-fill' style={draw(0.1, 0.18)} />
+      <rect x={ITEMS.x} y={ITEMS.y} width={ITEMS.w} height={ITEMS.h} pathLength={1} className='dg-fill' style={draw(0.1, 0.18)} />
       <Crosshairs x={ITEMS.x} y={ITEMS.y} w={ITEMS.w} h={ITEMS.h} style={fade(0.16, 0.2)} />
       <text x={ITEMS.x + 8} y={ITEMS.y + 10} className='dg-dim dg-small' style={fade(0.16, 0.22)}>sưu tầm · vật phẩm</text>
       {SLOT_Y.map(y => SLOT_X.map(x => (
-        <rect key={`${x}-${y}`} x={x} y={y} width={SLOT} height={SLOT} rx={3} className='dg-edge dg-dash' style={fade(0.18, 0.26)} />
+        <rect key={`${x}-${y}`} x={x} y={y} width={SLOT} height={SLOT} className='dg-edge dg-dash' style={fade(0.18, 0.26)} />
       )))}
       {SLOTS.map((slot, i) => {
         const a = 0.85 + i * 0.05
         return (
           <g key={slot.label} style={rise(a, a + 0.06, 0, -8)}>
-            <rect x={slot.x} y={slot.y} width={SLOT} height={SLOT} rx={3} className='dg-fill dg-accent' />
+            <rect x={slot.x} y={slot.y} width={SLOT} height={SLOT} className='dg-fill dg-accent' />
             <path d={i === 0 ? onion(slot.x + 15, slot.y + 13) : chest(slot.x + 15, slot.y + 15)} className='dg-line' style={{ strokeWidth: 1 }} />
             <text x={slot.x + 15} y={slot.y + SLOT + 8} textAnchor='middle' className='dg-small'>{slot.label}</text>
           </g>
@@ -208,7 +208,7 @@ export function BetatruyenDiagram () {
 
       {/* ---- the module linked with truyenyy -------------------------------------------------------------------- */}
       <g style={rise(0.91, 0.97, 8, 0)}>
-        <rect x={LINK.x} y={LINK.y} width={LINK.w} height={LINK.h} rx={3} className='dg-fill dg-accent' />
+        <rect x={LINK.x} y={LINK.y} width={LINK.w} height={LINK.h} className='dg-fill dg-accent' />
         <text x={LINK.x + 8} y={LINK.y + 12} className='dg-dim dg-small'>module · liên kết</text>
         <text x={LINK.x + 8} y={LINK.y + 30} style={{ fontSize: 12 }}>truyenyy</text>
         <path d='M254 326a4 4 0 0 1 0 8h-4a4 4 0 0 1 0-8m8 0h4a4 4 0 0 1 0 8h-4m-8-4h12' className='dg-line' style={{ strokeWidth: 1 }} />

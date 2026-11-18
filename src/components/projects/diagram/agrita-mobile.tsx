@@ -92,8 +92,8 @@ function Balloon ({ k }: { k: number }) {
 function EntryCard ({ check = false }: { check?: boolean }) {
   return (
     <g>
-      <rect x={-CARD_W / 2} y={-CARD_H / 2} width={CARD_W} height={CARD_H} rx={2.5} className='dg-fill' />
-      <rect x={-CARD_W / 2 + 3} y={-CARD_H / 2 + 3} width={14} height={14} rx={1.5} className='dg-edge' />
+      <rect x={-CARD_W / 2} y={-CARD_H / 2} width={CARD_W} height={CARD_H} className='dg-fill' />
+      <rect x={-CARD_W / 2 + 3} y={-CARD_H / 2 + 3} width={14} height={14} className='dg-edge' />
       <path d={`M${-CARD_W / 2 + 4.5} ${CARD_H / 2 - 4.5}l4 -5l3 3l2 -2l3 4`} className='dg-line' strokeWidth={0.8} />
       <path d={`M${-CARD_W / 2 + 20} ${-4}h14M${-CARD_W / 2 + 20} ${1}h10`} className='dg-edge' />
       {check && <path d={`M${CARD_W / 2 - 10} 5l2.5 2.5l5 -5.5`} pathLength={1} className='dg-accent' strokeWidth={1.4} style={draw(0.96, 1)} />}
@@ -105,11 +105,11 @@ export function AgritaMobileDiagram () {
   return (
     <svg viewBox='0 0 640 520' role='img' aria-label='AgriTA Mobile spec sheet: the field worker phone with the weather, tasks, camera journal and sync center; the app exploded into its ui, routes, state, forms, client and sync layers; a journal entry written offline waits in the outbox and syncs to the AgriTA API when the signal returns' className='dg'>
       {/* ---- the phone ---------------------------------------------------------------------------------------- */}
-      <rect x={36} y={36} width={180} height={384} rx={22} pathLength={1} className='dg-fill' style={draw(0, 0.1)} />
+      <rect x={36} y={36} width={180} height={384} pathLength={1} className='dg-fill' style={draw(0, 0.1)} />
       <path d='M34.5 110v18M34.5 134v26M217.5 124v30' className='dg-line' style={fade(0.08, 0.12)} />
-      <rect x={46} y={46} width={160} height={364} rx={14} className='dg-edge' style={fade(0.06, 0.1)} />
+      <rect x={46} y={46} width={160} height={364} className='dg-edge' style={fade(0.06, 0.1)} />
       <circle cx={126} cy={57} r={3} className='dg-edge' style={fade(0.08, 0.12)} />
-      <rect x={110} y={412} width={32} height={2.4} rx={1.2} className='dg-ink' opacity={0.5} style={fade(0.08, 0.12)} />
+      <rect x={110} y={412} width={32} height={2.4} className='dg-ink' opacity={0.5} style={fade(0.08, 0.12)} />
 
       {/* status bar: app name, the signal bars (dimmed with a slash while the signal is gone) */}
       <g style={fade(0.1, 0.14)}>
@@ -129,7 +129,7 @@ export function AgritaMobileDiagram () {
 
       {/* weather card: sun and a small fl_chart sparkline */}
       <g style={rise(0.13, 0.18, 0, 6)}>
-        <rect x={54} y={86} width={144} height={38} rx={4} className='dg-fill' />
+        <rect x={54} y={86} width={144} height={38} className='dg-fill' />
         <circle cx={72} cy={105} r={6} className='dg-line' />
         <path d='M72 95v-3M72 115v3M62 105h-3M82 105h3M64.9 97.9l-2.1-2.1M79.1 112.1l2.1 2.1M79.1 97.9l2.1-2.1M64.9 112.1l-2.1 2.1' className='dg-line' strokeWidth={0.9} />
         <text x={90} y={96} className='dg-dim dg-small'>weather · today</text>
@@ -145,8 +145,8 @@ export function AgritaMobileDiagram () {
         return (
           <g key={label}>
             <g style={fade(a, a + 0.03)}>
-              <rect x={54} y={y} width={144} height={16} rx={3} className='dg-fill' />
-              <rect x={59} y={y + 3} width={10} height={10} rx={2} className='dg-edge' />
+              <rect x={54} y={y} width={144} height={16} className='dg-fill' />
+              <rect x={59} y={y + 3} width={10} height={10} className='dg-edge' />
               <text x={75} y={y + 8} className='dg-small'>{label}</text>
             </g>
             {i < 2 && <path d={`M61 ${y + 8}l2.5 2.5l5 -5.5`} pathLength={1} className='dg-accent' strokeWidth={1.3} style={draw(a + 0.03, a + 0.06)} />}
@@ -169,7 +169,7 @@ export function AgritaMobileDiagram () {
 
       {/* sync center strip, then its status: outbox count while offline, synced at the end */}
       <g style={fade(0.23, 0.27)}>
-        <rect x={54} y={322} width={144} height={28} rx={4} className='dg-fill' />
+        <rect x={54} y={322} width={144} height={28} className='dg-fill' />
         <text x={60} y={331} className='dg-dim dg-small'>sync center</text>
         <path d='M60 343h132' className='dg-edge' />
       </g>
@@ -213,7 +213,7 @@ export function AgritaMobileDiagram () {
 
       {/* the external AgriTA API */}
       <g style={rise(0.44, 0.5, 0, -6)}>
-        <rect x={540} y={12} width={88} height={60} rx={2} className='dg-edge dg-dash' />
+        <rect x={540} y={12} width={88} height={60} className='dg-edge dg-dash' />
         <path d={crosshairs(540, 12, 88, 60)} className='dg-line' strokeWidth={0.8} />
         <text x={548} y={24} style={{ fontSize: 10 }}>AgriTA API</text>
         <text x={548} y={35} className='dg-dim dg-small'>external</text>
