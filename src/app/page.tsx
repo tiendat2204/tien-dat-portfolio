@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { AwardCard } from '@/components/AwardCard'
+import BlurFadeText from '@/components/magicui/blur-fade-text'
 import { ShellPrompt } from '@/components/shell-prompt'
 import { ProjectCard } from '@/components/project-card'
 import { ResumeCard } from '@/components/resume-card'
@@ -119,9 +120,12 @@ export default function Page () {
               </div>
 
               <div className='flex items-center justify-between border-y'>
-                <ShellPrompt command='whoami' className='min-w-0 px-3 py-1.5 sm:px-4'>
-                  <span className='block truncate font-doto text-2xl font-extrabold tracking-tight sm:text-3xl'>{DATA.name}</span>
-                </ShellPrompt>
+                <BlurFadeText
+                  delay={BLUR_FADE_DELAY}
+                  className='truncate text-2xl font-extrabold tracking-tight sm:text-3xl font-doto px-3 sm:px-4'
+                  yOffset={0}
+                  text={DATA.name}
+                />
                 <div className='size-6 shrink-0 mr-3 sm:mr-4'>
                   <Icons.Logo />
                 </div>
@@ -154,11 +158,13 @@ export default function Page () {
         </div>
 
         <div className='p-4'>
-          <BlurFade delay={BLUR_FADE_DELAY * 4} offset={0}>
-            <Markdown className='prose max-w-full text-pretty font-ibm text-sm text-muted-foreground -tracking-tighter dark:prose-invert'>
-              {DATA.summary}
-            </Markdown>
-          </BlurFade>
+          <ShellPrompt command='cat about.md'>
+            <div className='my-3'>
+              <Markdown className='prose max-w-full text-pretty font-ibm text-sm text-muted-foreground -tracking-tighter dark:prose-invert'>
+                {DATA.summary}
+              </Markdown>
+            </div>
+          </ShellPrompt>
         </div>
       </section>
       <section id='skills' className='relative screen-line-after border-x'>

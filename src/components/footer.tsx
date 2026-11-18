@@ -135,7 +135,7 @@ export function Footer () {
 
       <div className='flex items-end justify-between gap-4 border-b px-4 py-3'>
         <span className='text-xs text-muted-foreground'># signed</span>
-        <Signature className='h-16 w-auto text-foreground' />
+        <Signature className='h-24 w-auto text-foreground' />
       </div>
 
       <div className='flex items-center justify-between gap-4 px-4 py-3'>
