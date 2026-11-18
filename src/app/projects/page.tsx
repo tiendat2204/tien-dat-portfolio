@@ -1,5 +1,8 @@
 import Image from 'next/image'
-import { Fragment } from 'react'
+import { Fragment, Suspense } from 'react'
+
+import { Back } from '@/app/blog/back'
+import { Icons } from '@/components/icons'
 
 import { Icon } from '@/components/Icon'
 import { DiagramSlot } from '@/components/projects/diagram/diagram-slot'
@@ -17,6 +20,17 @@ export const metadata = buildPageMetadata({
   description: 'Selected projects by Tien Dat: what each one is, the stack behind it and where to see it live.',
 })
 
+const TAB_LABEL: Record<string, string> = {
+  'tien-dat-portfolio': 'Portfolio',
+  agrita: 'AgriTA',
+  eoffice: 'E-Office',
+  'digital-library': 'Library',
+  'agrita-mobile': 'AgriTA Mobile',
+  'tangni-web': 'TangNi',
+  'xn2-admin': 'XN2',
+  betatruyen: 'BetaTruyen',
+}
+
 // Techs without a logo file show a square monogram tile (name in the tooltip), the same 24px box as the logos.
 const monogram = (name: string) => {
   const words = name.split(/[\s_-]+/).filter(Boolean)
@@ -26,17 +40,48 @@ const monogram = (name: string) => {
 export default function ProjectsPage () {
   const sections = buildProjectSections()
   return (
-    <main className='mx-auto w-full max-w-3xl border-x px-4 py-24 lg:max-w-7xl'>
-      <h1 className='font-doto text-4xl font-extrabold'>projects</h1>
+    <main className='mx-auto w-full max-w-3xl border-x pb-24 lg:max-w-[1360px] 2xl:max-w-[1600px]'>
+      <section id='projects-header' className='relative screen-line-after'>
+        <Icon className='absolute -bottom-3 -left-3 z-20 size-6 text-black dark:text-white' />
+        <Icon className='absolute -right-3 -bottom-3 z-20 size-6 text-black dark:text-white' />
+        <div className='flex items-center justify-between border-b'>
+          <div className='px-4'>
+            <Suspense>
+              <Back />
+            </Suspense>
+          </div>
+          <div className='mr-4 size-6'>
+            <Icons.Logo />
+          </div>
+        </div>
+        <div className='px-4 pt-10 pb-6'>
+          <p className='font-ibm text-sm text-muted-foreground'>Selected work</p>
+          <h1 className='font-doto text-5xl font-extrabold leading-tight md:text-6xl'>projects</h1>
+          <p className='mt-2 max-w-2xl font-ibm text-sm text-muted-foreground'>What each project is and the stack behind it, one scroll at a time.</p>
+        </div>
+      </section>
+      <nav aria-label='Projects' className='relative screen-line-after'>
+        <ul className='no-scrollbar flex overflow-x-auto font-ibm text-xs uppercase tracking-wide'>
+          {sections.map(section => (
+            <li key={section.id} className='shrink-0 border-r first:border-l-0'>
+              <a href={`#${section.id}`} className='block px-4 py-3 text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground'>
+                <span className='mr-2 tabular-nums'>{String(section.index).padStart(2, '0')}</span>
+                {TAB_LABEL[section.id] ?? section.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div aria-hidden='true' className='relative h-8 screen-line-after bg-lines-pattern-light dark:bg-lines-pattern' />
       <ProjectsScroller>
         {sections.map(section => (
           <Fragment key={section.id}>
-            <div aria-hidden='true' className='screen-line-before relative -mx-4 mt-12 h-px'>
+            <div aria-hidden='true' className='screen-line-before relative mt-12 h-px'>
               <Icon className='absolute -top-3 -left-3 z-20 size-6 text-black dark:text-white' />
               <Icon className='absolute -top-3 -right-3 z-20 size-6 text-black dark:text-white' />
             </div>
-            <section id={section.id} className='dg-section mt-12 grid scroll-mt-24 gap-6 lg:min-h-[calc(100svh-6rem)] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-12'>
-              <div className='lg:flex lg:max-h-[calc(100svh-8rem)] lg:flex-col'>
+            <section id={section.id} className='dg-section mt-12 grid scroll-mt-24 gap-6 px-4 lg:min-h-[calc(100svh-6rem)] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-0 lg:px-0'>
+              <div className='lg:flex lg:max-h-[calc(100svh-8rem)] lg:flex-col lg:px-8'>
                 <p className='text-xs tabular-nums text-muted-foreground'>{String(section.index).padStart(2, '0')}</p>
                 <h2 className='font-doto text-2xl font-extrabold'>{section.title}</h2>
                 <p className='text-sm text-muted-foreground'>{[section.role, section.company, section.period].filter(Boolean).join(' · ')}</p>
@@ -60,7 +105,7 @@ export default function ProjectsPage () {
                   ))}
                 </ul>
               </div>
-              <div className='min-w-0'>
+              <div className='min-w-0 lg:border-l lg:px-8'>
                 <DiagramSlot figureId={section.figureId} />
               </div>
             </section>
