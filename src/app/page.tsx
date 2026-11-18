@@ -26,6 +26,7 @@ import { BackgroundHero } from '@/components/landing/background-hero'
 import { LocalTime } from '@/components/local-time'
 import { HeroGreeting } from '@/components/time-greeting'
 import { HowIBuildSection } from './section/how-i-build-section'
+import { SectionHead } from '@/components/section-head'
 
 export const metadata = buildPageMetadata({
   siteUrl: SITE_INFO.url,
@@ -118,12 +119,15 @@ export default function Page () {
               </div>
 
               <div className='flex items-center justify-between border-y'>
-                <BlurFadeText
-                  delay={BLUR_FADE_DELAY}
-                  className='truncate text-2xl font-extrabold tracking-tight sm:text-3xl font-doto px-3 sm:px-4'
-                  yOffset={0}
-                  text={DATA.name}
-                />
+                <div className='flex min-w-0 items-center'>
+                  <span aria-hidden='true' className='pl-3 font-ibm text-lg text-muted-foreground sm:pl-4 sm:text-xl'>$</span>
+                  <BlurFadeText
+                    delay={BLUR_FADE_DELAY}
+                    className='min-w-0 truncate text-2xl font-extrabold tracking-tight sm:text-3xl font-doto pl-2 pr-3 sm:pr-4'
+                    yOffset={0}
+                    text={DATA.name}
+                  />
+                </div>
                 <div className='size-6 shrink-0 mr-3 sm:mr-4'>
                   <Icons.Logo />
                 </div>
@@ -151,7 +155,7 @@ export default function Page () {
       <section id='about' className='relative  screen-line-after  border-x'>
         <div className='border-b'>
           <BlurFade delay={BLUR_FADE_DELAY * 3} offset={0}>
-            <h2 className='text-2xl font-extrabold px-4 font-doto'>About</h2>
+            <SectionHead index={1} total={10} title='About' />
           </BlurFade>
         </div>
 
@@ -170,7 +174,7 @@ export default function Page () {
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
         <div className='border-b'>
           <BlurFade delay={BLUR_FADE_DELAY * 3} offset={0}>
-            <h2 className='text-2xl font-extrabold px-4 font-doto'>Skills</h2>
+            <SectionHead index={2} total={10} title='Skills' />
           </BlurFade>
         </div>
 
@@ -192,9 +196,7 @@ export default function Page () {
         <div className='flex min-h-0 flex-col'>
           <div className='border-b'>
             <BlurFade delay={BLUR_FADE_DELAY * 5} offset={0}>
-              <h2 className='text-2xl font-extrabold px-4 font-doto'>
-                Experience
-              </h2>
+              <SectionHead index={5} total={10} title='Experience' />
             </BlurFade>
           </div>
           <WorkSection />
@@ -210,9 +212,7 @@ export default function Page () {
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
         <div className='border-b'>
           <BlurFade delay={BLUR_FADE_DELAY * 7}>
-            <h2 className='text-2xl font-extrabold px-4 font-doto'>
-              Education
-            </h2>
+            <SectionHead index={6} total={10} title='Education' />
           </BlurFade>
         </div>
         <div className='relative p-4 space-y-4'>
@@ -249,7 +249,7 @@ export default function Page () {
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
         <div className='border-b'>
           <BlurFade delay={BLUR_FADE_DELAY * 11}>
-            <h2 className='text-2xl font-extrabold px-4 font-doto'>Project</h2>
+            <SectionHead index={7} total={10} title='Project' link={{ href: '/projects', label: 'all projects' }} />
           </BlurFade>
         </div>
         <div className='grid grid-cols-1  '>
@@ -284,7 +284,7 @@ export default function Page () {
         <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
         <div className='border-b'>
           <BlurFade delay={BLUR_FADE_DELAY * 13}>
-            <h2 className='text-2xl font-extrabold px-4 font-doto'>Awards</h2>
+            <SectionHead index={9} total={10} title='Awards' />
           </BlurFade>
         </div>
         <BlurFade delay={BLUR_FADE_DELAY * 14}>

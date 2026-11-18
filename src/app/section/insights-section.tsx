@@ -5,6 +5,7 @@ import { INSIGHTS_SOURCE } from '@/data/insights'
 import { getUmamiInsights } from '@/lib/umami'
 import { cn } from '@/lib/utils'
 import { InsightsChart } from './insights-chart'
+import { SectionHead } from '@/components/section-head'
 
 export async function InsightsSection () {
   const insights = await getUmamiInsights()
@@ -19,7 +20,7 @@ export async function InsightsSection () {
       <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
       <div className='flex items-baseline justify-between border-b pr-4'>
         <BlurFade delay={BLUR_FADE_DELAY * 3} offset={0}>
-          <h2 className='text-2xl font-extrabold px-4 font-doto'>Insights</h2>
+          <SectionHead index={4} total={10} title='Insights' />
         </BlurFade>
         {range && <span className='text-xs text-muted-foreground'>[{range}]</span>}
       </div>

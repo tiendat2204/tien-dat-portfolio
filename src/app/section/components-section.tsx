@@ -5,6 +5,7 @@ import { BlurFade } from '@/components/magicui/blur-fade'
 import { ComponentList } from '@/app/components/_components/component-list'
 import { getAllComponents } from '@/data/blog'
 import { BLUR_FADE_DELAY } from '@/data/config'
+import { SectionHead } from '@/components/section-head'
 
 export default function ComponentsSection () {
   const components = getAllComponents()
@@ -20,7 +21,7 @@ export default function ComponentsSection () {
       <div className='border-b'>
         <div className='flex items-center justify-between'>
           <BlurFade delay={BLUR_FADE_DELAY * 13} offset={0}>
-            <h2 className='text-2xl font-extrabold px-4 font-doto'>Components</h2>
+            <SectionHead index={8} total={10} title='Components' />
           </BlurFade>
           <Link
             href='/components'

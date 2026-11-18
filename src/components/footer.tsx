@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import { Icon } from '@/components/Icon'
 import { Icons } from '@/components/icons'
+import { Signature } from '@/components/signature'
 import { Status, StatusIndicator, StatusLabel } from '@/components/kibo-ui/status'
 import { GITHUB_REPO, SITE_INFO } from '@/data/config'
 import { DATA } from '@/data/resume'
@@ -129,6 +130,11 @@ export function Footer () {
             </ul>
           </div>
         </div>
+      </div>
+
+      <div className='flex items-end justify-between gap-4 border-b px-4 py-3'>
+        <span className='text-xs text-muted-foreground'># signed</span>
+        <Signature className='h-16 w-auto text-foreground' />
       </div>
 
       <div className='flex items-center justify-between gap-4 px-4 py-3'>

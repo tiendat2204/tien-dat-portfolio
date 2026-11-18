@@ -6,6 +6,7 @@ import type { Post } from '@/types/blog'
 import { BlurFade } from '@/components/magicui/blur-fade'
 import { BLUR_FADE_DELAY } from '@/data/config'
 import { BlogCard } from './blog/BlogCard'
+import { SectionHead } from '@/components/section-head'
 
 export default function BlogSection () {
   const posts: Post[] = getAllPosts()
@@ -18,7 +19,7 @@ export default function BlogSection () {
       <div className='border-b'>
         <div className='flex items-center justify-between'>
           <BlurFade delay={BLUR_FADE_DELAY * 3} offset={0}>
-            <h2 className='text-2xl font-extrabold px-4 font-doto'>Recent Articles</h2>
+            <SectionHead index={10} total={10} title='Recent Articles' />
           </BlurFade>
           <Link
             href='/blog'

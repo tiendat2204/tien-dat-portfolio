@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { Icon } from '@/components/Icon'
 import { BlurFade } from '@/components/magicui/blur-fade'
 import { BLUR_FADE_DELAY } from '@/data/config'
+import { SectionHead } from '@/components/section-head'
 
 // Teaser for /uses: the writer → reviewer → me loop, plus one link per workflow diagram.
 const FLOWS = [
@@ -32,7 +33,7 @@ export function HowIBuildSection () {
       <Icon className='absolute z-20 h-6 w-6 -bottom-3 -right-3 dark:text-white text-black' />
       <div className='flex items-baseline justify-between border-b pr-4'>
         <BlurFade delay={BLUR_FADE_DELAY * 3} offset={0}>
-          <h2 className='text-2xl font-extrabold px-4 font-doto'>How I build</h2>
+          <SectionHead index={3} total={10} title='How I build' />
         </BlurFade>
         <Link href='/uses' className='text-xs text-muted-foreground transition-colors hover:text-foreground'>
           [full setup →]

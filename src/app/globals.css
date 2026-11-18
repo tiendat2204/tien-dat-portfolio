@@ -248,6 +248,29 @@
     margin-right: -50vw;
     width: 100vw;
   }
+  .signature {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    overflow: visible;
+  }
+  .signature path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .signature[data-drawn] path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.7s ease-in-out calc(var(--i) * 0.45s);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .signature path {
+      stroke-dashoffset: 0;
+      transition: none;
+    }
+  }
+
   .font-ibm {
     font-family: "IBM Plex Mono", monospace;
   }
