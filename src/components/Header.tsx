@@ -60,6 +60,7 @@ export function Header ({ stars }: { stars: number | null }) {
       className={cn(
         'sticky top-0 z-40 screen-line-before   mx-auto w-full max-w-3xl border-b border-transparent transition-all ease-out',
         {
+          'lg:max-w-[1360px] 2xl:max-w-[1600px]': pathname.startsWith('/projects'),
           'bg-background/95 supports-[backdrop-filter]:bg-background/50 border-border backdrop-blur-lg':
             scrolled && !open,
           'bg-background/90': open,

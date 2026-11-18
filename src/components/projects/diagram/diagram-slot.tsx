@@ -29,7 +29,7 @@ export function DiagramSlot ({ figureId }: { figureId?: FigureId }) {
   if (!figureId) return null
   const { fig, title, hint, Diagram } = DIAGRAMS[figureId]
   return (
-    <div data-figure={figureId} className='mt-6 w-full'>
+    <div data-figure={figureId} className='w-full'>
       <FigureFrame fig={fig} title={title} hint={hint} readout='spec sheet'>
         <Diagram />
       </FigureFrame>
