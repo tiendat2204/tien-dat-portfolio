@@ -268,31 +268,15 @@
     transform-origin: left center;
     transform: scaleX(0);
   }
-  .signature-flourish {
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 11;
-    stroke-linecap: round;
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-  }
   .signature[data-drawn] .signature-wipe {
     transform: scaleX(1);
-    transition: transform 2.2s cubic-bezier(0.6, 0, 0.3, 1);
-  }
-  .signature[data-drawn] .signature-flourish {
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 0.9s ease-out 2s;
+    transition: transform 2.4s cubic-bezier(0.55, 0, 0.3, 1);
   }
   @media (prefers-reduced-motion: reduce) {
     .signature-wipe {
       transform: scaleX(1);
     }
-    .signature-flourish {
-      stroke-dashoffset: 0;
-    }
-    .signature[data-drawn] .signature-wipe,
-    .signature[data-drawn] .signature-flourish {
+    .signature[data-drawn] .signature-wipe {
       transition: none;
     }
   }
