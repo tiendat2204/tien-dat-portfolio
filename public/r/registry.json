@@ -76,7 +76,49 @@
           "type": "registry:component"
         },
         {
+          "path": "src/registry/InfiniteSelect/infinite-select-types.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/registry/InfiniteSelect/infinite-options-state.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/registry/InfiniteSelect/use-infinite-options.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/registry/InfiniteSelect/use-infinite-scroll-trigger.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/registry/InfiniteSelect/infinite-list-status.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "type": "registry:component"
+    },
+    {
+      "name": "scroll-stage",
+      "description": "A block that pins while the page scrolls and exposes the scroll progress as a CSS variable, with helpers to animate SVG and HTML in pure CSS.",
+      "dependencies": [
+        "gsap"
+      ],
+      "files": [
+        {
+          "path": "src/registry/ScrollStage/scroll-stage-plan.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/registry/ScrollStage/scroll-progress.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/registry/ScrollStage/use-scroll-stage.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/registry/ScrollStage/scroll-stage.tsx",
           "type": "registry:component"
         }
       ],
