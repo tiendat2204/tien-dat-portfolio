@@ -120,7 +120,7 @@ export function SelectSingleInfiniteScroll<T extends SelectItemType> ({
     ? getEmptyMessage(data.search)
     : data.search ? labels.noResults : labels.empty
 
-  const { sentinelRef } = useInfiniteScrollTrigger({ hasNextPage, isFetchingNextPage, fetchNextPage })
+  const { sentinelRef } = useInfiniteScrollTrigger({ hasNextPage, isFetchingNextPage, fetchNextPage, isError })
 
   const handleSelect = useCallback((item: T) => {
     const nextItem = item.id === value ? undefined : item

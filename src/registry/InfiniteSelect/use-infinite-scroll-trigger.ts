@@ -6,6 +6,8 @@ interface UseInfiniteScrollTriggerArgs {
   hasNextPage: boolean
   isFetchingNextPage: boolean
   fetchNextPage: () => void
+  /** A failed load pauses automatic paging until the caller retries; otherwise a visible sentinel would loop on the error. */
+  isError?: boolean
   /** Set to false to pause loading, e.g. while "select all" is already walking the pages. */
   enabled?: boolean
   /** How far before the end of the list the next page starts loading. */
@@ -23,12 +25,13 @@ export function useInfiniteScrollTrigger ({
   hasNextPage,
   isFetchingNextPage,
   fetchNextPage,
+  isError = false,
   enabled = true,
   rootMargin = '0px 0px 48px 0px',
 }: UseInfiniteScrollTriggerArgs) {
   const [sentinel, setSentinel] = useState<HTMLElement | null>(null)
   const sentinelRef = useCallback((node: HTMLElement | null) => setSentinel(node), [])
-  const active = enabled && hasNextPage && !isFetchingNextPage
+  const active = enabled && !isError && hasNextPage && !isFetchingNextPage
 
   // Re-observing after each page makes the observer report the current state again, which is what chains the loads.
   useEffect(() => {

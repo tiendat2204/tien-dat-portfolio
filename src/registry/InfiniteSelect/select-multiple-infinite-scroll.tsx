@@ -262,7 +262,7 @@ export function SelectMultipleInfiniteScroll<T extends SelectItemType> ({
   }, [])
 
   // "Select all" already walks the pages by itself, so scrolling must not start a second load.
-  const { sentinelRef } = useInfiniteScrollTrigger({ hasNextPage, isFetchingNextPage, fetchNextPage, enabled: !isAutoFetching })
+  const { sentinelRef } = useInfiniteScrollTrigger({ hasNextPage, isFetchingNextPage, fetchNextPage, isError, enabled: !isAutoFetching })
 
   const handleRetry = data.retry
 
