@@ -71,4 +71,28 @@ export const components: Registry['items'] = [
       },
     ],
   },
+  {
+    name: 'scroll-stage',
+    type: 'registry:component',
+    description: 'A block that pins while the page scrolls and exposes the scroll progress as a CSS variable, with helpers to animate SVG and HTML in pure CSS.',
+    dependencies: ['gsap'],
+    files: [
+      {
+        path: 'ScrollStage/scroll-stage-plan.ts',
+        type: 'registry:component',
+      },
+      {
+        path: 'ScrollStage/scroll-progress.ts',
+        type: 'registry:component',
+      },
+      {
+        path: 'ScrollStage/use-scroll-stage.ts',
+        type: 'registry:component',
+      },
+      {
+        path: 'ScrollStage/scroll-stage.tsx',
+        type: 'registry:component',
+      },
+    ],
+  },
 ]

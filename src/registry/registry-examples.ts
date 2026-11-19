@@ -45,4 +45,15 @@ export const examples: Registry['items'] = [
       },
     ],
   },
+  {
+    name: 'scroll-stage-demo',
+    type: 'registry:example',
+    registryDependencies: ['https://tiendat.work/r/scroll-stage.json'],
+    files: [
+      {
+        path: 'examples/scroll-stage-demo.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
 ]

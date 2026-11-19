@@ -1,0 +1,154 @@
+---
+title: Scroll Stage
+description: A block that pins while the page scrolls and exposes the scroll progress as a CSS variable, so SVG and HTML can animate in pure CSS with no per-frame JavaScript.
+registry: scroll-stage
+new: true
+publishedAt: "2026-11-19"
+tags: ["react", "gsap", "scroll", "animation", "svg", "ui"]
+---
+
+<ComponentPreview
+  name="scroll-stage-demo"
+  openInV0Url="https://tiendat.work/r/scroll-stage.json"
+/>
+
+## What is Scroll Stage?
+
+A pinned section whose scroll position becomes one number: `--p`, from 0 to 1, written to the stage element as a CSS custom property. Anything inside can be styled as a `calc()` of it, so a diagram draws itself, a packet travels, a result fades in, and React never re-renders while you scroll.
+
+It plays three ways, chosen from the viewport:
+
+- **Pinned** on wide screens: the stage pins and the scroll scrubs `--p`.
+- **Stacked** on narrow screens: no pinning; `--p` plays from 0 to 1 once when the stage comes into view.
+- **Static** with `prefers-reduced-motion`: `--p` stays at 1, so people see the finished state.
+
+Before scripts run, `--p` is 0, so a stage starts empty instead of flashing its end state.
+
+## Installation
+
+<CodeTabs className="gap-0">
+  <TabsList>
+    <TabsTriggerShadcnCLI />
+    <TabsTrigger value="manual">Manual</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="cli" className="[&>figure]:mb-0">
+    ```bash
+    npx shadcn@latest add https://tiendat.work/r/scroll-stage.json
+    ```
+  </TabsContent>
+
+  <TabsContent value="manual">
+    <Steps>
+            <Step>Install GSAP</Step>
+            ```bash
+            npm install gsap
+            ```
+            <Step>Copy and paste the following code into your project</Step>
+            <ComponentSource
+                name="scroll-stage"
+                src="src/registry/ScrollStage/scroll-stage-plan.ts"
+                title="components/ScrollStage/scroll-stage-plan.ts"
+                showLineNumbers
+            />
+            <ComponentSource
+                name="scroll-stage"
+                src="src/registry/ScrollStage/scroll-progress.ts"
+                title="components/ScrollStage/scroll-progress.ts"
+                showLineNumbers
+            />
+            <ComponentSource
+                name="scroll-stage"
+                src="src/registry/ScrollStage/use-scroll-stage.ts"
+                title="components/ScrollStage/use-scroll-stage.ts"
+                showLineNumbers
+            />
+            <ComponentSource
+                name="scroll-stage"
+                src="src/registry/ScrollStage/scroll-stage.tsx"
+                title="components/ScrollStage/scroll-stage.tsx"
+                showLineNumbers
+            />
+            <Step>Update the import paths to match your project setup</Step>
+        </Steps>
+  </TabsContent>
+</CodeTabs>
+
+## Usage
+
+Wrap your content in `ScrollStage` and style it with the helpers. Each helper takes a progress range: the effect holds its start state before `a` and its end state after `b`.
+
+```tsx
+import { ScrollStage, draw, fade, pulse, rise, travel } from '@/components/ScrollStage/scroll-stage'
+
+export function Pipeline () {
+  return (
+    <ScrollStage topOffset={96} distance={1.5}>
+      <svg viewBox='0 0 400 160'>
+        {/* 0 - 0.3: the track draws in */}
+        <path d='M30 80H370' pathLength={1} stroke='currentColor' fill='none' style={draw(0, 0.3)} />
+
+        {/* 0.3 - 0.7: a packet runs along it, visible only while it moves */}
+        <rect x={26} y={74} width={12} height={12} style={{ ...travel(0.3, 0.7, 340), ...pulse(0.28, 0.74) }} />
+
+        {/* 0.7 - 0.9: the result appears */}
+        <text x={262} y={122} style={rise(0.7, 0.9, 0, 10)}>result: ok</text>
+      </svg>
+    </ScrollStage>
+  )
+}
+```
+
+Any element can use `--p` directly, no helper needed:
+
+```tsx
+<div style={{ width: 'calc(var(--p) * 100%)' }} className='h-1 bg-foreground' />
+```
+
+### Helpers
+
+| Helper | Effect |
+|--------|--------|
+| `seg(a, b)` | A CSS number: 0 until `a`, 1 from `b`, linear in between. The others are built on it. |
+| `draw(a, b)` | Draws an SVG shape in from its start. Put `pathLength={1}` on the element. |
+| `fade(a, b)` | Fades opacity from 0 to 1. |
+| `rise(a, b, dx?, dy?)` | Fades in while sliding from (dx, dy) px to its place. |
+| `travel(a, b, dx, dy?)` | Moves from the origin to (dx, dy) px. |
+| `pulse(a, b, edge?)` | Visible only between `a` and `b`, fading in and out over `edge`. |
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `distance` | `number` | `1.5` | How long the stage stays pinned, in viewport heights. |
+| `topOffset` | `number` | `0` | Distance from the top of the viewport where it pins, e.g. a sticky header's height. |
+| `pinFrom` | `number` | `1024` | Viewport width from which the stage pins. Narrower screens play once instead. |
+| `duration` | `number` | `1` | Seconds the one-shot play takes on narrow screens. |
+| `onProgress` | `(progress: number) => void` | - | Called with each new progress value, e.g. to drive a canvas. |
+
+Every other prop (`className`, `style`, `id`, …) goes to the stage's `div`. Use `useScrollStage(ref, options)` if you want the behaviour on an element you render yourself.
+
+## Notes
+
+### Smooth scrolling (Lenis)
+
+ScrollStage listens to the page's scroll through GSAP's ScrollTrigger. With a smooth-scroll library, tell ScrollTrigger when it moves. With Lenis:
+
+```tsx
+import { useLenis } from 'lenis/react'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+useLenis(() => ScrollTrigger.update())
+```
+
+### Content that changes height
+
+Images and lazy components change the page height after mount, which would leave pin positions stale. The stage watches its own size and re-measures once per frame, so you do not need to call `ScrollTrigger.refresh()` yourself.
+
+### Pin spacing
+
+While pinned the stage keeps its place and the page below waits for the pin to finish. Spacing is forced on, because GSAP otherwise turns it off when the parent is a flex or grid container and the next content would slide under the stage.
+
+### Stage state, not scroll position
+
+`--p` is progress through *this* stage, 0 at the pin and 1 at its end, not the page's scroll offset. Several stages on one page each have their own `--p`.

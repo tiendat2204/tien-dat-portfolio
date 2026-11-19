@@ -70,6 +70,24 @@ export const Index: Record<string, any> = {
       type: 'registry:component',
     }],
   },
+  'scroll-stage': {
+    name: 'scroll-stage',
+    description: 'A block that pins while the page scrolls and exposes the scroll progress as a CSS variable, with helpers to animate SVG and HTML in pure CSS.',
+    type: 'registry:component',
+    files: [{
+      path: 'src/registry/ScrollStage/scroll-stage-plan.ts',
+      type: 'registry:component',
+    }, {
+      path: 'src/registry/ScrollStage/scroll-progress.ts',
+      type: 'registry:component',
+    }, {
+      path: 'src/registry/ScrollStage/use-scroll-stage.ts',
+      type: 'registry:component',
+    }, {
+      path: 'src/registry/ScrollStage/scroll-stage.tsx',
+      type: 'registry:component',
+    }],
+  },
   'sticker-animation-demo': {
     name: 'sticker-animation-demo',
     description: '',
@@ -109,5 +127,15 @@ export const Index: Record<string, any> = {
       type: 'registry:example',
     }],
     component: React.lazy(() => import('@/registry/examples/infinite-select-demo.tsx')),
+  },
+  'scroll-stage-demo': {
+    name: 'scroll-stage-demo',
+    description: '',
+    type: 'registry:example',
+    files: [{
+      path: 'src/registry/examples/scroll-stage-demo.tsx',
+      type: 'registry:example',
+    }],
+    component: React.lazy(() => import('@/registry/examples/scroll-stage-demo.tsx')),
   },
 }
