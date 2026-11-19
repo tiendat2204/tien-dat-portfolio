@@ -1,13 +1,14 @@
 'use client'
 
-import { useCallback, useMemo, useState, type MouseEvent, type ReactNode, type UIEvent } from 'react'
-import { Check, ChevronDown, Loader2, X } from 'lucide-react'
+import { useCallback, useMemo, useState, type MouseEvent, type ReactNode } from 'react'
+import { Check, ChevronDown, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 
+import { InfiniteListEnd, InfiniteListError, InfiniteListLoading, InfiniteListLoadingMore } from './infinite-list-status'
 import {
   defaultInfiniteSelectLabels,
   mergeById,
@@ -16,6 +17,7 @@ import {
   type InfiniteSelectLabels,
   type SelectItemType,
 } from './use-infinite-options'
+import { useInfiniteScrollTrigger } from './use-infinite-scroll-trigger'
 
 export type { InfiniteQueryResult, InfiniteSource, QueryFn, SelectItemType } from './use-infinite-options'
 
@@ -53,8 +55,6 @@ type SelectSingleInfiniteScrollProps<T extends SelectItemType> = InfiniteDataPro
   open?: boolean
   onOpenChange?: (open: boolean) => void
 }
-
-const SCROLL_THRESHOLD = 20
 
 export function SelectSingleInfiniteScroll<T extends SelectItemType> ({
   queryFn,
@@ -108,31 +108,19 @@ export function SelectSingleInfiniteScroll<T extends SelectItemType> ({
     return [...items, ...data.selected, ...picked].find(item => item.id === value)
   }, [value, items, data.selected, picked])
 
-  const handleRetry = data.retry
-
   // A failed load is not an empty list: saying "No results" sends people looking for a record that is there.
   const errorMessage = isError ? getErrorMessage?.(data.error) || labels.error : null
+  const handleRetry = data.retry
+
   const errorState = errorMessage
-    ? (
-      <div role='alert' className='space-y-2 py-3 text-center'>
-        <p className='text-destructive text-xs'>{errorMessage}</p>
-        <Button type='button' variant='outline' size='sm' disabled={isFetching} onClick={handleRetry}>
-          {isFetching ? labels.loading : labels.retry}
-        </Button>
-      </div>
-      )
+    ? <InfiniteListError message={errorMessage} labels={labels} isFetching={isFetching} onRetry={handleRetry} />
     : null
 
   const emptyMessage = getEmptyMessage
     ? getEmptyMessage(data.search)
     : data.search ? labels.noResults : labels.empty
 
-  const handleScroll = useCallback((e: UIEvent<HTMLDivElement>) => {
-    const target = e.currentTarget
-    const isNearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - SCROLL_THRESHOLD
-
-    if (isNearBottom && hasNextPage && !isFetchingNextPage) fetchNextPage()
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+  const { sentinelRef } = useInfiniteScrollTrigger({ hasNextPage, isFetchingNextPage, fetchNextPage })
 
   const handleSelect = useCallback((item: T) => {
     const nextItem = item.id === value ? undefined : item
@@ -195,19 +183,13 @@ export function SelectSingleInfiniteScroll<T extends SelectItemType> ({
         <Command shouldFilter={false}>
           <CommandInput placeholder={labels.search} value={inputSearch} onValueChange={setInputSearch} />
           <CommandList
-            onScroll={handleScroll}
             data-lenis-prevent
             className='scroll-fade no-scrollbar'
             style={{ maxHeight }}
           >
             <CommandEmpty>
               {isLoading
-                ? (
-                  <div className='flex items-center justify-center py-4 text-xs text-muted-foreground'>
-                    <Loader2 className='mr-2 size-3.5 animate-spin' aria-hidden='true' />
-                    {labels.loading}
-                  </div>
-                  )
+                ? <InfiniteListLoading labels={labels} />
                 : (errorState ?? (
                   <div className='space-y-2 py-3 text-center'>
                     <p className='text-muted-foreground text-xs'>{emptyMessage}</p>
@@ -239,21 +221,14 @@ export function SelectSingleInfiniteScroll<T extends SelectItemType> ({
                 )
               })}
 
-              {isFetchingNextPage && (
-                <div className='flex items-center justify-center py-2 text-xs text-muted-foreground'>
-                  <Loader2 className='mr-2 size-3 animate-spin' aria-hidden='true' />
-                  {labels.loadingMore}
-                </div>
-              )}
+              {isFetchingNextPage && <InfiniteListLoadingMore labels={labels} />}
 
               {/* A later page that failed leaves the loaded ones in place. */}
               {items.length > 0 && errorState}
 
-              {!hasNextPage && !isError && items.length > 0 && (
-                <div className='border-t py-1.5 text-center text-xs text-muted-foreground/60'>
-                  {labels.end}
-                </div>
-              )}
+              {!hasNextPage && !isError && items.length > 0 && <InfiniteListEnd labels={labels} />}
+
+              <div ref={sentinelRef} aria-hidden='true' />
             </CommandGroup>
 
             {footerAction && items.length > 0 && <div className='border-t p-2'>{footerAction}</div>}

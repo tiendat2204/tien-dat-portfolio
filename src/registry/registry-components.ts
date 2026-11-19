@@ -50,7 +50,23 @@ export const components: Registry['items'] = [
         type: 'registry:component',
       },
       {
+        path: 'InfiniteSelect/infinite-select-types.ts',
+        type: 'registry:component',
+      },
+      {
+        path: 'InfiniteSelect/infinite-options-state.ts',
+        type: 'registry:component',
+      },
+      {
         path: 'InfiniteSelect/use-infinite-options.ts',
+        type: 'registry:component',
+      },
+      {
+        path: 'InfiniteSelect/use-infinite-scroll-trigger.ts',
+        type: 'registry:component',
+      },
+      {
+        path: 'InfiniteSelect/infinite-list-status.tsx',
         type: 'registry:component',
       },
     ],

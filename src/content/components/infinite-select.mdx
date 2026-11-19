@@ -42,8 +42,32 @@ A combobox for lists too big to ship to the browser: cities, customers, products
             <Step>Copy and paste the following code into your project</Step>
             <ComponentSource
                 name="infinite-select"
+                src="src/registry/InfiniteSelect/infinite-select-types.ts"
+                title="components/InfiniteSelect/infinite-select-types.ts"
+                showLineNumbers
+            />
+            <ComponentSource
+                name="infinite-select"
+                src="src/registry/InfiniteSelect/infinite-options-state.ts"
+                title="components/InfiniteSelect/infinite-options-state.ts"
+                showLineNumbers
+            />
+            <ComponentSource
+                name="infinite-select"
                 src="src/registry/InfiniteSelect/use-infinite-options.ts"
                 title="components/InfiniteSelect/use-infinite-options.ts"
+                showLineNumbers
+            />
+            <ComponentSource
+                name="infinite-select"
+                src="src/registry/InfiniteSelect/use-infinite-scroll-trigger.ts"
+                title="components/InfiniteSelect/use-infinite-scroll-trigger.ts"
+                showLineNumbers
+            />
+            <ComponentSource
+                name="infinite-select"
+                src="src/registry/InfiniteSelect/infinite-list-status.tsx"
+                title="components/InfiniteSelect/infinite-list-status.tsx"
                 showLineNumbers
             />
             <ComponentSource
@@ -187,6 +211,19 @@ Shared by both selects:
 | `showSelectedCount` | `boolean` | `true` | Show "N selected" above the list. |
 | `showSelectionOrder` | `boolean` | `true` | Number badge on each selected row. |
 | `collapseBadges` | `boolean` | `true` | First badge plus "+N more" instead of one badge each. |
+
+## How it is organised
+
+Each file does one job, so you can read or replace one without the others:
+
+| File | Job |
+|------|-----|
+| `infinite-select-types.ts` | Types (`QueryFn`, `InfiniteSource`, `SelectItemType`) and the default labels. |
+| `infinite-options-state.ts` | Pure paging state: cache per search, merging pages, stale-request guard. No React. |
+| `use-infinite-options.ts` | Hooks that run that state: `useInfiniteOptions` (cursor paging over a `queryFn`) and `useInfiniteSelectData` (one view for both data modes, with the search debounce). |
+| `use-infinite-scroll-trigger.ts` | Loads the next page when a sentinel at the end of the list is visible. Also fires when the first page is too short to scroll. |
+| `infinite-list-status.tsx` | Loading, loading more, error with retry, and end-of-list rows shared by both selects. |
+| `select-single-infinite-scroll.tsx` / `select-multiple-infinite-scroll.tsx` | The two components. |
 
 ## Notes
 

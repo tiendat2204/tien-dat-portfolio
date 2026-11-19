@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState, type ReactNode, type UIEvent } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Check, ChevronDown, Loader2, X } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
+import { InfiniteListEnd, InfiniteListError, InfiniteListLoading, InfiniteListLoadingMore } from './infinite-list-status'
 import {
   defaultInfiniteSelectLabels,
   mergeById,
@@ -18,6 +19,7 @@ import {
   type InfiniteSelectLabels,
   type SelectItemType,
 } from './use-infinite-options'
+import { useInfiniteScrollTrigger } from './use-infinite-scroll-trigger'
 
 export type { InfiniteQueryResult, InfiniteSource, QueryFn, SelectItemType } from './use-infinite-options'
 
@@ -46,8 +48,6 @@ type SelectMultipleInfiniteScrollProps<T extends SelectItemType> = InfiniteDataP
   /** Show the first choice plus "+N more" instead of one badge per choice. */
   collapseBadges?: boolean
 }
-
-const SCROLL_THRESHOLD = 20
 
 function useItemSelection<T extends SelectItemType> (value: string[], onChange: (value: string[]) => void) {
   const selectedIds = useMemo(() => new Set(value), [value])
@@ -261,14 +261,8 @@ export function SelectMultipleInfiniteScroll<T extends SelectItemType> ({
     setIsAutoFetching(false)
   }, [])
 
-  const handleScroll = useCallback((e: UIEvent<HTMLDivElement>) => {
-    if (isAutoFetching) return
-
-    const target = e.currentTarget
-    const isNearBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - SCROLL_THRESHOLD
-
-    if (isNearBottom && hasNextPage && !isFetchingNextPage) fetchNextPage()
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage, isAutoFetching])
+  // "Select all" already walks the pages by itself, so scrolling must not start a second load.
+  const { sentinelRef } = useInfiniteScrollTrigger({ hasNextPage, isFetchingNextPage, fetchNextPage, enabled: !isAutoFetching })
 
   const handleRetry = data.retry
 
@@ -385,28 +379,15 @@ export function SelectMultipleInfiniteScroll<T extends SelectItemType> ({
           </div>
 
           <CommandList
-            onScroll={handleScroll}
             data-lenis-prevent
             className='scroll-fade no-scrollbar'
             style={{ maxHeight }}
           >
             <CommandEmpty>
               {isLoading
-                ? (
-                  <div className='flex items-center justify-center py-4 text-xs text-muted-foreground'>
-                    <Loader2 className='mr-2 size-3.5 animate-spin' aria-hidden='true' />
-                    {labels.loading}
-                  </div>
-                  )
+                ? <InfiniteListLoading labels={labels} />
                 : isError
-                  ? (
-                    <div role='alert' className='space-y-2 py-3 text-center'>
-                      <p className='text-destructive text-xs'>{labels.error}</p>
-                      <Button type='button' variant='outline' size='sm' disabled={isFetching} onClick={handleRetry}>
-                        {isFetching ? labels.loading : labels.retry}
-                      </Button>
-                    </div>
-                    )
+                  ? <InfiniteListError message={labels.error} labels={labels} isFetching={isFetching} onRetry={handleRetry} />
                   : (
                     <p className='py-3 text-center text-xs text-muted-foreground'>
                       {data.search ? labels.noResults : labels.empty}
@@ -436,27 +417,15 @@ export function SelectMultipleInfiniteScroll<T extends SelectItemType> ({
                 />
               ))}
 
-              {isFetchingNextPage && (
-                <div className='flex items-center justify-center py-2 text-xs text-muted-foreground'>
-                  <Loader2 className='mr-2 size-3 animate-spin' aria-hidden='true' />
-                  {labels.loadingMore}
-                </div>
-              )}
+              {isFetchingNextPage && <InfiniteListLoadingMore labels={labels} />}
 
               {items.length > 0 && isError && (
-                <div role='alert' className='space-y-2 py-3 text-center'>
-                  <p className='text-destructive text-xs'>{labels.error}</p>
-                  <Button type='button' variant='outline' size='sm' disabled={isFetching} onClick={handleRetry}>
-                    {isFetching ? labels.loading : labels.retry}
-                  </Button>
-                </div>
+                <InfiniteListError message={labels.error} labels={labels} isFetching={isFetching} onRetry={handleRetry} />
               )}
 
-              {!hasNextPage && !isError && items.length > 0 && (
-                <div className='border-t py-1.5 text-center text-xs text-muted-foreground/60'>
-                  {labels.end}
-                </div>
-              )}
+              {!hasNextPage && !isError && items.length > 0 && <InfiniteListEnd labels={labels} />}
+
+              <div ref={sentinelRef} aria-hidden='true' />
             </CommandGroup>
           </CommandList>
         </Command>

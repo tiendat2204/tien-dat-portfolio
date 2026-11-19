@@ -54,7 +54,19 @@ export const Index: Record<string, any> = {
       path: 'src/registry/InfiniteSelect/select-multiple-infinite-scroll.tsx',
       type: 'registry:component',
     }, {
+      path: 'src/registry/InfiniteSelect/infinite-select-types.ts',
+      type: 'registry:component',
+    }, {
+      path: 'src/registry/InfiniteSelect/infinite-options-state.ts',
+      type: 'registry:component',
+    }, {
       path: 'src/registry/InfiniteSelect/use-infinite-options.ts',
+      type: 'registry:component',
+    }, {
+      path: 'src/registry/InfiniteSelect/use-infinite-scroll-trigger.ts',
+      type: 'registry:component',
+    }, {
+      path: 'src/registry/InfiniteSelect/infinite-list-status.tsx',
       type: 'registry:component',
     }],
   },
