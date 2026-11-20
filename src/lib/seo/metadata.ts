@@ -36,7 +36,8 @@ export function buildPageMetadata (input: PageMetadataInput): Metadata {
   const { siteUrl, siteName, path, title, description, image, type = 'website', absoluteTitle = false, publishedTime, authors } = input
   const url = buildCanonicalUrl(siteUrl, path)
   const ogImage = buildOgImageUrl(image, title)
-  const isGenerated = image == null || image.length === 0
+  // Generated cards (the /og routes) are always 1200x630; other images have no size we know.
+  const isGenerated = image == null || image.length === 0 || image.startsWith('/og/')
   const ogTitle = absoluteTitle ? title : `${title} – ${siteName}`
   const hasPublished = type === 'article' && publishedTime != null && !Number.isNaN(new Date(publishedTime).getTime())
   return {

@@ -80,3 +80,10 @@ test('buildPageMetadata declares 1200x630 only for generated images', () => {
   const m = buildPageMetadata({ ...base, path: '/blog/x', title: 'X', description: 'd', image: '/blog/x.png', type: 'article' })
   assert.equal((m.openGraph as OgShape).images[0].width, undefined)
 })
+
+test('buildPageMetadata declares 1200x630 for the /og cards, including a custom one', () => {
+  const m = buildPageMetadata({ ...base, path: '/', title: 'Home', description: 'd', image: '/og/profile/' })
+
+  assert.equal((m.openGraph as OgShape).images[0].url, '/og/profile/')
+  assert.equal((m.openGraph as OgShape).images[0].width, 1200)
+})

@@ -37,7 +37,7 @@ export const metadata = buildPageMetadata({
   description: SEO_PROFILE.description,
   absoluteTitle: true,
   type: 'profile',
-  image: SEO_PROFILE.image,
+  image: SEO_PROFILE.ogImage,
 })
 
 export default function Page () {

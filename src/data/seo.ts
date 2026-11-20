@@ -6,4 +6,6 @@ export const SEO_PROFILE = {
   alternateNames: ['Triệu Tiến Đạt', 'Trieu Tien Dat', 'Tiến Đạt', 'tiendat2204', 'tiendat.work'],
   keywords: ['Tien Dat', 'Triệu Tiến Đạt', 'Trieu Tien Dat', 'Tiến Đạt', 'tiendat2204', 'tiendat.work'],
   image: '/me.jpg',
+  // 1200x630 link-preview card (src/app/og/profile): the raw portrait is tall and gets centre-cropped to a torso.
+  ogImage: '/og/profile/',
 } as const
