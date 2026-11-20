@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { draw, fade, pulse, rise, seg, travel, writeProgress } from '../../src/registry/ScrollStage/scroll-progress'
-import { createFrameThrottle, scrollStagePlan } from '../../src/registry/ScrollStage/scroll-stage-plan'
+import { draw, fade, pulse, rise, seg, travel, writeProgress, writeSmoothed } from '../../src/registry/ScrollStage/scroll-progress'
+import { chapterAt, createFrameThrottle, progressToScroll, scrollStagePlan, smoothToward } from '../../src/registry/ScrollStage/scroll-stage-plan'
 
 test('plan: reduced motion wins over width', () => {
   assert.equal(scrollStagePlan(1440, true, 1024), 'static')
@@ -62,4 +62,41 @@ test('frame throttle runs once per frame and can be cancelled', () => {
   throttle.request()
   throttle.cancel()
   assert.equal(frames.size, 0)
+})
+
+test('chapterAt returns the last chapter that has started', () => {
+  const chapters = [{ at: 0, label: 'a' }, { at: 0.3, label: 'b' }, { at: 0.7, label: 'c' }]
+
+  assert.equal(chapterAt(0, chapters), 0)
+  assert.equal(chapterAt(0.29, chapters), 0)
+  assert.equal(chapterAt(0.3, chapters), 1)
+  assert.equal(chapterAt(0.69, chapters), 1)
+  assert.equal(chapterAt(1, chapters), 2)
+  assert.equal(chapterAt(0.5, []), 0)
+})
+
+test('progressToScroll maps progress onto the trigger range and clamps it', () => {
+  assert.equal(progressToScroll(1000, 2000, 0.5), 1500)
+  assert.equal(progressToScroll(1000, 2000, -1), 1000)
+  assert.equal(progressToScroll(1000, 2000, 2), 2000)
+})
+
+test('smoothToward eases toward the target, reports velocity and settles exactly', () => {
+  const step = smoothToward(0, 1)
+
+  assert.ok(step.value > 0 && step.value < 1)
+  assert.equal(step.velocity, 1)
+  assert.deepEqual(smoothToward(0.9998, 1), { value: 1, velocity: 0 })
+  assert.equal(smoothToward(1, 0.5).velocity, -1)
+  assert.ok(Math.abs(smoothToward(0.5, 0.52).velocity - 0.16) < 1e-9)
+})
+
+test('writeSmoothed sets --ps and --v', () => {
+  const props = new Map<string, string>()
+  const element = { style: { setProperty: (name: string, value: string) => props.set(name, value) } }
+
+  writeSmoothed(element as unknown as HTMLElement, 0.25, -0.5)
+
+  assert.equal(props.get('--ps'), '0.2500')
+  assert.equal(props.get('--v'), '-0.500')
 })

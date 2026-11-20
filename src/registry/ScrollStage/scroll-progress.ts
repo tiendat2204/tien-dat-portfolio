@@ -12,6 +12,12 @@ export function writeProgress (element: HTMLElement, progress: number) {
   element.style.setProperty('--p', value)
 }
 
+/** Writes the eased progress `--ps` and the signed velocity `--v` (-1..1, 0 at rest). */
+export function writeSmoothed (element: HTMLElement, value: number, velocity: number) {
+  element.style.setProperty('--ps', value.toFixed(4))
+  element.style.setProperty('--v', velocity.toFixed(3))
+}
+
 /** 0 until `a`, 1 from `b`, linear in between (a CSS number, usable inside any calc()). */
 export const seg = (a: number, b: number) => {
   // Rounded so 0.6 - 0.2 is not written as 0.39999999999999997, and never 0 so a === b cannot divide by zero.

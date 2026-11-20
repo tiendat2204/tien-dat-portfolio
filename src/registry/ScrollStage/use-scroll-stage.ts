@@ -2,10 +2,10 @@
 
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useEffect, useRef, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, type RefObject } from 'react'
 
-import { writeProgress } from './scroll-progress'
-import { createFrameThrottle, scrollStagePlan } from './scroll-stage-plan'
+import { writeProgress, writeSmoothed } from './scroll-progress'
+import { createFrameThrottle, progressToScroll, scrollStagePlan, smoothToward } from './scroll-stage-plan'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -23,15 +23,20 @@ export interface ScrollStageOptions {
 }
 
 /**
- * Pins `ref` while the page scrolls and writes the scroll progress to its `--p` property and `data-progress`.
+ * Pins `ref` while the page scrolls and writes, on that element:
+ * - `--p` and `data-progress`: the scroll progress, 0..1, exactly as scrolled;
+ * - `--ps`: the same progress eased, so effects trail the scroll a little instead of snapping to it;
+ * - `--v`: how fast it is still moving, -1..1 and 0 at rest, for skew or blur while scrolling.
  * Which way it plays (pinned, once on narrow screens, or not at all with reduced motion) follows scrollStagePlan.
  * With smooth scrolling such as Lenis, call `ScrollTrigger.update()` from its scroll event.
+ * Returns `goTo(progress)`, which scrolls a pinned stage to that progress.
  */
 export function useScrollStage<T extends HTMLElement> (
   ref: RefObject<T | null>,
   { distance = 1.5, topOffset = 0, pinFrom = 1024, duration = 1, onProgress }: ScrollStageOptions = {}
 ) {
   const onProgressRef = useRef(onProgress)
+  const triggerRef = useRef<ScrollTrigger | null>(null)
 
   useEffect(() => {
     onProgressRef.current = onProgress
@@ -42,9 +47,34 @@ export function useScrollStage<T extends HTMLElement> (
 
     if (!element) return
 
+    // The eased value chases the real one on animation frames, and stops once it has arrived.
+    let target = 0
+    let eased = 0
+    let frame: number | null = null
+    let still = false
+
+    const tick = () => {
+      frame = null
+
+      const next = smoothToward(eased, target)
+
+      eased = next.value
+      writeSmoothed(element, eased, next.velocity)
+
+      if (next.velocity !== 0) frame = requestAnimationFrame(tick)
+    }
+
     const report = (progress: number) => {
       writeProgress(element, progress)
       onProgressRef.current?.(progress)
+      target = progress
+
+      if (still) {
+        eased = progress
+        writeSmoothed(element, eased, 0)
+      } else if (frame === null) {
+        frame = requestAnimationFrame(tick)
+      }
     }
 
     let hasTriggers = false
@@ -75,6 +105,8 @@ export function useScrollStage<T extends HTMLElement> (
         const mode = scrollStagePlan(width, reduce, pinFrom)
 
         hasTriggers = mode !== 'static'
+        // Reduced motion shows the finished state with nothing trailing behind it.
+        still = reduce
 
         if (mode === 'static') {
           report(1)
@@ -85,7 +117,7 @@ export function useScrollStage<T extends HTMLElement> (
         report(0)
 
         if (mode === 'pinned') {
-          ScrollTrigger.create({
+          triggerRef.current = ScrollTrigger.create({
             trigger: element,
             start: `top ${topOffset}px`,
             end: `+=${distance * 100}%`,
@@ -113,9 +145,22 @@ export function useScrollStage<T extends HTMLElement> (
     )
 
     return () => {
+      triggerRef.current = null
+      if (frame !== null) cancelAnimationFrame(frame)
       observer.disconnect()
       throttle.cancel()
       media.revert()
     }
   }, [ref, distance, topOffset, pinFrom, duration])
+
+  /** Scrolls a pinned stage to `progress` (0..1). Does nothing when the stage is not pinned. */
+  const goTo = useCallback((progress: number) => {
+    const trigger = triggerRef.current
+
+    if (!trigger) return
+
+    window.scrollTo({ top: progressToScroll(trigger.start, trigger.end, progress), behavior: 'smooth' })
+  }, [])
+
+  return { goTo }
 }

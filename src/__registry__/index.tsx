@@ -72,7 +72,7 @@ export const Index: Record<string, any> = {
   },
   'scroll-stage': {
     name: 'scroll-stage',
-    description: 'A block that pins while the page scrolls and exposes the scroll progress as a CSS variable, with helpers to animate SVG and HTML in pure CSS.',
+    description: 'A block that pins while the page scrolls and exposes progress, eased progress and velocity as CSS variables, with named chapters and helpers to animate SVG and HTML in pure CSS.',
     type: 'registry:component',
     files: [{
       path: 'src/registry/ScrollStage/scroll-stage-plan.ts',
@@ -82,6 +82,9 @@ export const Index: Record<string, any> = {
       type: 'registry:component',
     }, {
       path: 'src/registry/ScrollStage/use-scroll-stage.ts',
+      type: 'registry:component',
+    }, {
+      path: 'src/registry/ScrollStage/scroll-stage-rail.tsx',
       type: 'registry:component',
     }, {
       path: 'src/registry/ScrollStage/scroll-stage.tsx',
