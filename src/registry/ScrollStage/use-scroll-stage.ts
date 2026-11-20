@@ -2,7 +2,7 @@
 
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useCallback, useEffect, useRef, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 
 import { writeProgress, writeSmoothed } from './scroll-progress'
 import { createFrameThrottle, progressToScroll, scrollStagePlan, smoothToward } from './scroll-stage-plan'
@@ -29,7 +29,7 @@ export interface ScrollStageOptions {
  * - `--v`: how fast it is still moving, -1..1 and 0 at rest, for skew or blur while scrolling.
  * Which way it plays (pinned, once on narrow screens, or not at all with reduced motion) follows scrollStagePlan.
  * With smooth scrolling such as Lenis, call `ScrollTrigger.update()` from its scroll event.
- * Returns `goTo(progress)`, which scrolls a pinned stage to that progress.
+ * Returns `goTo(progress)`, which scrolls a pinned stage to that progress, and `pinned`, whether a pin is live.
  */
 export function useScrollStage<T extends HTMLElement> (
   ref: RefObject<T | null>,
@@ -37,6 +37,8 @@ export function useScrollStage<T extends HTMLElement> (
 ) {
   const onProgressRef = useRef(onProgress)
   const triggerRef = useRef<ScrollTrigger | null>(null)
+  // True only while a pin is live: `goTo` has nothing to scroll to on narrow screens or with reduced motion.
+  const [pinned, setPinned] = useState(false)
 
   useEffect(() => {
     onProgressRef.current = onProgress
@@ -117,7 +119,7 @@ export function useScrollStage<T extends HTMLElement> (
         report(0)
 
         if (mode === 'pinned') {
-          triggerRef.current = ScrollTrigger.create({
+          const trigger = ScrollTrigger.create({
             trigger: element,
             start: `top ${topOffset}px`,
             end: `+=${distance * 100}%`,
@@ -128,7 +130,15 @@ export function useScrollStage<T extends HTMLElement> (
             onUpdate: self => report(self.progress),
           })
 
-          return
+          triggerRef.current = trigger
+
+          setPinned(true)
+
+          // GSAP runs this when the pin is reverted (a resize across `pinFrom`, a reduced-motion change, unmount).
+          return () => {
+            triggerRef.current = null
+            setPinned(false)
+          }
         }
 
         const state = { value: 0 }
@@ -162,5 +172,5 @@ export function useScrollStage<T extends HTMLElement> (
     window.scrollTo({ top: progressToScroll(trigger.start, trigger.end, progress), behavior: 'smooth' })
   }, [])
 
-  return { goTo }
+  return { goTo, pinned }
 }

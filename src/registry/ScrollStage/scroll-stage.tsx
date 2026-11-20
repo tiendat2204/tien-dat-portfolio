@@ -3,15 +3,12 @@
 import { useCallback, useRef, useState, type ComponentPropsWithoutRef, type CSSProperties } from 'react'
 
 import { ScrollStageRail } from './scroll-stage-rail'
-import { chapterAt, type ScrollStageChapter } from './scroll-stage-plan'
+import { chapterAt, chapterTarget, type ScrollStageChapter } from './scroll-stage-plan'
 import { useScrollStage, type ScrollStageOptions } from './use-scroll-stage'
 
 export type { ScrollStageOptions } from './use-scroll-stage'
 export type { ScrollStageChapter } from './scroll-stage-plan'
 export { draw, fade, pulse, rise, seg, travel } from './scroll-progress'
-
-// Scrolling lands a hair short of an exact value, so a chapter jump aims just past its start to count as inside it.
-const CHAPTER_NUDGE = 0.002
 
 type ScrollStageProps = ComponentPropsWithoutRef<'div'> & ScrollStageOptions & {
   /** Named parts of the scroll. Adds a numbered strip under the content; a cell scrolls the stage to its chapter. */
@@ -34,7 +31,7 @@ export function ScrollStage ({ distance, topOffset, pinFrom, duration, onProgres
     onProgress?.(progress)
   }, [chapters, onProgress])
 
-  const { goTo } = useScrollStage(ref, { distance, topOffset, pinFrom, duration, onProgress: handleProgress })
+  const { goTo, pinned } = useScrollStage(ref, { distance, topOffset, pinFrom, duration, onProgress: handleProgress })
 
   return (
     <div
@@ -44,7 +41,9 @@ export function ScrollStage ({ distance, topOffset, pinFrom, duration, onProgres
       {...rest}
     >
       {children}
-      {chapters && chapters.length > 0 && <ScrollStageRail chapters={chapters} active={chapter} onSelect={target => goTo(target.at + CHAPTER_NUDGE)} />}
+      {chapters && chapters.length > 0 && (
+        <ScrollStageRail chapters={chapters} active={chapter} interactive={pinned} onSelect={target => goTo(chapterTarget(target, chapters))} />
+      )}
     </div>
   )
 }

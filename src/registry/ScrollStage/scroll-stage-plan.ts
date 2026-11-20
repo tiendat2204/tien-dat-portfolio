@@ -72,3 +72,14 @@ export function smoothToward (current: number, target: number, ease = 0.12) {
 
   return { value: current + gap * ease, velocity: Math.min(1, Math.max(-1, gap * 8)) }
 }
+
+// Scrolling lands a hair short of an exact value, so a chapter jump aims just past its start to count as inside it,
+// but never further than halfway to the next chapter (chapters can be closer together than the nudge).
+const CHAPTER_NUDGE = 0.002
+
+/** The progress a jump to `chapter` should scroll to. */
+export function chapterTarget (chapter: ScrollStageChapter, chapters: readonly ScrollStageChapter[]): number {
+  const next = chapters[chapters.indexOf(chapter) + 1]?.at ?? 1
+
+  return chapter.at + Math.min(CHAPTER_NUDGE, (next - chapter.at) / 2)
+}

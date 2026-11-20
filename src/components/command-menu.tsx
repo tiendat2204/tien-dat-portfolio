@@ -13,7 +13,7 @@ import {
   SearchIcon,
 } from 'lucide-react'
 import { Dialog } from 'radix-ui'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'nextjs-toploader/app'
 import { useTheme } from 'next-themes'
 import { useLenis } from 'lenis/react'
 import { useEffect, useState } from 'react'

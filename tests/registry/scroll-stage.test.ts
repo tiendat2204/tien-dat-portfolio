@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import { draw, fade, pulse, rise, seg, travel, writeProgress, writeSmoothed } from '../../src/registry/ScrollStage/scroll-progress'
-import { chapterAt, createFrameThrottle, progressToScroll, scrollStagePlan, smoothToward } from '../../src/registry/ScrollStage/scroll-stage-plan'
+import { chapterAt, chapterTarget, createFrameThrottle, progressToScroll, scrollStagePlan, smoothToward } from '../../src/registry/ScrollStage/scroll-stage-plan'
 
 test('plan: reduced motion wins over width', () => {
   assert.equal(scrollStagePlan(1440, true, 1024), 'static')
@@ -99,4 +99,15 @@ test('writeSmoothed sets --ps and --v', () => {
 
   assert.equal(props.get('--ps'), '0.2500')
   assert.equal(props.get('--v'), '-0.500')
+})
+
+test('chapterTarget lands just inside a chapter and never reaches the next one', () => {
+  const far = [{ at: 0, label: 'a' }, { at: 0.3, label: 'b' }, { at: 0.7, label: 'c' }]
+  const close = [{ at: 0, label: 'a' }, { at: 0.3, label: 'b' }, { at: 0.301, label: 'c' }]
+
+  assert.equal(chapterTarget(far[1], far), 0.302)
+  assert.equal(chapterAt(chapterTarget(far[1], far), far), 1)
+  assert.equal(chapterAt(chapterTarget(close[1], close), close), 1)
+  assert.ok(chapterTarget(close[1], close) < 0.301)
+  assert.ok(chapterTarget(far[2], far) <= 1)
 })
