@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { ReactLenis } from 'lenis/react'
+import NextTopLoader from 'nextjs-toploader'
 import { Footer } from '@/components/footer'
 import { Providers } from '@/components/Providers'
 import { Header } from '@/components/Header'
@@ -132,6 +133,8 @@ export default async function RootLayout ({
         )}
         suppressHydrationWarning
       >
+        {/* Square, hairline bar in the foreground colour: no glow and no spinner, like the rest of the site. */}
+        <NextTopLoader color='hsl(var(--foreground))' height={2} showSpinner={false} shadow={false} crawlSpeed={150} zIndex={100} />
         <Section
           className='overflow-x-clip w-full'
           crossesOffset='lg:translate-y-[3.15rem]'
