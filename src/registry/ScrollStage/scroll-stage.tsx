@@ -1,9 +1,9 @@
 'use client'
 
-import { useCallback, useRef, useState, type ComponentPropsWithoutRef, type CSSProperties } from 'react'
+import { useCallback, useMemo, useRef, useState, type ComponentPropsWithoutRef, type CSSProperties } from 'react'
 
 import { ScrollStageRail } from './scroll-stage-rail'
-import { chapterAt, chapterTarget, type ScrollStageChapter } from './scroll-stage-plan'
+import { chapterAt, chapterTarget, sortChapters, type ScrollStageChapter } from './scroll-stage-plan'
 import { useScrollStage, type ScrollStageOptions } from './use-scroll-stage'
 
 export type { ScrollStageOptions } from './use-scroll-stage'
@@ -22,16 +22,17 @@ type ScrollStageProps = ComponentPropsWithoutRef<'div'> & ScrollStageOptions & {
  * Style children with the helpers from `scroll-progress` (draw, fade, rise, travel, pulse) or any `calc(var(--p))`.
  * Before scripts run `--p` is 0 (the stage starts empty); with reduced motion it is 1 (the finished state).
  */
-export function ScrollStage ({ distance, topOffset, pinFrom, duration, onProgress, chapters, style, children, ...rest }: ScrollStageProps) {
+export function ScrollStage ({ distance, topOffset, pinFrom, duration, onProgress, scrollTo, chapters: chaptersProp, style, children, ...rest }: ScrollStageProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [chapter, setChapter] = useState(0)
+  const chapters = useMemo(() => chaptersProp && sortChapters(chaptersProp), [chaptersProp])
 
   const handleProgress = useCallback((progress: number) => {
     if (chapters) setChapter(chapterAt(progress, chapters))
     onProgress?.(progress)
   }, [chapters, onProgress])
 
-  const { goTo, pinned } = useScrollStage(ref, { distance, topOffset, pinFrom, duration, onProgress: handleProgress })
+  const { goTo, pinned } = useScrollStage(ref, { distance, topOffset, pinFrom, duration, onProgress: handleProgress, scrollTo })
 
   return (
     <div

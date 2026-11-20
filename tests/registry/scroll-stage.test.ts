@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import { draw, fade, pulse, rise, seg, travel, writeProgress, writeSmoothed } from '../../src/registry/ScrollStage/scroll-progress'
-import { chapterAt, chapterTarget, createFrameThrottle, progressToScroll, scrollStagePlan, smoothToward } from '../../src/registry/ScrollStage/scroll-stage-plan'
+import { chapterAt, chapterTarget, createFrameThrottle, progressToScroll, scrollStagePlan, smoothToward, sortChapters } from '../../src/registry/ScrollStage/scroll-stage-plan'
 
 test('plan: reduced motion wins over width', () => {
   assert.equal(scrollStagePlan(1440, true, 1024), 'static')
@@ -110,4 +110,14 @@ test('chapterTarget lands just inside a chapter and never reaches the next one',
   assert.equal(chapterAt(chapterTarget(close[1], close), close), 1)
   assert.ok(chapterTarget(close[1], close) < 0.301)
   assert.ok(chapterTarget(far[2], far) <= 1)
+})
+
+test('sortChapters orders a copy by start so jumps and the active chapter agree', () => {
+  const given = [{ at: 0, label: 'a' }, { at: 0.7, label: 'c' }, { at: 0.3, label: 'b' }]
+  const sorted = sortChapters(given)
+
+  assert.deepEqual(sorted.map(chapter => chapter.label), ['a', 'b', 'c'])
+  assert.deepEqual(given.map(chapter => chapter.label), ['a', 'c', 'b'])
+  assert.equal(chapterTarget(sorted[2], sorted), 0.702)
+  assert.equal(chapterAt(chapterTarget(sorted[2], sorted), sorted), 2)
 })

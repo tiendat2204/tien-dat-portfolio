@@ -46,6 +46,9 @@ export interface ScrollStageChapter {
   label: string
 }
 
+/** A copy ordered by start, so rendering, the active chapter and jump targets all agree whatever order was passed. */
+export const sortChapters = (chapters: readonly ScrollStageChapter[]): ScrollStageChapter[] => [...chapters].sort((a, b) => a.at - b.at)
+
 /** Index of the chapter a progress value falls in: the last one that has started (0 before the first `at`). */
 export function chapterAt (progress: number, chapters: readonly ScrollStageChapter[]): number {
   let index = 0

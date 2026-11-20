@@ -125,7 +125,7 @@ Any element can use the variables directly, no helper needed:
 
 ### Chapters
 
-Name the parts of the scroll and the stage shows them as a strip. The active chapter is inverted, a cell scrolls the stage to where its chapter starts, and the stage gets `data-chapter` so CSS can react to it.
+Name the parts of the scroll and the stage shows them as a strip (they are ordered by `at`, whatever order you pass them in). The active chapter is inverted, a cell scrolls the stage to where its chapter starts, and the stage gets `data-chapter` so CSS can react to it.
 
 ```tsx
 const chapters = [
@@ -160,6 +160,7 @@ const chapters = [
 | `pinFrom` | `number` | `1024` | Viewport width from which the stage pins. Narrower screens play once instead. |
 | `duration` | `number` | `1` | Seconds the one-shot play takes on narrow screens. |
 | `chapters` | `{ at: number, label: string }[]` | - | Named parts of the scroll (`at` is the progress where one starts). Adds the strip and `data-chapter`. |
+| `scrollTo` | `(top: number) => void` | native smooth scroll | How chapter jumps scroll the page. Pass your smooth-scroll library's `scrollTo` (see Notes). |
 | `onProgress` | `(progress: number) => void` | - | Called with each new progress value, e.g. to drive a canvas. |
 
 Every other prop (`className`, `style`, `id`, …) goes to the stage's `div`. Use `useScrollStage(ref, options)` if you want the behaviour on an element you render yourself; it returns `goTo(progress)` to scroll a pinned stage to a progress value.
@@ -174,8 +175,12 @@ ScrollStage listens to the page's scroll through GSAP's ScrollTrigger. With a sm
 import { useLenis } from 'lenis/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-useLenis(() => ScrollTrigger.update())
+const lenis = useLenis(() => ScrollTrigger.update())
+
+<ScrollStage chapters={chapters} scrollTo={top => lenis?.scrollTo(top)}>…</ScrollStage>
 ```
+
+Pass `scrollTo` so chapter jumps go through Lenis. Lenis rewrites the page position every frame while it glides, so a native scroll started during a glide would be undone.
 
 ### Content that changes height
 

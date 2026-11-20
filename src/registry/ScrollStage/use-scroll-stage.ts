@@ -20,6 +20,8 @@ export interface ScrollStageOptions {
   duration?: number
   /** Called with each new progress value (0..1), e.g. to drive a canvas. */
   onProgress?: (progress: number) => void
+  /** How `goTo` scrolls the page. Defaults to a native smooth scroll; with Lenis pass `top => lenis.scrollTo(top)`. */
+  scrollTo?: (top: number) => void
 }
 
 /**
@@ -33,15 +35,17 @@ export interface ScrollStageOptions {
  */
 export function useScrollStage<T extends HTMLElement> (
   ref: RefObject<T | null>,
-  { distance = 1.5, topOffset = 0, pinFrom = 1024, duration = 1, onProgress }: ScrollStageOptions = {}
+  { distance = 1.5, topOffset = 0, pinFrom = 1024, duration = 1, onProgress, scrollTo }: ScrollStageOptions = {}
 ) {
   const onProgressRef = useRef(onProgress)
+  const scrollToRef = useRef(scrollTo)
   const triggerRef = useRef<ScrollTrigger | null>(null)
   // True only while a pin is live: `goTo` has nothing to scroll to on narrow screens or with reduced motion.
   const [pinned, setPinned] = useState(false)
 
   useEffect(() => {
     onProgressRef.current = onProgress
+    scrollToRef.current = scrollTo
   })
 
   useEffect(() => {
@@ -169,7 +173,11 @@ export function useScrollStage<T extends HTMLElement> (
 
     if (!trigger) return
 
-    window.scrollTo({ top: progressToScroll(trigger.start, trigger.end, progress), behavior: 'smooth' })
+    const top = progressToScroll(trigger.start, trigger.end, progress)
+
+    // A smooth-scroll library keeps writing its own position every frame, which would undo a native scroll.
+    if (scrollToRef.current) scrollToRef.current(top)
+    else window.scrollTo({ top, behavior: 'smooth' })
   }, [])
 
   return { goTo, pinned }
