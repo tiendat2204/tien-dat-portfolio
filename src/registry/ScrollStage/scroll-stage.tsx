@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useRef, useState, type ComponentPropsWithoutRef, type CSSProperties } from 'react'
+import { createContext, useCallback, useContext, useMemo, useRef, useState, type ComponentPropsWithoutRef, type CSSProperties } from 'react'
 
 import { ScrollStageRail } from './scroll-stage-rail'
 import { chapterAt, chapterTarget, sortChapters, type ScrollStageChapter } from './scroll-stage-plan'
@@ -9,6 +9,15 @@ import { useScrollStage, type ScrollStageOptions } from './use-scroll-stage'
 export type { ScrollStageOptions } from './use-scroll-stage'
 export type { ScrollStageChapter } from './scroll-stage-plan'
 export { draw, fade, pulse, rise, seg, travel } from './scroll-progress'
+
+/**
+ * Tells every stage below it how to scroll the page for a chapter jump, once, instead of a `scrollTo` prop on each.
+ * Use it with a smooth-scroll library: `<ScrollStageScroller value={top => lenis?.scrollTo(top)}>`.
+ * A stage's own `scrollTo` prop wins; with neither, jumps use a native smooth scroll.
+ */
+const ScrollerContext = createContext<((top: number) => void) | undefined>(undefined)
+
+export const ScrollStageScroller = ScrollerContext.Provider
 
 type ScrollStageProps = ComponentPropsWithoutRef<'div'> & ScrollStageOptions & {
   /** Named parts of the scroll. Adds a numbered strip under the content; a cell scrolls the stage to its chapter. */
@@ -24,6 +33,7 @@ type ScrollStageProps = ComponentPropsWithoutRef<'div'> & ScrollStageOptions & {
  */
 export function ScrollStage ({ distance, topOffset, pinFrom, duration, onProgress, scrollTo, chapters: chaptersProp, style, children, ...rest }: ScrollStageProps) {
   const ref = useRef<HTMLDivElement>(null)
+  const providedScrollTo = useContext(ScrollerContext)
   const [chapter, setChapter] = useState(0)
   const chapters = useMemo(() => chaptersProp && sortChapters(chaptersProp), [chaptersProp])
 
@@ -32,7 +42,7 @@ export function ScrollStage ({ distance, topOffset, pinFrom, duration, onProgres
     onProgress?.(progress)
   }, [chapters, onProgress])
 
-  const { goTo, pinned } = useScrollStage(ref, { distance, topOffset, pinFrom, duration, onProgress: handleProgress, scrollTo })
+  const { goTo, pinned } = useScrollStage(ref, { distance, topOffset, pinFrom, duration, onProgress: handleProgress, scrollTo: scrollTo ?? providedScrollTo })
 
   return (
     <div

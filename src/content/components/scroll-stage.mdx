@@ -180,7 +180,21 @@ const lenis = useLenis(() => ScrollTrigger.update())
 <ScrollStage chapters={chapters} scrollTo={top => lenis?.scrollTo(top)}>…</ScrollStage>
 ```
 
-Pass `scrollTo` so chapter jumps go through Lenis. Lenis rewrites the page position every frame while it glides, so a native scroll started during a glide would be undone.
+Pass `scrollTo` so chapter jumps go through Lenis, or set it once for every stage below a provider:
+
+```tsx
+import { ScrollStageScroller } from '@/components/ScrollStage/scroll-stage'
+
+function Scroller ({ children }) {
+  const lenis = useLenis()
+
+  return <ScrollStageScroller value={lenis ? top => lenis.scrollTo(top) : undefined}>{children}</ScrollStageScroller>
+}
+```
+
+A stage's own `scrollTo` prop wins over the provider.
+
+Chapter jumps go through Lenis this way. Lenis rewrites the page position every frame while it glides, so a native scroll started during a glide would be undone.
 
 ### Content that changes height
 

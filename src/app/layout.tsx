@@ -6,6 +6,7 @@ import './globals.css'
 import { ReactLenis } from 'lenis/react'
 import NextTopLoader from 'nextjs-toploader'
 import { Footer } from '@/components/footer'
+import { LenisScrollStage } from '@/components/lenis-scroll-stage'
 import { Providers } from '@/components/Providers'
 import { Header } from '@/components/Header'
 import { buildWebSiteJsonLd } from '@/lib/seo/jsonld'
@@ -146,16 +147,18 @@ export default async function RootLayout ({
           <TooltipProvider delayDuration={0}>
 
             <Providers>
-              <Header stars={stars} />
+              <LenisScrollStage>
+                <Header stars={stars} />
 
-              {children}
-              <Footer />
-              <CommandMenu
-                posts={getAllPosts().map((p) => ({ slug: p.slug, title: p.metadata.title }))}
-                components={getAllComponents().map((c) => ({ slug: c.slug, title: c.metadata.title }))}
-              />
-              <UiEffects />
-              <KeyboardShortcuts />
+                {children}
+                <Footer />
+                <CommandMenu
+                  posts={getAllPosts().map((p) => ({ slug: p.slug, title: p.metadata.title }))}
+                  components={getAllComponents().map((c) => ({ slug: c.slug, title: c.metadata.title }))}
+                />
+                <UiEffects />
+                <KeyboardShortcuts />
+              </LenisScrollStage>
             </Providers>
           </TooltipProvider>
 
