@@ -6,19 +6,19 @@ import Link from 'next/link'
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 
 import { AGENTS, BUILD_STEPS, type AgentId } from '@/data/agents'
-import { sectionAt, wallSlots } from '@/lib/agent-cursors-plan'
+import { sectionAt, type Point } from '@/lib/agent-cursors-plan'
 import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
 
 /*
   The home page's agents: Ori, Quill and Boo (AgentDot characters). Nothing happens unless the visitor asks.
 
   - AgentDock: the three sit small in the bottom-right corner, in the empty gutter beside the content (so only on
-    wide screens). They hop when a new section is reached and say a line when poked. Its ▶ starts a build, and a
-    character can be picked up and dropped on a section.
-  - AgentScene: where the work shows, standing on the top rule of a section of the page. A build (BUILD_STEPS) is a
-    wall of voxel bricks, the same cubes as the hero figure: Ori marks out the slots, Quill lays a brick in each,
-    Boo checks them and kicks out a bad one, the gates ripple through the wall, and it ships. A dropped character
-    does only its own part. When it is over the wall goes and the cast returns to the dock.
+    wide screens). They hop when a new section is reached and say a line when poked. Its ▶ starts a build of the section in view,
+    and a character picked up and dropped on a section starts one there.
+  - AgentScene: where the work shows. The crew builds a section of the page out of that section's own pieces: Ori
+    plans it (the content goes and a dashed outline stands in for every block), Quill builds the pieces one by one
+    with a thrown voxel brick, Boo approves them and sends one back, the gates pulse through, and it ships. Then
+    the section is exactly as it was and the cast returns to the dock.
   - AgentCast: the same cast as real controls in "How I build", with the build as text.
 
   Nothing runs per frame or per scroll event, and the canvases stop drawing off screen and in a hidden tab.
@@ -34,23 +34,16 @@ const DROP_EVENT = 'agent-swarm:drop'
 const BUSY_EVENT = 'agent-swarm:busy'
 const STATUS_EVENT = 'agent-swarm:status'
 
-// The wall is narrower where the section is, as on a phone.
-const WALL = { cols: 10, narrowCols: 6, rows: 3 }
-const BRICK = { w: 18, h: 20, rise: 11 }
-// The scene's box sits on a section so that `ground` is the section's own top rule.
-const STAGE = { height: 150, ground: 150, actor: 52 }
+const BRICK = { w: 18, h: 20 }
+// Size of a character while it is out on the page.
+const ACTOR = 52
+// A section is built from at most this many pieces; a busier one is taken in bigger blocks.
+const MAX_PIECES = 26
 // A section's top rule must be this far below the header, and this far above the bottom, to build on it.
 const HEADROOM = 230
 const FOOTROOM = 140
 
 const BY_ID = Object.fromEntries(AGENTS.map((a) => [a.id, a])) as { [K in AgentId]: Extract<typeof AGENTS[number], { id: K }> }
-
-// A per-brick callback for a staggered tween: recolours the brick as its own tween starts.
-const tint = (color: string) => function (this: gsap.core.Tween) {
-  const el = this.targets()[0] as HTMLElement
-  el.style.color = color
-  el.removeAttribute('data-ghost')
-}
 
 // One voxel brick: an isometric cube in the current colour, lit from the top.
 function Brick () {
@@ -258,7 +251,44 @@ type Cast = Record<AgentId, Actor>
 
 const resting = (): Cast => Object.fromEntries(AGENTS.map((a) => [a.id, { mood: 'idle', busy: false, alert: false }])) as Cast
 
-// Where the work shows: on the top rule of a section of the page, and only when asked for.
+// Tags that are one piece of a section however much they hold; anything else is opened up to find its pieces.
+const WHOLE = new Set(['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'A', 'BUTTON', 'IMG', 'SVG', 'CANVAS', 'SPAN', 'TIME', 'CODE', 'PRE', 'FIGURE', 'BLOCKQUOTE', 'LI', 'LABEL', 'INPUT', 'VIDEO'])
+
+/**
+ * The pieces a section is built from: its visible blocks, in reading order, as fine-grained as fits in MAX_PIECES.
+ * Only what is on screen counts, so a tall section is built a screenful at a time.
+ */
+function piecesOf (section: HTMLElement): HTMLElement[] {
+  const onScreen = (el: Element) => {
+    const r = el.getBoundingClientRect()
+    return r.width > 8 && r.height > 8 && r.bottom > 80 && r.top < window.innerHeight - 8
+  }
+  const collect = (maxDepth: number) => {
+    const found: HTMLElement[] = []
+    const open = (el: Element, depth: number) => {
+      for (const child of el.children) {
+        // The section's own `+` corner marks and other decoration are not content.
+        if (child.getAttribute('aria-hidden') === 'true' || !onScreen(child)) continue
+        const kids = [...child.children].filter(onScreen)
+        if (kids.length > 0 && depth < maxDepth && !WHOLE.has(child.tagName.toUpperCase())) open(child, depth + 1)
+        else found.push(child as HTMLElement)
+      }
+    }
+    open(section, 0)
+    return found
+  }
+  let pieces = collect(6)
+  for (let depth = 5; pieces.length > MAX_PIECES && depth >= 0; depth--) pieces = collect(depth)
+  return pieces
+    .slice(0, MAX_PIECES)
+    .sort((a, b) => {
+      const ra = a.getBoundingClientRect()
+      const rb = b.getBoundingClientRect()
+      return Math.abs(ra.top - rb.top) > 12 ? ra.top - rb.top : ra.left - rb.left
+    })
+}
+
+// Where the work shows: the cast builds a section of the page out of its own pieces, and only when asked to.
 export function AgentScene () {
   const rootRef = useRef<HTMLDivElement>(null)
   const { still } = usePrefs()
@@ -276,254 +306,252 @@ export function AgentScene () {
   useEffect(() => {
     const root = rootRef.current
     if (still || !root) return
-    const box = root.querySelector<HTMLElement>('[data-stage]')!
 
-    const allBricks = () => gsap.utils.toArray<HTMLElement>('[data-brick]', box)
-    const card = (kind: 'ticket' | 'write' | 'review') => box.querySelector<HTMLElement>(`[data-card='${kind}']`)!
-    const stamp = box.querySelector<HTMLElement>('[data-part="stamp"]')!
-    const actor = (id: AgentId) => box.querySelector<HTMLElement>(`[data-actor='${id}']`)!
+    const frames = () => gsap.utils.toArray<HTMLElement>('[data-frame]', root)
+    const bricks = () => gsap.utils.toArray<HTMLElement>('[data-brick]', root)
+    const card = (kind: 'ticket' | 'write' | 'review') => root.querySelector<HTMLElement>(`[data-card='${kind}']`)!
+    const stamp = root.querySelector<HTMLElement>('[data-part="stamp"]')!
+    const chip = root.querySelector<HTMLElement>('[data-part="chip"]')!
+    const actor = (id: AgentId) => root.querySelector<HTMLElement>(`[data-actor='${id}']`)!
     const bot = (id: AgentId) => actor(id).querySelector<HTMLElement>('[data-bot]')!
     const act = (id: AgentId, patch: Partial<Actor>) => setCast((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }))
-    const everything = () => [...box.querySelectorAll('[data-brick], [data-card], [data-actor], [data-bot]'), stamp]
-    const at = {} as Record<AgentId, number>
+    const props = () => [...root.querySelectorAll('[data-frame], [data-brick], [data-card], [data-actor]'), stamp, chip]
+    const at = {} as Record<AgentId, Point>
+    // The section's pieces while they are being built, with the inline styles to put back afterwards.
+    let held: { el: HTMLElement; opacity: string; clipPath: string }[] = []
     let run = { dead: true }
     let timers: gsap.core.Tween[] = []
 
     const wait = (seconds: number) => new Promise<void>((resolve) => { timers.push(gsap.delayedCall(seconds, resolve)) })
-    const narrate = (text: string, step?: number) => {
-      const full = step ? `${step}/${BUILD_STEPS.length}  ${text}` : text
+    const narrate = (text: string, step: number) => {
+      const full = `${step}/${BUILD_STEPS.length}  ${text}`
       setLine(full)
       // The scene is hidden from assistive tech; AgentCast announces the same line.
       window.dispatchEvent(new CustomEvent(STATUS_EVENT, { detail: full }))
     }
 
-    // Everything is laid out from the section's width, so the scene works at any size.
-    const layout = () => {
-      const width = box.clientWidth
-      const cols = width < 520 ? WALL.narrowCols : WALL.cols
-      const wallWidth = cols * BRICK.w + BRICK.w / 2
-      const x0 = (width - wallWidth) / 2
-      return {
-        count: cols * WALL.rows,
-        marks: { orca: Math.max(28, x0 - 150), claude: Math.max(76, x0 - 44), codex: Math.min(width - 30, x0 + wallWidth + 96) } as Record<AgentId, number>,
-        slots: wallSlots(cols, WALL.rows, BRICK, x0, STAGE.ground - BRICK.h),
-        wall: { left: x0, right: x0 + wallWidth, top: STAGE.ground - BRICK.h - (WALL.rows - 1) * BRICK.rise },
-      }
-    }
-
-    const appear = (id: AgentId, x: number) => {
-      at[id] = x
-      gsap.set(actor(id), { x, autoAlpha: 1 })
+    const appear = (id: AgentId, to: Point) => {
+      at[id] = to
+      gsap.set(actor(id), { x: to.x, y: to.y, autoAlpha: 1 })
       return gsap.fromTo(bot(id), { scale: 0 }, { scale: 1, duration: 0.4, ease: 'back.out(2.6)' }).then()
     }
 
     // A character does not glide: it hops, leans into the jump and squashes on landing.
-    const go = (id: AgentId, x: number, duration = 0.6) => {
-      const lean = Math.sign(x - at[id])
-      at[id] = x
+    const go = (id: AgentId, to: Point, duration = 0.45) => {
+      const lean = Math.sign(to.x - at[id].x)
+      at[id] = to
       gsap.timeline()
         .to(bot(id), { y: -14, rotation: lean * 10, scaleY: 1.08, duration: duration / 2, ease: 'power2.out' })
         .to(bot(id), { y: 0, rotation: 0, scaleY: 1, duration: duration / 2, ease: 'power2.in' })
         .to(bot(id), { scaleY: 0.82, scaleX: 1.12, duration: 0.07 })
         .to(bot(id), { scaleY: 1, scaleX: 1, duration: 0.22, ease: 'back.out(3)' })
-      return gsap.to(actor(id), { x, duration, ease: 'power1.inOut' }).then()
+      return gsap.to(actor(id), { x: to.x, y: to.y, duration, ease: 'power1.inOut' }).then()
     }
 
     // A task card is thrown in an arc, and whoever it reaches catches it with a little swell.
-    const pass = async (kind: 'ticket' | 'write' | 'review', from: number, to: number, catcher: AgentId, duration = 0.8) => {
+    const pass = async (kind: 'ticket' | 'write' | 'review', from: Point, to: Point, catcher: AgentId, duration = 0.8) => {
       const el = card(kind)
-      const y = STAGE.ground - STAGE.actor - 6
-      gsap.set(el, { x: from, y, xPercent: -50, yPercent: -50, autoAlpha: 1, scale: 1, rotation: -10 })
-      gsap.to(el, { x: to, rotation: 8, duration, ease: 'power1.inOut' })
+      gsap.set(el, { x: from.x, y: from.y - 34, xPercent: -50, yPercent: -50, autoAlpha: 1, scale: 1, rotation: -10 })
+      gsap.to(el, { x: to.x, rotation: 8, duration, ease: 'power1.inOut' })
       await gsap.timeline()
-        .to(el, { y: y - 30, duration: duration / 2, ease: 'power2.out' })
-        .to(el, { y, duration: duration / 2, ease: 'power2.in' })
+        .to(el, { y: Math.min(from.y, to.y) - 70, duration: duration / 2, ease: 'power2.out' })
+        .to(el, { y: to.y - 34, duration: duration / 2, ease: 'power2.in' })
         .then()
       gsap.to(el, { scale: 0, autoAlpha: 0, duration: 0.2 })
       gsap.fromTo(bot(catcher), { scale: 1.2 }, { scale: 1, duration: 0.3, ease: 'back.out(3)' })
     }
 
-    // Stop whatever is playing and clear the scene away.
+    // Stop whatever is playing, give the section its content back exactly as it was, and clear the scene away.
     const strike = () => {
       run.dead = true
       timers.forEach((t) => t.kill())
       timers = []
-      gsap.killTweensOf(everything())
-      gsap.set([...box.querySelectorAll('[data-card], [data-actor]'), stamp], { autoAlpha: 0 })
-      gsap.set(allBricks(), { opacity: 0 })
+      gsap.killTweensOf([...props(), ...held.map((h) => h.el)])
+      const restore = held
+      held = []
+      const putBack = () => {
+        for (const { el, opacity, clipPath } of restore) {
+          el.style.opacity = opacity
+          el.style.clipPath = clipPath
+        }
+      }
+      putBack()
+      // And once more on the next frame: a tween killed in the same tick it rendered can still flush a late write.
+      if (restore.length > 0) requestAnimationFrame(putBack)
+      gsap.set(props(), { autoAlpha: 0 })
       setCast(resting())
       setLive(false)
       window.dispatchEvent(new CustomEvent(BUSY_EVENT, { detail: false }))
     }
 
-    // The end of a run: everything leaves, and the dock gets its cast back.
-    const curtain = async (me: { dead: boolean }) => {
-      gsap.to([...allBricks(), stamp], { opacity: 0, scale: 0.4, duration: 0.35, stagger: { amount: 0.25, from: 'center' } })
+    // The build: the section is taken apart into its pieces and put back together by the three of them.
+    const story = async (section: HTMLElement) => {
+      strike()
+      const me = run = { dead: false }
+      const ori = BY_ID.orca
+      const quill = BY_ID.claude
+      const boo = BY_ID.codex
+
+      // Bring the section's top rule to a clear part of the view first.
+      let rect = section.getBoundingClientRect()
+      if (rect.top < HEADROOM || rect.top > window.innerHeight - FOOTROOM) {
+        scrollRef.current?.(window.scrollY + rect.top - window.innerHeight * 0.38)
+        await wait(1.1)
+        if (me.dead) return
+        rect = section.getBoundingClientRect()
+      }
+      const origin = root.getBoundingClientRect()
+      const left = rect.left - origin.left
+      const rule = rect.top - origin.top
+      const pieces = piecesOf(section)
+      if (pieces.length === 0) {
+        run.dead = true
+        return
+      }
+      held = pieces.map((el) => ({ el, opacity: el.style.opacity, clipPath: el.style.clipPath }))
+      const spots = pieces.map((el) => {
+        const r = el.getBoundingClientRect()
+        return { x: r.left - origin.left, y: r.top - origin.top, w: r.width, h: r.height }
+      })
+      const count = pieces.length
+      const outline = frames().slice(0, count)
+      gsap.set(outline, { x: (i) => spots[i].x - 3, y: (i) => spots[i].y - 3, width: (i) => spots[i].w + 6, height: (i) => spots[i].h + 6, autoAlpha: 0, scale: 1, borderStyle: 'dashed', borderColor: ori.color, backgroundColor: 'transparent' })
+      gsap.set(chip, { x: left + 8, y: rule - 150, autoAlpha: 1 })
+      gsap.set(stamp, { x: left + rect.width - 14, y: rule, xPercent: -100, yPercent: -50, scale: 1 })
+      AGENTS.forEach(({ id }) => gsap.set(bot(id), { y: 0, rotation: 0, scale: 1 }))
+      setLive(true)
+      window.dispatchEvent(new CustomEvent(BUSY_EVENT, { detail: true }))
+
+      // They start out standing on the section's top rule; while working, each stands beside its piece.
+      const onRule = (along: number): Point => ({ x: left + 40 + (rect.width - 80) * along, y: rule - ACTOR / 2 })
+      const beside = (i: number, side: -1 | 1): Point => ({
+        x: gsap.utils.clamp(left + 22, left + rect.width - 22, side < 0 ? spots[i].x - 14 : spots[i].x + spots[i].w + 14),
+        y: spots[i].y + Math.min(spots[i].h / 2, 30),
+      })
+      const stride = Math.max(1, Math.ceil(count / 5))
+
+      await appear('orca', onRule(0.2))
+      if (me.dead) return
+
+      // 1. The ticket flies in from the left, and Ori catches it.
+      narrate(`me → ${ori.name}: build ${section.id}`, 1)
+      await pass('ticket', { x: left - 60, y: rule - ACTOR / 2 }, at.orca, 'orca', 0.9)
+      if (me.dead) return
+
+      // 2. The plan: the section's content goes, and a dashed outline stands in for every piece.
+      narrate(`${ori.name} plans it: ${count} pieces`, 2)
+      act('orca', { mood: 'focused', busy: true })
+      gsap.to(pieces, { opacity: 0, duration: 0.2, stagger: 0.025 })
+      await gsap.fromTo(outline, { autoAlpha: 0, scale: 0.94 }, { autoAlpha: 1, scale: 1, duration: 0.25, stagger: 0.025 }).then()
+      if (me.dead) return
+      act('orca', { mood: 'idle', busy: false })
+      appear('claude', onRule(0.5))
+      appear('codex', onRule(0.8))
+      await Promise.all([pass('write', at.orca, onRule(0.5), 'claude', 0.6), pass('review', at.orca, onRule(0.8), 'codex', 0.9)])
+      if (me.dead) return
+      // Its part is done for now: Ori dozes off until the gates.
+      act('orca', { mood: 'asleep' })
+
+      // A piece is built by a voxel brick thrown at its slot: the outline goes solid and the content wipes in.
+      const build = (i: number) => {
+        const brick = bricks()[i % bricks().length]
+        gsap.fromTo(brick, { x: at.claude.x, y: at.claude.y - 20, autoAlpha: 1, scale: 1, rotation: 0 }, { x: spots[i].x, y: spots[i].y, rotation: 180, duration: 0.2, ease: 'power1.in', onComplete: () => { gsap.set(brick, { autoAlpha: 0 }) } })
+        // Started when the brick lands, through a tracked timer, so a strike in between cancels it cleanly.
+        timers.push(gsap.delayedCall(0.2, () => {
+          gsap.set(outline[i], { borderStyle: 'solid', borderColor: quill.color, backgroundColor: `${quill.color}26` })
+          gsap.to(outline[i], { backgroundColor: `${quill.color}00`, duration: 0.5, delay: 0.1 })
+          gsap.fromTo(pieces[i], { opacity: 1, clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 0.35, ease: 'power2.out' })
+        }))
+      }
+
+      // 3. Quill works down the section, building one piece after another.
+      narrate(`${quill.name} writes ${section.id}`, 3)
+      act('claude', { mood: 'working', busy: true })
+      for (let i = 0; i < count; i++) {
+        if (i % stride === 0) await go('claude', beside(i, -1))
+        if (me.dead) return
+        build(i)
+        await wait(0.13)
+        if (me.dead) return
+      }
+      await wait(0.45)
+      if (me.dead) return
+      act('claude', { mood: 'idle', busy: false })
+
+      // 4. Boo follows, approving each piece (its outline turns green). One is wrong.
+      const bad = Math.min(count - 1, Math.floor(count * 0.6))
+      const approve = async (start: number, end: number) => {
+        for (let i = start; i < end; i++) {
+          if (i % stride === 0) await go('codex', beside(i, 1))
+          if (me.dead) return
+          gsap.set(outline[i], { borderColor: boo.color })
+          gsap.fromTo(outline[i], { scale: 1.04 }, { scale: 1, duration: 0.2 })
+          await wait(0.07)
+          if (me.dead) return
+        }
+      }
+      narrate(`${boo.name} reviews it`, 4)
+      act('codex', { mood: 'focused', busy: true })
+      await approve(0, bad)
+      if (me.dead) return
+      await go('codex', beside(bad, 1))
+      gsap.set(outline[bad], { borderColor: REJECTED, backgroundColor: `${REJECTED}26` })
+      gsap.fromTo(outline[bad], { x: spots[bad].x - 6 }, { x: spots[bad].x, duration: 0.06, repeat: 7, yoyo: true })
+      gsap.to(pieces[bad], { opacity: 0.25, duration: 0.2 })
+      narrate(`${boo.name}: 1 issue. Back to ${quill.name}.`, 4)
+      act('codex', { busy: false })
+      // The writer jumps at the news, then comes back and builds that piece again.
+      act('claude', { mood: 'surprised', alert: true })
+      gsap.fromTo(bot('claude'), { y: 0 }, { y: -12, duration: 0.16, ease: 'power2.out', yoyo: true, repeat: 1 })
+      await wait(0.9)
+      if (me.dead) return
+      act('claude', { mood: 'working', alert: false, busy: true })
+      await go('claude', beside(bad, -1))
+      if (me.dead) return
+      gsap.killTweensOf(outline[bad])
+      gsap.set(outline[bad], { x: spots[bad].x - 3 })
+      build(bad)
+      await wait(0.7)
+      if (me.dead) return
+      act('claude', { mood: 'idle', busy: false })
+      act('codex', { busy: true })
+      await approve(bad, count)
+      if (me.dead) return
+      act('codex', { mood: 'happy', busy: false })
+      await wait(0.4)
+      if (me.dead) return
+
+      // 5. Each gate pulses through every piece and ticks off on a stamp on the section's rule.
+      act('orca', { mood: 'idle' })
+      act('codex', { mood: 'idle' })
+      const gates = ['tsc', 'test', 'build']
+      for (let i = 0; i < gates.length; i++) {
+        const done = gates.slice(0, i + 1).map((g) => `${g} ✓`).join('  ')
+        narrate(`gates: ${done}`, 5)
+        stamp.textContent = done
+        gsap.fromTo(stamp, { autoAlpha: 1, scale: 1.25 }, { scale: 1, duration: 0.25, ease: 'back.out(2)' })
+        await gsap.fromTo(outline, { opacity: 0.35 }, { opacity: 1, duration: 0.2, stagger: 0.012 }).then()
+        if (me.dead) return
+      }
+
+      // 6. Shipped: the outlines let go and the section is itself again.
+      narrate('me: ship it. Deployed to tiendat.work.', 6)
+      stamp.textContent = '✓ shipped'
+      gsap.fromTo(stamp, { scale: 1.6 }, { scale: 1, duration: 0.3, ease: 'back.out(2)' })
+      gsap.to(outline, { autoAlpha: 0, scale: 1.04, duration: 0.4, stagger: 0.015 })
+      AGENTS.forEach(({ id }, i) => {
+        act(id, { mood: 'happy' })
+        go(id, onRule(0.2 + i * 0.3), 0.5)
+      })
+      await wait(2.8)
+      if (me.dead) return
+      gsap.to([stamp, chip], { autoAlpha: 0, duration: 0.3 })
       await gsap.to(AGENTS.map(({ id }) => bot(id)), { scale: 0, duration: 0.3, ease: 'back.in(2)', stagger: 0.06 }).then()
       if (me.dead) return
       strike()
     }
 
-    // Put the scene on a section: scroll the section's top rule into a clear part of the view if it is not, then
-    // sit the box on that rule.
-    const setUp = async (section: HTMLElement) => {
-      strike()
-      const me = run = { dead: false }
-      let rect = section.getBoundingClientRect()
-      if (rect.top < HEADROOM || rect.top > window.innerHeight - FOOTROOM) {
-        scrollRef.current?.(window.scrollY + rect.top - window.innerHeight * 0.45)
-        await wait(1.1)
-        if (me.dead) return null
-        rect = section.getBoundingClientRect()
-      }
-      const origin = root.getBoundingClientRect()
-      gsap.set(box, { x: rect.left - origin.left, y: rect.top - origin.top - STAGE.ground, width: rect.width })
-      const plan = layout()
-      const bricks = allBricks().slice(0, plan.count)
-      gsap.set(bricks, { x: (i) => plan.slots[i].x, y: (i) => plan.slots[i].y, visibility: 'visible', opacity: 0, scale: 1, rotation: 0, color: BY_ID.orca.color })
-      bricks.forEach((b) => b.toggleAttribute('data-ghost', true))
-      gsap.set(stamp, { x: (plan.wall.left + plan.wall.right) / 2, y: plan.wall.top - 16, xPercent: -50, yPercent: -50, scale: 1, opacity: 1 })
-      AGENTS.forEach(({ id }) => gsap.set(bot(id), { y: 0, rotation: 0, scale: 1 }))
-      setLive(true)
-      window.dispatchEvent(new CustomEvent(BUSY_EVENT, { detail: true }))
-      return { me, name: section.id, bricks, top: (i: number) => plan.slots[i].y, ...plan }
-    }
-
-    const story = async (section: HTMLElement) => {
-      const set = await setUp(section)
-      if (!set) return
-      const { me, bricks, slots, top, marks, wall, count } = set
-      const ori = BY_ID.orca
-      const quill = BY_ID.claude
-      const boo = BY_ID.codex
-
-      await appear('orca', marks.orca)
-      if (me.dead) return
-
-      // 1. The ticket flies in from the left, and Ori catches it.
-      narrate(`me → ${ori.name}: build tien-dat-profile`, 1)
-      await pass('ticket', -40, marks.orca, 'orca', 0.9)
-      if (me.dead) return
-
-      // 2. The plan: one dashed slot per brick. Then the ticket becomes two task cards.
-      narrate(`${ori.name} plans the wall, then hands out the tasks`, 2)
-      act('orca', { mood: 'focused', busy: true })
-      await gsap.fromTo(bricks, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.22, stagger: 0.025 }).then()
-      if (me.dead) return
-      act('orca', { mood: 'idle', busy: false })
-      appear('claude', marks.claude)
-      appear('codex', marks.codex)
-      await Promise.all([pass('write', marks.orca, marks.claude, 'claude', 0.6), pass('review', marks.orca, marks.codex, 'codex', 0.9)])
-      if (me.dead) return
-      // Its part is done for now: Ori dozes off until the gates.
-      act('orca', { mood: 'asleep' })
-
-      // 3. Quill lays a brick in every slot, course by course.
-      narrate(`${quill.name} writes the change`, 3)
-      act('claude', { mood: 'working', busy: true })
-      const lay = gsap.fromTo(bricks,
-        { y: (i) => top(i) - 26, opacity: 0 },
-        { y: top, opacity: 1, duration: 0.38, ease: 'bounce.out', immediateRender: false, stagger: { each: 0.055, onStart: tint(quill.color) } })
-      await go('claude', wall.left + 30)
-      await go('claude', wall.left - 30)
-      await lay.then()
-      if (me.dead) return
-      act('claude', { mood: 'idle', busy: false })
-
-      // 4. Boo checks them one by one and turns each approved brick green; one is wrong.
-      const bad = Math.floor(count * 0.57)
-      const approve = (start: number, end: number) => gsap.to(bricks.slice(start, end), {
-        keyframes: [{ scale: 1.3, duration: 0.07 }, { scale: 1, duration: 0.15 }],
-        stagger: { each: 0.05, onStart: tint(boo.color) },
-      }).then()
-      narrate(`${boo.name} reviews it`, 4)
-      act('codex', { mood: 'focused', busy: true })
-      await go('codex', wall.right + 40)
-      await approve(0, bad)
-      if (me.dead) return
-      const wrong = bricks[bad]
-      wrong.style.color = REJECTED
-      gsap.fromTo(wrong, { rotation: -14 }, { rotation: 14, duration: 0.07, repeat: 7, yoyo: true })
-      narrate(`${boo.name}: 1 issue. Back to ${quill.name}.`, 4)
-      act('codex', { busy: false })
-      // The writer jumps at the news.
-      act('claude', { mood: 'surprised', alert: true })
-      gsap.fromTo(bot('claude'), { y: 0 }, { y: -12, duration: 0.16, ease: 'power2.out', yoyo: true, repeat: 1 })
-      await wait(0.9)
-      if (me.dead) return
-      // The bad brick is kicked out and a new one laid.
-      gsap.to(wrong, { x: '+=70', y: '-=46', rotation: 260, opacity: 0, duration: 0.55, ease: 'power2.out' })
-      act('claude', { mood: 'working', alert: false, busy: true })
-      await go('claude', wall.left + 10, 0.5)
-      gsap.killTweensOf(wrong)
-      wrong.style.color = quill.color
-      await gsap.fromTo(wrong, { x: slots[bad].x, y: top(bad) - 26, rotation: 0, opacity: 0 }, { y: top(bad), opacity: 1, duration: 0.38, ease: 'bounce.out' }).then()
-      if (me.dead) return
-      act('claude', { mood: 'idle', busy: false })
-      go('claude', marks.claude, 0.5)
-      act('codex', { busy: true })
-      await approve(bad, count)
-      if (me.dead) return
-      act('codex', { mood: 'happy', busy: false })
-      await wait(0.5)
-      if (me.dead) return
-
-      // 5. Each gate sends a ripple through the wall.
-      act('orca', { mood: 'idle' })
-      act('codex', { mood: 'idle' })
-      const gates = ['tsc', 'test', 'build']
-      for (let i = 0; i < gates.length; i++) {
-        narrate(`gates: ${gates.slice(0, i + 1).map((g) => `${g} ✓`).join('  ')}`, 5)
-        await gsap.to(bricks, { keyframes: [{ y: '-=6', duration: 0.1, ease: 'power2.out' }, { y: '+=6', duration: 0.16, ease: 'power2.in' }], stagger: 0.012 }).then()
-        if (me.dead) return
-      }
-
-      // 6. Shipped: the stamp lands on the wall, everyone cheers, and then it is all cleared away.
-      narrate('me: ship it. Deployed to tiendat.work.', 6)
-      stamp.textContent = '✓ shipped'
-      gsap.fromTo(stamp, { autoAlpha: 0, scale: 1.8 }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: 'back.out(2)' })
-      go('codex', marks.codex, 0.5)
-      AGENTS.forEach(({ id }) => act(id, { mood: 'happy' }))
-      await wait(3)
-      if (me.dead) return
-      await curtain(me)
-    }
-
-    // One character, dropped on a section, does only its own part of the build there.
-    const solo = async (id: AgentId, section: HTMLElement) => {
-      const set = await setUp(section)
-      if (!set) return
-      const { me, bricks, top, marks, name } = set
-      const { name: who, color } = BY_ID[id]
-      await appear(id, marks[id])
-      if (me.dead) return
-      if (id === 'orca') {
-        narrate(`${who} plans ${name}`)
-        act(id, { mood: 'focused', busy: true })
-        await gsap.fromTo(bricks, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.22, stagger: 0.03 }).then()
-      } else if (id === 'claude') {
-        narrate(`${who} writes ${name}`)
-        act(id, { mood: 'working', busy: true })
-        await gsap.fromTo(bricks, { y: (i) => top(i) - 26, opacity: 0 }, { y: top, opacity: 1, duration: 0.38, ease: 'bounce.out', stagger: { each: 0.05, onStart: tint(color) } }).then()
-      } else {
-        // There has to be something to review: a finished wall, which Boo then goes over.
-        narrate(`${who} reviews ${name}`)
-        bricks.forEach((b) => b.removeAttribute('data-ghost'))
-        gsap.set(bricks, { opacity: 1, color: BY_ID.claude.color })
-        act(id, { mood: 'focused', busy: true })
-        await gsap.to(bricks, { keyframes: [{ scale: 1.3, duration: 0.07 }, { scale: 1, duration: 0.15 }], stagger: { each: 0.05, onStart: tint(color) } }).then()
-        if (me.dead) return
-        stamp.textContent = '✓ reviewed'
-        gsap.fromTo(stamp, { autoAlpha: 0, scale: 1.8 }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: 'back.out(2)' })
-      }
-      if (me.dead) return
-      act(id, { mood: 'happy', busy: false })
-      await wait(1.8)
-      if (me.dead) return
-      await curtain(me)
-    }
-
-    // The section to build on when none is named: the first whose top rule is clear in the view, else "How I build".
+    // The section to build when none is named: the first whose top rule is clear in the view, else "How I build".
     const pick = () => {
       const list = sections()
       return list.find((s) => { const top = s.getBoundingClientRect().top; return top >= HEADROOM && top <= window.innerHeight - FOOTROOM }) ??
@@ -534,21 +562,24 @@ export function AgentScene () {
       const section = (id ? document.getElementById(id) : null) ?? pick()
       if (section) story(section)
     }
+    // Whichever character is dropped, the whole crew comes to build the section it landed on.
     const onDrop = (e: Event) => {
-      const { id, x, y } = (e as CustomEvent<{ id: AgentId; x: number; y: number }>).detail
+      const { x, y } = (e as CustomEvent<{ id: AgentId; x: number; y: number }>).detail
       const section = document.elementsFromPoint(x, y).map((el) => el.closest<HTMLElement>('main > section[id]')).find(Boolean)
-      if (section) solo(id, section)
+      if (section) story(section)
     }
-    // Off screen there is nobody to play to: stop, and give the dock its cast back.
+    // Scrolled out of sight there is nobody to play to: stop, and put everything back.
     const leaver = new IntersectionObserver(([entry]) => { if (!entry.isIntersecting && !run.dead) strike() })
-    leaver.observe(box)
+    leaver.observe(chip)
     window.addEventListener(RUN_EVENT, onRun)
     window.addEventListener(DROP_EVENT, onDrop)
+    window.addEventListener('resize', strike)
 
     return () => {
       leaver.disconnect()
       window.removeEventListener(RUN_EVENT, onRun)
       window.removeEventListener(DROP_EVENT, onDrop)
+      window.removeEventListener('resize', strike)
       strike()
     }
   }, [still])
@@ -557,29 +588,28 @@ export function AgentScene () {
 
   return (
     <div ref={rootRef} aria-hidden='true' className='pointer-events-none absolute inset-0 z-30 font-ibm'>
-      <div data-stage='' className='absolute left-0 top-0' style={{ height: STAGE.height }}>
-        {live && line && <span className='absolute left-2 top-2 border bg-background px-1.5 py-0.5 text-[11px] leading-4 text-muted-foreground shadow-sm'>{line}</span>}
-        {Array.from({ length: WALL.cols * WALL.rows }, (_, i) => (
-          <span key={i} data-brick='' className='invisible absolute left-0 top-0'>
-            <Brick />
+      {Array.from({ length: MAX_PIECES }, (_, i) => <span key={i} data-frame='' className='invisible absolute left-0 top-0 border' />)}
+      {Array.from({ length: 6 }, (_, i) => (
+        <span key={i} data-brick='' className='invisible absolute left-0 top-0' style={{ color: BY_ID.claude.color }}>
+          <Brick />
+        </span>
+      ))}
+      <span data-part='chip' className='invisible absolute left-0 top-0 w-max border bg-background px-1.5 py-0.5 text-[11px] leading-4 text-muted-foreground shadow-sm'>{line}</span>
+      <span data-part='stamp' className='invisible absolute left-0 top-0 w-max border bg-background px-1.5 py-0.5 text-[11px] leading-4' style={{ borderColor: BY_ID.codex.color, color: BY_ID.codex.color }}>✓ shipped</span>
+      {([['ticket', 'ticket: build', 'currentColor'], ['write', 'task: write', BY_ID.claude.color], ['review', 'task: review', BY_ID.codex.color]] as const).map(([kind, text, color]) => (
+        <span key={kind} data-card={kind} className='invisible absolute left-0 top-0 flex w-max items-center gap-1.5 border bg-background px-1.5 py-1 text-[11px] leading-none shadow-sm' style={{ borderColor: color }}>
+          <span className='size-1.5' style={{ backgroundColor: color }} />
+          {text}
+        </span>
+      ))}
+      {AGENTS.map(({ id, avatar, color }, i) => (
+        <span key={id} data-actor={id} className='invisible absolute left-0 top-0'>
+          <span data-bot='' className='absolute -left-[26px] -top-[26px] block origin-bottom'>
+            {/* Only drawn while a scene is on, so an idle page pays nothing for them. */}
+            {live && <AgentDot type={avatar} color={color} size={ACTOR} seed={i / AGENTS.length} paused={hidden} interactive={false} {...cast[id]} />}
           </span>
-        ))}
-        <span data-part='stamp' className='invisible absolute left-0 top-0 w-max border bg-background px-1.5 py-0.5 text-[11px] leading-4' style={{ borderColor: BY_ID.codex.color, color: BY_ID.codex.color }}>✓ shipped</span>
-        {([['ticket', 'ticket: build', 'currentColor'], ['write', 'task: write', BY_ID.claude.color], ['review', 'task: review', BY_ID.codex.color]] as const).map(([kind, text, color]) => (
-          <span key={kind} data-card={kind} className='invisible absolute left-0 top-0 flex w-max items-center gap-1.5 border bg-background px-1.5 py-1 text-[11px] leading-none shadow-sm' style={{ borderColor: color }}>
-            <span className='size-1.5' style={{ backgroundColor: color }} />
-            {text}
-          </span>
-        ))}
-        {AGENTS.map(({ id, avatar, color }, i) => (
-          <span key={id} data-actor={id} className='invisible absolute left-0' style={{ top: STAGE.ground - STAGE.actor }}>
-            <span data-bot='' className='block origin-bottom -translate-x-1/2'>
-              {/* Only drawn while a scene is on, so an idle page pays nothing for them. */}
-              {live && <AgentDot type={avatar} color={color} size={STAGE.actor} seed={i / AGENTS.length} paused={hidden} interactive={false} {...cast[id]} />}
-            </span>
-          </span>
-        ))}
-      </div>
+        </span>
+      ))}
     </div>
   )
 }

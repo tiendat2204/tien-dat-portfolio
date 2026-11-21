@@ -676,7 +676,3 @@ section[data-reveal][data-revealed] h2.font-doto {
     stroke-dashoffset: 0;
   }
 }
-
-/* A planned brick on the agents' stage (agent-swarm.tsx): an empty, dashed slot waiting to be filled. */
-[data-ghost] .agent-brick-face { fill-opacity: 0.06; }
-[data-ghost] .agent-brick-edge { stroke-dasharray: 1.6 1.6; opacity: 0.7; }
