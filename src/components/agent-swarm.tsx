@@ -11,7 +11,8 @@ import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
 /*
   The home page's agents, Ori, Quill and Boo (AgentDot characters), in two places that never cover the content:
 
-  - AgentDock: the three sit small in the bottom-right corner of the window. They are quiet. They give a little hop
+  - AgentDock: the three sit small in the bottom-right corner of the window, in the empty gutter beside the content (so only on wide screens). They are
+    quiet. They give a little hop
     when the visitor reaches a new section, say a line when poked, and offer a ▶ that goes to the stage.
   - AgentStage: a box inside "How I build" where they act out one build of this site (BUILD_STEPS) with a wall of
     voxel bricks, the same cubes as the hero figure: Ori marks out the slots, Quill lays a brick in each, Boo
@@ -70,21 +71,26 @@ function storeOn (on: boolean) {
   window.dispatchEvent(new CustomEvent(TOGGLE_EVENT))
 }
 
-// `on`: the visitor has not sent the dock home. `wide`: there is room for it. `still`: reduced motion.
+// `on`: the visitor has not sent the dock home. `wide`: room for the full stage. `roomy`: an empty gutter beside
+// the content column, wide enough to hold the dock without covering anything. `still`: reduced motion.
 function usePrefs () {
-  const [state, setState] = useState({ on: true, wide: false, still: true })
+  const [state, setState] = useState({ on: true, wide: false, roomy: false, still: true })
 
   useEffect(() => {
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const wide = window.matchMedia('(min-width: 640px)')
-    const sync = () => setState({ on: storedOn(), wide: wide.matches, still: motion.matches })
+    // The column is 768px; the dock needs about 150px of gutter to its right.
+    const roomy = window.matchMedia('(min-width: 1080px)')
+    const sync = () => setState({ on: storedOn(), wide: wide.matches, roomy: roomy.matches, still: motion.matches })
     sync()
     motion.addEventListener('change', sync)
     wide.addEventListener('change', sync)
+    roomy.addEventListener('change', sync)
     window.addEventListener(TOGGLE_EVENT, sync)
     return () => {
       motion.removeEventListener('change', sync)
       wide.removeEventListener('change', sync)
+      roomy.removeEventListener('change', sync)
       window.removeEventListener(TOGGLE_EVENT, sync)
     }
   }, [])
@@ -109,8 +115,8 @@ function useTabHidden () {
 // The three in the corner of the window. Quiet until someone is curious.
 export function AgentDock () {
   const rootRef = useRef<HTMLDivElement>(null)
-  const { on, wide, still } = usePrefs()
-  const enabled = on && wide && !still
+  const { on, roomy, still } = usePrefs()
+  const enabled = on && roomy && !still
   const hidden = useTabHidden()
   const [said, setSaid] = useState<{ id: AgentId; line: number } | null>(null)
   const [away, setAway] = useState(false)
@@ -199,7 +205,7 @@ const resting = (): Cast => Object.fromEntries(AGENTS.map((a) => [a.id, { mood: 
 // The stage in "How I build": the build played out with a wall of voxel bricks, and the cast as real controls.
 export function AgentStage () {
   const boxRef = useRef<HTMLDivElement>(null)
-  const { on, wide, still } = usePrefs()
+  const { on, wide, roomy, still } = usePrefs()
   const hidden = useTabHidden()
   const [cast, setCast] = useState<Cast>(resting)
   const [open, setOpen] = useState<AgentId | null>(null)
@@ -482,7 +488,7 @@ export function AgentStage () {
               [▶ run build]
             </button>
           )}
-          {wide && !still && (
+          {roomy && !still && (
             <button type='button' aria-pressed={on} className='transition-colors hover:text-foreground' onClick={() => storeOn(!on)}>
               [dock: {on ? 'on' : 'off'}]
             </button>
