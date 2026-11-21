@@ -200,6 +200,7 @@ export function AgentSwarm () {
       AGENTS.forEach(({ id, verb }) => {
         gsap.set(dots(id), { opacity: 0 })
         gsap.set(anchor(id), { autoAlpha: 0 })
+        anchor(id).removeAttribute('data-alert')
         gsap.set(bot(id), { x: 0, y: 0, rotation: 0, scale: 1 })
         say(id, verb)
         feel(id, 'idle')
