@@ -77,6 +77,15 @@ export function AgentDock () {
   const away = useBusy()
   const [said, setSaid] = useState<{ id: AgentId; line: number } | null>(null)
   const [held, setHeld] = useState<AgentId | null>(null)
+  // The plush avatars are costly to animate, so in the dock they hold still until someone comes near, pokes one,
+  // or a new section sets them hopping; then they move for a moment.
+  const [awake, setAwake] = useState(false)
+  const drowse = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const wake = (ms: number) => {
+    setAwake(true)
+    clearTimeout(drowse.current)
+    drowse.current = setTimeout(() => setAwake(false), ms)
+  }
   const [hint, setHint] = useState<string | null>(null)
 
   // A build that could not start says why, in the dock's bubble.
@@ -94,6 +103,10 @@ export function AgentDock () {
     }
   }, [])
 
+  const wakeRef = useRef(wake)
+  useEffect(() => { wakeRef.current = wake })
+  useEffect(() => () => clearTimeout(drowse.current), [])
+
   // A little hop, one after another, when scrolling stops in a new section.
   useEffect(() => {
     const root = rootRef.current
@@ -105,6 +118,7 @@ export function AgentDock () {
       if (index === last || index < 0) return
       const first = last < 0
       last = index
+      if (!first) wakeRef.current(1600)
       if (!first) gsap.to(root.querySelectorAll('[data-bot]'), { keyframes: [{ y: -9, duration: 0.14, ease: 'power2.out' }, { y: 0, duration: 0.2, ease: 'bounce.out' }], stagger: 0.08 })
     }
     const onScroll = () => {
@@ -164,7 +178,7 @@ export function AgentDock () {
   return (
     <>
       {/* A column no wider than the three characters, so the bubble and the controls stay in the gutter too. */}
-      <div ref={rootRef} className={`group/dock pointer-events-none fixed bottom-3 right-3 z-30 flex w-32 flex-col items-end gap-1 font-ibm transition-opacity duration-200 ${away ? 'opacity-0' : '*:pointer-events-auto'}`}>
+      <div ref={rootRef} onPointerEnter={() => wake(60000)} onPointerLeave={() => wake(1200)} onFocus={() => wake(60000)} onBlur={() => wake(1200)} className={`group/dock pointer-events-none fixed bottom-3 right-3 z-30 flex w-32 flex-col items-end gap-1 font-ibm transition-opacity duration-200 ${away ? 'opacity-0' : '*:pointer-events-auto'}`}>
         <span role='status' className='w-full text-[11px] leading-4'>
           {(said || hint) && <span className='block border bg-background px-2 py-1 shadow-sm'>{said ? `${BY_ID[said.id].name}: ${BY_ID[said.id].lines[said.line]}` : hint}</span>}
         </span>
@@ -186,7 +200,7 @@ export function AgentDock () {
               className={`cursor-grab touch-none select-none active:cursor-grabbing ${held === id ? 'opacity-30' : ''}`}
             >
               <span data-bot='' className='block origin-bottom'>
-                <AgentDot type={avatar} color={color} size={DOCKED} seed={i / AGENTS.length} paused={hidden || away} mood={said?.id === id ? 'happy' : 'idle'} />
+                <AgentDot type={avatar} color={color} size={DOCKED} seed={i / AGENTS.length} paused={hidden || away || !(awake || said)} mood={said?.id === id ? 'happy' : 'idle'} />
               </span>
             </button>
           ))}
@@ -195,7 +209,7 @@ export function AgentDock () {
       {held && (
         <span ref={heldRef} aria-hidden='true' className='pointer-events-none fixed left-0 top-0 z-50' style={{ transform: 'translate(-200px, -200px)' }}>
           <span className='block -translate-x-1/2 -translate-y-1/2'>
-            <AgentDot type={BY_ID[held].avatar} color={BY_ID[held].color} size={52} mood='surprised' interactive={false} />
+            <AgentDot type={BY_ID[held].avatar} color={BY_ID[held].color} size={52} shading='crisp' mood='surprised' interactive={false} />
           </span>
         </span>
       )}
@@ -679,7 +693,7 @@ export function AgentScene () {
         <span key={id} data-actor={id} className='invisible absolute left-0 top-0'>
           <span data-bot='' className='absolute -left-[26px] -top-[26px] block origin-bottom'>
             {/* Only drawn while a scene is on, so an idle page pays nothing for them. */}
-            {live && <AgentDot type={avatar} color={color} size={ACTOR} seed={i / AGENTS.length} paused={hidden} interactive={false} {...cast[id]} />}
+            {live && <AgentDot type={avatar} color={color} size={ACTOR} seed={i / AGENTS.length} shading='crisp' paused={hidden} interactive={false} {...cast[id]} />}
           </span>
         </span>
       ))}

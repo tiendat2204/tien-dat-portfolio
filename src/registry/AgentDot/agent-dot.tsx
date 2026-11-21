@@ -45,6 +45,11 @@ export interface AgentDotProps {
   interactive?: boolean
   /** Offset 0–1 so a row of characters does not blink in unison. */
   seed?: number
+  /**
+   * How the body is drawn. `fabric` (the library's default) is plush fur and by far the most expensive to animate:
+   * about ten times `plastic`, `crisp`, `smooth` or `flat`. Keep it for a character that is paused or on its own.
+   */
+  shading?: BotAvatarProps['shading']
   className?: string
 }
 
@@ -65,6 +70,7 @@ export function AgentDot ({
   paused = false,
   interactive = !paused,
   seed,
+  shading,
   className,
 }: AgentDotProps) {
   const isClient = useIsClient()
@@ -77,7 +83,7 @@ export function AgentDot ({
         </span>
       )}
       <span aria-hidden='true' className='relative block shrink-0' style={{ width: size, height: size }}>
-        {isClient && <BotAvatar type={type} color={color} face='mouth' size={size} seed={seed} paused={paused} interactive={interactive} {...MOODS[mood]} />}
+        {isClient && <BotAvatar type={type} color={color} face='mouth' size={size} seed={seed} shading={shading} paused={paused} interactive={interactive} {...MOODS[mood]} />}
         {alert && (
           <span className='absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-foreground text-xs font-bold text-background'>!</span>
         )}

@@ -17,6 +17,8 @@ export function AgentCast () {
   const [open, setOpen] = useState<AgentId | null>(null)
   const [status, setStatus] = useState('')
   const [seen, setSeen] = useState(false)
+  // The plush avatars are costly to animate: only the one under the pointer, or the open one, moves.
+  const [near, setNear] = useState<AgentId | null>(null)
   const ref = useRef<HTMLDivElement>(null)
   const current = AGENTS.find((a) => a.id === open)
 
@@ -46,11 +48,15 @@ export function AgentCast () {
             aria-expanded={open === id}
             aria-controls='agent-details'
             onClick={() => setOpen(open === id ? null : id)}
+            onPointerEnter={() => setNear(id)}
+            onPointerLeave={() => setNear(null)}
+            onFocus={() => setNear(id)}
+            onBlur={() => setNear(null)}
             className={`flex items-center gap-2.5 border px-2.5 py-1.5 text-xs transition-colors hover:bg-muted/50 ${open === id ? 'border-foreground/60 bg-muted/50' : ''}`}
           >
             {/* The box keeps the avatar's place while it loads. */}
             <span className='block size-11 shrink-0'>
-              {seen && <AgentDot type={avatar} color={color} size={44} seed={i / AGENTS.length} paused={still || hidden} mood={open === id ? 'happy' : 'idle'} />}
+              {seen && <AgentDot type={avatar} color={color} size={44} seed={i / AGENTS.length} paused={still || hidden || !(open === id || near === id)} mood={open === id ? 'happy' : 'idle'} />}
             </span>
             <span className='text-left'>
               <span className='block font-medium'>{name}</span>

@@ -101,10 +101,13 @@ Leave `name` out for a bare avatar, for example inside a button:
 | `paused` | `boolean` | `false` | Freeze the avatar |
 | `interactive` | `boolean` | `!paused` | Eyes follow the pointer and a click makes it hop |
 | `seed` | `number` | – | 0–1 offset so a row does not blink in unison |
+| `shading` | `fabric` \| `plastic` \| `crisp` \| `smooth` \| `flat` | `fabric` | How the body is drawn; see Performance |
 
 ## Performance
 
 Each character is a canvas that redraws while it is animated. Pass `paused` when it does not need to move: under `prefers-reduced-motion`, while the tab is hidden, or while it is off screen.
+
+The plush `fabric` shading is the expensive part. Three 40px characters animating in `fabric` kept the main thread busy for about 420 ms of every second in my measurements, against about 70 ms in `plastic` and 35 ms in `crisp`. So on this site the characters are `fabric` only while they stand still (`paused`), and `crisp` while they move.
 
 ```tsx
 const [seen, setSeen] = useState(false)
