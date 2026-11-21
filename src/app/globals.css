@@ -676,24 +676,3 @@ section[data-reveal][data-revealed] h2.font-doto {
     stroke-dashoffset: 0;
   }
 }
-
-/* Agent cursors (agent-cursors.tsx): three dots pulse in turn while an agent is busy. */
-@keyframes agent-dot {
-  0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
-  40% { opacity: 1; transform: translateY(-1px); }
-}
-
-.agent-dots i {
-  width: 3px;
-  height: 3px;
-  border-radius: 9999px;
-  background: currentColor;
-  animation: agent-dot 1s ease-in-out infinite;
-}
-
-.agent-dots i:nth-child(2) { animation-delay: 0.2s; }
-.agent-dots i:nth-child(3) { animation-delay: 0.4s; }
-
-/* A planned brick (agent-swarm.tsx): an empty, dashed slot waiting to be filled. */
-[data-ghost] .agent-brick-face { fill-opacity: 0.06; }
-[data-ghost] .agent-brick-edge { stroke-dasharray: 1.6 1.6; opacity: 0.7; }

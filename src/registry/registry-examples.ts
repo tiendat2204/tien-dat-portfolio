@@ -45,4 +45,15 @@ export const examples: Registry['items'] = [
       },
     ],
   },
+  {
+    name: 'agent-dot-demo',
+    type: 'registry:example',
+    registryDependencies: ['https://tiendat.work/r/agent-dot.json'],
+    files: [
+      {
+        path: 'examples/agent-dot-demo.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
 ]

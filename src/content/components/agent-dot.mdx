@@ -1,0 +1,121 @@
+---
+title: Agent Dot
+description: An AI agent as a little character, with moods, a name tag that says what it is doing, an alert badge and a speech bubble.
+registry: agent-dot
+new: true
+publishedAt: "2026-11-21"
+tags: ["react", "ai", "agents", "avatar", "animation"]
+---
+
+<ComponentPreview
+  name="agent-dot-demo"
+  openInV0Url="https://tiendat.work/r/agent-dot.json"
+/>
+
+## What is Agent Dot?
+
+A way to put a face on an AI agent. Each agent is a plush character with a name tag under it that says what it is doing right now (`Quill · write about`), three pulsing dots while it works, a `!` badge when something needs attention and a speech bubble when it has something to say.
+
+It is the cast of the build scene on [the home page](/): Ori plans, Quill writes and Boo reviews.
+
+The character itself is drawn by [bot-avatars](https://www.npmjs.com/package/bot-avatars) (MIT) on a 2D canvas. Agent Dot adds the agent parts on top: moods, the name tag, the badge and the bubble. It is presentational. Where a character stands and what it feels are up to you.
+
+## Installation
+
+<CodeTabs className="gap-0">
+  <TabsList>
+    <TabsTriggerShadcnCLI />
+    <TabsTrigger value="manual">Manual</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="cli" className="[&>figure]:mb-0">
+    ```bash
+    npx shadcn@latest add https://tiendat.work/r/agent-dot.json
+    ```
+  </TabsContent>
+
+  <TabsContent value="manual">
+    <Steps>
+      <Step>Install the avatar library</Step>
+      ```bash
+      npm install bot-avatars
+      ```
+      <Step>Copy and paste the following code into your project</Step>
+      <ComponentSource
+        name="agent-dot"
+        title="components/agent-dot.tsx"
+        showLineNumbers
+      />
+      <Step>Update the import paths to match your project setup</Step>
+    </Steps>
+  </TabsContent>
+</CodeTabs>
+
+## Usage
+
+```tsx
+import { AgentDot } from '@/components/agent-dot'
+
+<AgentDot type="star" color="#f58742" name="Quill" task="write about" mood="working" busy />
+```
+
+A reviewer that found something, with the writer reacting:
+
+```tsx
+<AgentDot type="ghost" color="#4cc47c" name="Boo" task="1 issue" mood="focused" />
+<AgentDot type="star" color="#f58742" name="Quill" mood="surprised" alert bubble="1 issue? on it." />
+```
+
+Leave `name` out for a bare avatar, for example inside a button:
+
+```tsx
+<AgentDot type="droid" size={44} />
+```
+
+## Moods
+
+| Mood | What you see |
+| --- | --- |
+| `idle` | Looks around, blinks, hops now and then |
+| `working` | Hops and spins, laughs now and then |
+| `happy` | The same lively motion as `working`, for a celebration |
+| `focused` | Head held down and slightly turned, eyes on the work |
+| `surprised` | Head thrown back; pair it with `alert` |
+| `asleep` | Head down, lids shut, slow breaths |
+
+`focused` and `surprised` are head poses: the avatar library does not redraw the eyes for them.
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `type` | bot-avatars shape (`star`, `ghost`, `droid`, `cat`, …) | `star` | Body shape |
+| `color` | `string` | the shape's own | Body colour; the name tag uses it too |
+| `size` | `number` | `64` | Avatar size in px |
+| `name` | `string` | – | Name tag under the character; omit for a bare avatar |
+| `task` | `string` | – | What it is doing, after the name |
+| `busy` | `boolean` | `false` | Three pulsing dots after the task |
+| `alert` | `boolean` | `false` | A `!` badge on the shoulder |
+| `mood` | `AgentDotMood` | `idle` | See the table above |
+| `bubble` | `ReactNode` | – | Speech bubble above the character |
+| `paused` | `boolean` | `false` | Freeze the avatar |
+| `interactive` | `boolean` | `!paused` | Eyes follow the pointer and a click makes it hop |
+| `seed` | `number` | – | 0–1 offset so a row does not blink in unison |
+
+## Performance
+
+Each character is a canvas that redraws while it is animated. Pass `paused` when it does not need to move: under `prefers-reduced-motion`, while the tab is hidden, or while it is off screen.
+
+```tsx
+const [seen, setSeen] = useState(false)
+// set `seen` from an IntersectionObserver on the wrapper
+<AgentDot type="star" paused={!seen} />
+```
+
+The canvas is only created in the browser, so the component is safe to render on the server; it shows up after hydration.
+
+## Accessibility
+
+- The avatar and the badge are decorative and hidden from assistive technology. The name tag is real text.
+- The speech bubble has `role="status"`, so a new line is announced.
+- Do not rely on mood alone to carry meaning: say it in `task` or the bubble too.

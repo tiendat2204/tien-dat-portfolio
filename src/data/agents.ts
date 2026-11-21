@@ -1,9 +1,10 @@
 // The cast of the home page's agent scene (agent-swarm.tsx). Each character has its own name; `runsOn` is the
-// tool behind it. Roles and setup mirror /uses.
+// tool behind it. Roles and setup mirror /uses; `lines` are what it says when poked.
 
 export const AGENTS = [
   {
     id: 'orca',
+    lines: ['I split the job into tasks.', 'One worktree per worker.', 'Drop me on a section to plan it.'],
     name: 'Ori',
     avatar: 'droid',
     verb: 'plan',
@@ -15,6 +16,7 @@ export const AGENTS = [
   },
   {
     id: 'claude',
+    lines: ['I write the change.', 'CLAUDE.md says: square corners.', 'Drop me on a section to write it.'],
     name: 'Quill',
     avatar: 'star',
     verb: 'write',
@@ -26,6 +28,7 @@ export const AGENTS = [
   },
   {
     id: 'codex',
+    lines: ['I read every diff.', 'Found an issue? I say how to fix it.', 'Drop me on a section to review it.'],
     name: 'Boo',
     avatar: 'ghost',
     verb: 'review',

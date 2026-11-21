@@ -71,4 +71,16 @@ export const components: Registry['items'] = [
       },
     ],
   },
+  {
+    name: 'agent-dot',
+    type: 'registry:component',
+    description: 'An AI agent as a little character: a plush avatar with moods, a name tag that says what it is doing, an alert badge and a speech bubble.',
+    dependencies: ['bot-avatars'],
+    files: [
+      {
+        path: 'AgentDot/agent-dot.tsx',
+        type: 'registry:component',
+      },
+    ],
+  },
 ]

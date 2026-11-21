@@ -70,6 +70,15 @@ export const Index: Record<string, any> = {
       type: 'registry:component',
     }],
   },
+  'agent-dot': {
+    name: 'agent-dot',
+    description: 'An AI agent as a little character: a plush avatar with moods, a name tag that says what it is doing, an alert badge and a speech bubble.',
+    type: 'registry:component',
+    files: [{
+      path: 'src/registry/AgentDot/agent-dot.tsx',
+      type: 'registry:component',
+    }],
+  },
   'sticker-animation-demo': {
     name: 'sticker-animation-demo',
     description: '',
@@ -109,5 +118,15 @@ export const Index: Record<string, any> = {
       type: 'registry:example',
     }],
     component: React.lazy(() => import('@/registry/examples/infinite-select-demo.tsx')),
+  },
+  'agent-dot-demo': {
+    name: 'agent-dot-demo',
+    description: '',
+    type: 'registry:example',
+    files: [{
+      path: 'src/registry/examples/agent-dot-demo.tsx',
+      type: 'registry:example',
+    }],
+    component: React.lazy(() => import('@/registry/examples/agent-dot-demo.tsx')),
   },
 }
