@@ -164,10 +164,15 @@ export function AgentDock () {
   }
 
   return (
-    <div ref={rootRef} className={`group/dock fixed bottom-3 right-3 z-30 flex items-end gap-1 font-ibm transition-[opacity,scale] duration-300 ${away ? 'pointer-events-none scale-75 opacity-0' : ''}`}>
-      <span className='mb-1 mr-1 flex flex-col items-end gap-1 text-[11px] text-muted-foreground opacity-0 transition-opacity focus-within:opacity-100 group-hover/dock:opacity-100'>
+    <div ref={rootRef} className={`group/dock pointer-events-none fixed bottom-3 right-3 z-30 flex items-end gap-1 font-ibm transition-[opacity,scale] duration-300 ${away ? 'scale-75 opacity-0' : '*:pointer-events-auto'}`}>
+      {/* Hidden until the dock is hovered or focused, and takes no clicks while hidden. */}
+      <span className='invisible mb-1 mr-1 flex flex-col items-end gap-1 text-[11px] text-muted-foreground opacity-0 transition-opacity focus-within:visible focus-within:opacity-100 group-hover/dock:visible group-hover/dock:opacity-100 group-focus-within/dock:visible group-focus-within/dock:opacity-100'>
         <button type='button' onClick={watch} className='border bg-background px-1.5 py-0.5 transition-colors hover:text-foreground'>▶ watch us build</button>
         <button type='button' onClick={() => storeOn(false)} className='border bg-background px-1.5 py-0.5 transition-colors hover:text-foreground'>× send us home</button>
+      </span>
+      {/* One bubble for the whole dock, opening leftwards so it never leaves the window. */}
+      <span role='status' className='absolute bottom-full right-0 mb-1 w-max max-w-[min(18rem,calc(100vw-1.5rem))] text-[11px] leading-4'>
+        {said && <span className='block border bg-background px-2 py-1 shadow-sm'>{BY_ID[said.id].name}: {BY_ID[said.id].lines[said.line]}</span>}
       </span>
       {AGENTS.map(({ id, name, verb, avatar, color, lines }, i) => (
         <button
@@ -178,7 +183,7 @@ export function AgentDock () {
           className='cursor-pointer'
         >
           <span data-bot='' className='block origin-bottom'>
-            <AgentDot type={avatar} color={color} size={40} seed={i / AGENTS.length} paused={hidden || away} mood={said?.id === id ? 'happy' : 'idle'} bubble={said?.id === id ? `${name}: ${lines[said.line]}` : undefined} />
+            <AgentDot type={avatar} color={color} size={40} seed={i / AGENTS.length} paused={hidden || away} mood={said?.id === id ? 'happy' : 'idle'} />
           </span>
         </button>
       ))}
@@ -213,7 +218,8 @@ export function AgentStage () {
 
     const cols = wide ? WALL.cols : WALL.narrowCols
     const count = cols * WALL.rows
-    const bricks = () => gsap.utils.toArray<HTMLElement>('[data-brick]', box).slice(0, count)
+    const allBricks = () => gsap.utils.toArray<HTMLElement>('[data-brick]', box)
+    const bricks = () => allBricks().slice(0, count)
     const card = (kind: 'ticket' | 'write' | 'review') => box.querySelector<HTMLElement>(`[data-card='${kind}']`)!
     const stamp = box.querySelector<HTMLElement>('[data-part="stamp"]')!
     const actor = (id: AgentId) => box.querySelector<HTMLElement>(`[data-actor='${id}']`)!
@@ -287,7 +293,10 @@ export function AgentStage () {
       setCast(resting())
       place()
       AGENTS.forEach(({ id }) => gsap.set(bot(id), { y: 0, rotation: 0, scale: 1 }))
-      gsap.set(bricks(), { x: (i) => slots[i].x, y: top, opacity: 0, scale: 1, rotation: 0, color: ori.color })
+      // Every brick, not only this layout's: a narrower wall must not keep bricks from a wider run.
+      gsap.killTweensOf(allBricks())
+      gsap.set(allBricks(), { opacity: 0 })
+      gsap.set(bricks(), { x: (i) => slots[i].x, y: top, scale: 1, rotation: 0, color: ori.color })
       bricks().forEach((b) => b.toggleAttribute('data-ghost', true))
       gsap.set([stamp, ...box.querySelectorAll('[data-card]')], { autoAlpha: 0 })
       window.dispatchEvent(new CustomEvent(BUSY_EVENT, { detail: true }))
@@ -389,7 +398,7 @@ export function AgentStage () {
     // It plays by itself once, the first time most of the stage is on screen.
     let played = false
     const starter = new IntersectionObserver(([entry]) => {
-      if (played || !entry.isIntersecting) return
+      if (played || !entry.isIntersecting || entry.intersectionRatio < 0.8) return
       played = true
       story()
     }, { threshold: 0.8 })
@@ -398,6 +407,17 @@ export function AgentStage () {
       played = true
       story()
     }
+    // Off screen there is nobody to play to: stop, and give the dock its cast back.
+    const leaver = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting || run.dead) return
+      run.dead = true
+      timers.forEach((t) => t.kill())
+      gsap.killTweensOf(everything())
+      setCast(resting())
+      setStatus('')
+      window.dispatchEvent(new CustomEvent(BUSY_EVENT, { detail: false }))
+    })
+    leaver.observe(box)
     const onResize = () => { if (run.dead) place() }
     window.addEventListener(RUN_EVENT, replay)
     window.addEventListener('resize', onResize)
@@ -406,6 +426,7 @@ export function AgentStage () {
       run.dead = true
       watcher.disconnect()
       starter.disconnect()
+      leaver.disconnect()
       timers.forEach((t) => t.kill())
       window.removeEventListener(RUN_EVENT, replay)
       window.removeEventListener('resize', onResize)
