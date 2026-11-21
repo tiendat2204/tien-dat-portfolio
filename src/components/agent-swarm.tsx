@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 
 import { AGENTS, BUILD_STEPS, type AgentId } from '@/data/agents'
-import { sectionAt, type Point } from '@/lib/agent-cursors-plan'
+import { mostVisible, sectionAt, type Point } from '@/lib/agent-cursors-plan'
 import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
 
 /*
@@ -319,6 +319,9 @@ export function AgentScene () {
     let held: { el: HTMLElement; opacity: string; clipPath: string }[] = []
     let run = { dead: true }
     let timers: gsap.core.Tween[] = []
+    // Watches the section being built: once it is scrolled wholly out of sight there is nobody to play to, so the
+    // build stops and everything is put back. (`strike` is declared below; this only runs later.)
+    const leaver = new IntersectionObserver(([entry]) => { if (!entry.isIntersecting && !run.dead) strike() })
 
     const wait = (seconds: number) => new Promise<void>((resolve) => { timers.push(gsap.delayedCall(seconds, resolve)) })
     const narrate = (text: string, step: number) => {
@@ -402,6 +405,8 @@ export function AgentScene () {
         return
       }
       held = pieces.map((el) => ({ el, opacity: el.style.opacity, clipPath: el.style.clipPath }))
+      leaver.disconnect()
+      leaver.observe(section)
       const spots = pieces.map((el) => {
         const r = el.getBoundingClientRect()
         return { x: r.left - origin.left, y: r.top - origin.top, w: r.width, h: r.height }
@@ -546,10 +551,10 @@ export function AgentScene () {
       strike()
     }
 
-    // The section to build when none is named: the one in the middle of the view.
+    // The section to build when none is named: the one with the most of itself on screen, if any.
     const pick = () => {
       const list = sections()
-      return list[sectionAt(list.map((s) => s.getBoundingClientRect()), window.innerHeight / 2)] ?? list[0] ?? null
+      return list[mostVisible(list.map((s) => s.getBoundingClientRect()), window.innerHeight, HEADER)] ?? null
     }
     const onRun = (e: Event) => {
       const id = (e as CustomEvent<{ section?: string } | undefined>).detail?.section
@@ -562,9 +567,6 @@ export function AgentScene () {
       const section = document.elementsFromPoint(x, y).map((el) => el.closest<HTMLElement>('main > section[id]')).find(Boolean)
       if (section) story(section)
     }
-    // Scrolled out of sight there is nobody to play to: stop, and put everything back.
-    const leaver = new IntersectionObserver(([entry]) => { if (!entry.isIntersecting && !run.dead) strike() })
-    leaver.observe(chip)
     window.addEventListener(RUN_EVENT, onRun)
     window.addEventListener(DROP_EVENT, onDrop)
     window.addEventListener('resize', strike)
