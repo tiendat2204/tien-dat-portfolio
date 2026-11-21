@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { AgentSwarm } from '@/components/agent-swarm'
+import { AgentSwarmLazy } from '@/components/agent-swarm-lazy'
 import { AwardCard } from '@/components/AwardCard'
 import BlurFadeText from '@/components/magicui/blur-fade-text'
 import { ShellPrompt } from '@/components/shell-prompt'
@@ -126,6 +126,7 @@ export default function Page () {
                   className='truncate text-2xl font-extrabold tracking-tight sm:text-3xl font-doto px-3 sm:px-4'
                   yOffset={0}
                   text={DATA.name}
+                  as='h1'
                 />
                 <div className='size-6 shrink-0 mr-3 sm:mr-4'>
                   <Icons.Logo />
@@ -313,7 +314,7 @@ export default function Page () {
 
       <BlogSection />
 
-      <AgentSwarm />
+      <AgentSwarmLazy />
     </main>
   )
 }

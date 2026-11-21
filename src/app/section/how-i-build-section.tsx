@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { AgentCast } from '@/components/agent-swarm'
+import { AgentCast } from '@/components/agent-cast'
 import { Icon } from '@/components/Icon'
 import { BlurFade } from '@/components/magicui/blur-fade'
 import { BLUR_FADE_DELAY } from '@/data/config'

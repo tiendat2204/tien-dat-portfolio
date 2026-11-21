@@ -3,10 +3,10 @@
 import { BorderBeam } from 'border-beam'
 import { gsap } from 'gsap'
 import { useTheme } from 'next-themes'
-import Link from 'next/link'
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { ThinkingOrb, type ThinkingOrbProps } from 'thinking-orbs'
 
+import { BUSY_EVENT, BY_ID, DROP_EVENT, HINT_EVENT, RUN_EVENT, STATUS_EVENT, storeOn, usePrefs, useTabHidden } from '@/components/agent-shared'
 import { AGENTS, BUILD_STEPS, type AgentId } from '@/data/agents'
 import { mostVisible, sectionAt, type Point } from '@/lib/agent-cursors-plan'
 import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
@@ -23,7 +23,7 @@ import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
     what it renders, Boo ticks them off and sends one back as removed lines, the gates are the repo's real
     commands, and it ships. A status line on the section's own top rule says which tool call is running, and one
     bright beam rides the section's border meanwhile. Then the section is exactly as it was and the cast returns to the dock.
-  - AgentCast: the same cast as real controls in "How I build", with the build as text.
+  - AgentCast (agent-cast.tsx): the same cast as real controls in "How I build", with the build as text.
 
   Nothing runs per frame or per scroll event, and the canvases stop drawing off screen and in a hidden tab.
 */
@@ -39,16 +39,6 @@ const MUTED = 'hsl(var(--muted-foreground))'
 const PAPER = 'hsl(var(--background))'
 // Line height of that code, in px.
 const LINE = 15
-const STORAGE_KEY = 'agent-cursors'
-const TOGGLE_EVENT = 'agent-swarm:toggle'
-/** detail: `{ section?: string }` — the section id to build on; the one in view when left out. */
-const RUN_EVENT = 'agent-swarm:run'
-/** detail: `{ id, x, y }` — a character let go at a viewport point. */
-const DROP_EVENT = 'agent-swarm:drop'
-const BUSY_EVENT = 'agent-swarm:busy'
-const STATUS_EVENT = 'agent-swarm:status'
-/** detail: a line for the dock to say, when a build was asked for but could not start. */
-const HINT_EVENT = 'agent-swarm:hint'
 const NOTHING_TO_BUILD = 'No section in view. Scroll to one first.'
 
 // Size of a character while it is out on the page, and in the dock.
@@ -61,63 +51,6 @@ const MAX_PIECES = 26
 // The site header's height, and the highest line (in the viewport) the characters may stand on below it.
 const HEADER = 57
 const STAND_MIN = HEADER + ACTOR + 20
-
-const BY_ID = Object.fromEntries(AGENTS.map((a) => [a.id, a])) as { [K in AgentId]: Extract<typeof AGENTS[number], { id: K }> }
-
-function storedOn () {
-  try {
-    return window.localStorage.getItem(STORAGE_KEY) !== 'off'
-  } catch {
-    return true
-  }
-}
-
-function storeOn (on: boolean) {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, on ? 'on' : 'off')
-  } catch {
-    // Storage can be blocked; the toggle still works for this page view.
-  }
-  window.dispatchEvent(new CustomEvent(TOGGLE_EVENT))
-}
-
-// `on`: the visitor has not sent the dock home. `roomy`: an empty gutter beside the content column, wide enough
-// to hold the dock without covering anything. `still`: reduced motion.
-function usePrefs () {
-  const [state, setState] = useState({ on: true, roomy: false, still: true })
-
-  useEffect(() => {
-    const motion = window.matchMedia('(prefers-reduced-motion: reduce)')
-    // The column is 768px; the dock needs about 150px of gutter to its right.
-    const roomy = window.matchMedia('(min-width: 1080px)')
-    const sync = () => setState({ on: storedOn(), roomy: roomy.matches, still: motion.matches })
-    sync()
-    motion.addEventListener('change', sync)
-    roomy.addEventListener('change', sync)
-    window.addEventListener(TOGGLE_EVENT, sync)
-    return () => {
-      motion.removeEventListener('change', sync)
-      roomy.removeEventListener('change', sync)
-      window.removeEventListener(TOGGLE_EVENT, sync)
-    }
-  }, [])
-
-  return state
-}
-
-// True while the tab is in the background, so the canvases can stop drawing.
-function useTabHidden () {
-  const [hidden, setHidden] = useState(false)
-
-  useEffect(() => {
-    const sync = () => setHidden(document.hidden)
-    sync()
-    document.addEventListener('visibilitychange', sync)
-    return () => document.removeEventListener('visibilitychange', sync)
-  }, [])
-
-  return hidden
-}
 
 // True while a build or a dropped character is at work on the page.
 function useBusy () {
@@ -760,92 +693,5 @@ export function AgentSwarm () {
       <AgentScene />
       <AgentDock />
     </>
-  )
-}
-
-// The same cast as real controls in "How I build": who each agent is, the build as text, and the switches.
-export function AgentCast () {
-  const { on, roomy, still } = usePrefs()
-  const hidden = useTabHidden()
-  const [open, setOpen] = useState<AgentId | null>(null)
-  const [status, setStatus] = useState('')
-  const [seen, setSeen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-  const current = AGENTS.find((a) => a.id === open)
-
-  // Each line of a running build is announced from here.
-  useEffect(() => {
-    const onStatus = (e: Event) => setStatus((e as CustomEvent<string>).detail)
-    window.addEventListener(STATUS_EVENT, onStatus)
-    return () => window.removeEventListener(STATUS_EVENT, onStatus)
-  }, [])
-
-  // The avatars only draw while this block is on screen.
-  useEffect(() => {
-    if (!ref.current) return
-    const observer = new IntersectionObserver(([entry]) => setSeen(entry.isIntersecting))
-    observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [])
-
-  return (
-    <div ref={ref} className='flex flex-col gap-3'>
-      <p aria-live='polite' className='sr-only'>{status}</p>
-      <div className='flex flex-wrap items-center gap-2'>
-        {AGENTS.map(({ id, name, verb, avatar, color }, i) => (
-          <button
-            key={id}
-            type='button'
-            aria-expanded={open === id}
-            aria-controls='agent-details'
-            onClick={() => setOpen(open === id ? null : id)}
-            className={`flex items-center gap-2.5 border px-2.5 py-1.5 text-xs transition-colors hover:bg-muted/50 ${open === id ? 'border-foreground/60 bg-muted/50' : ''}`}
-          >
-            <AgentDot type={avatar} color={color} size={44} seed={i / AGENTS.length} paused={still || hidden || !seen} mood={open === id ? 'happy' : 'idle'} />
-            <span className='text-left'>
-              <span className='block font-medium'>{name}</span>
-              <span className='block text-muted-foreground'>{verb}</span>
-            </span>
-          </button>
-        ))}
-        {!still && (
-          <span className='ml-auto flex gap-3 text-xs text-muted-foreground'>
-            <button type='button' className='transition-colors hover:text-foreground' onClick={() => window.dispatchEvent(new CustomEvent(RUN_EVENT, { detail: { section: 'how-i-build' } }))}>
-              [▶ run build]
-            </button>
-            {roomy && (
-              <button type='button' aria-pressed={on} className='transition-colors hover:text-foreground' onClick={() => storeOn(!on)}>
-                [dock: {on ? 'on' : 'off'}]
-              </button>
-            )}
-          </span>
-        )}
-      </div>
-
-      <div id='agent-details'>
-        {current && (
-          <div className='border-l-2 py-1 pl-3 text-xs' style={{ borderColor: current.color }}>
-            <p><span className='font-medium'>{current.name}.</span> {current.role}</p>
-            <p className='mt-1 text-muted-foreground'>Runs on {current.runsOn}.</p>
-            <ul className='mt-1 list-inside list-["–_"] text-muted-foreground'>
-              {current.setup.map((item) => <li key={item}>{item}</li>)}
-            </ul>
-            <Link href={current.href} className='mt-1 inline-block underline underline-offset-2 hover:text-foreground'>
-              see the {current.runsOn} workflow →
-            </Link>
-          </div>
-        )}
-      </div>
-
-      <ol className='grid gap-x-6 gap-y-1 text-xs text-muted-foreground sm:grid-cols-2'>
-        {BUILD_STEPS.map((step, i) => (
-          <li key={step} className='flex gap-2'>
-            <span className='text-foreground/60'>{String(i + 1).padStart(2, '0')}</span>
-            <span>{step}</span>
-          </li>
-        ))}
-      </ol>
-      {roomy && on && !still && <p className='text-xs text-muted-foreground'>They wait in the corner of the window: poke one, or drag it onto a section to put it to work.</p>}
-    </div>
   )
 }

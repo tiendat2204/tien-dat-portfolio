@@ -17,6 +17,8 @@ interface BlurFadeTextProps {
   delay?: number;
   yOffset?: number;
   animateByCharacter?: boolean;
+  // The wrapping element: `h1` when the text is the page's main heading.
+  as?: 'div' | 'h1';
 }
 const BlurFadeText = ({
   text,
@@ -26,6 +28,7 @@ const BlurFadeText = ({
   delay = 0,
   yOffset = 0,
   animateByCharacter = false,
+  as: Wrapper = 'div',
 }: BlurFadeTextProps) => {
   const defaultVariants: Variants = {
     hidden: { y: yOffset, opacity: 0, filter: 'blur(8px)' },
@@ -62,7 +65,7 @@ const BlurFadeText = ({
   }
 
   return (
-    <div className='flex'>
+    <Wrapper className='flex'>
       <AnimatePresence>
         <motion.span
           initial='hidden'
@@ -79,7 +82,7 @@ const BlurFadeText = ({
           {text}
         </motion.span>
       </AnimatePresence>
-    </div>
+    </Wrapper>
   )
 }
 

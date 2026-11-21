@@ -4,7 +4,7 @@ import { BLUR_FADE_DELAY } from '@/data/config'
 import { INSIGHTS_SOURCE } from '@/data/insights'
 import { getUmamiInsights } from '@/lib/umami'
 import { cn } from '@/lib/utils'
-import { InsightsChart } from './insights-chart'
+import { InsightsChartLazy } from './insights-chart-lazy'
 import { SectionHead } from '@/components/section-head'
 
 export async function InsightsSection () {
@@ -63,7 +63,7 @@ export async function InsightsSection () {
       )}
 
       <div className='border-b px-2 py-4'>
-        <InsightsChart data={daily} />
+        <InsightsChartLazy data={daily} />
       </div>
 
       <p className='px-4 py-3 text-xs text-muted-foreground'>
