@@ -114,6 +114,8 @@ export function AgentSwarm () {
     let timers: gsap.core.Tween[] = []
     let where = ''
     let dragging = false
+    // Scrolling settled while a character was held: the other two still owe a hop.
+    let owed = false
 
     const wait = (seconds: number) => new Promise<void>((resolve) => { timers.push(gsap.delayedCall(seconds, resolve)) })
     const later = (seconds: number, fn: () => void) => { timers.push(gsap.delayedCall(seconds, fn)) }
@@ -178,6 +180,7 @@ export function AgentSwarm () {
 
     // Hop to wherever they should be. Runs when scrolling stops, never while it is going on.
     const follow = () => {
+      if (dragging) owed = true
       if (!run.dead || dragging) return
       const target = spots()
       // Side seats are tied to the view, so they move with every scroll; an edge only when the section changes.
@@ -419,6 +422,11 @@ export function AgentSwarm () {
         gsap.to(bot(id), { scale: 1, duration: 0.2 })
         // Leave it where it was put until the visitor scrolls to another section.
         where = `dropped:${id}`
+        if (owed) {
+          owed = false
+          const target = spots()
+          AGENTS.forEach((other, i) => { if (other.id !== id) go(other.id, target.points[i], 0.6) })
+        }
         drop(id, e.clientX, e.clientY)
       }
       el.addEventListener('pointerdown', down)
