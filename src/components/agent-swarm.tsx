@@ -264,8 +264,44 @@ type Cast = Record<AgentId, Actor>
 
 const resting = (): Cast => Object.fromEntries(AGENTS.map((a) => [a.id, { mood: 'idle', busy: false, alert: false }])) as Cast
 
-// Tags that are one piece of a section however much they hold; anything else is opened up to find its pieces.
+// Tags that are one piece of a section however much they hold; anything else is opened up to find its pieces
+// (unless it is a component that names itself, with `data-jsx` or shadcn's `data-slot`).
 const WHOLE = new Set(['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'A', 'BUTTON', 'IMG', 'SVG', 'CANVAS', 'SPAN', 'TIME', 'CODE', 'PRE', 'FIGURE', 'BLOCKQUOTE', 'LI', 'LABEL', 'INPUT', 'VIDEO'])
+
+const pascal = (name: string) => name.split(/[-_\s]+/).filter(Boolean).map((w) => w[0].toUpperCase() + w.slice(1)).join('')
+
+/**
+ * A piece of the page as the JSX that renders it: the component's own source line where it declares one
+ * (`data-jsx`), a shadcn/ui component by its `data-slot`, a lucide icon by its class, next/image and next/link,
+ * and otherwise the tag with its first Tailwind classes.
+ */
+function jsxOf (el: Element): { open: string; close: string | null; text: string } {
+  const own = el.getAttribute('data-jsx')
+  if (own) return { open: own, close: null, text: '' }
+  const tag = el.tagName.toLowerCase()
+  // innerText, not textContent: it keeps the spaces between blocks ("TA Consultant Ho Chi Minh").
+  const text = ((el as HTMLElement).innerText ?? el.textContent ?? '').replace(/\s+/g, ' ').trim()
+  const slot = el.getAttribute('data-slot')
+  if (slot) return { open: `<${pascal(slot)}>`, close: `</${pascal(slot)}>`, text }
+  // A block that holds a run of the same shadcn/ui component reads as the map that renders it.
+  const inside = [...el.querySelectorAll('[data-slot]')].map((child) => child.getAttribute('data-slot')!)
+  const repeated = inside.find((name) => inside.filter((other) => other === name).length > 1)
+  if (tag === 'svg') {
+    const lucide = [...el.classList].find((c) => c.startsWith('lucide-'))
+    return { open: `<${lucide ? pascal(lucide.slice(7)) : 'Icon'} />`, close: null, text: '' }
+  }
+  if (tag === 'img') {
+    const src = el.getAttribute('src') ?? ''
+    const path = src.includes('url=') ? decodeURIComponent(src.split('url=')[1].split('&')[0]) : src
+    return { open: `<Image src="${path}" alt="${el.getAttribute('alt') ?? ''}" />`, close: null, text: '' }
+  }
+  if (tag === 'a') return { open: `<Link href="${el.getAttribute('href') ?? ''}">`, close: '</Link>', text }
+  if (tag === 'canvas') return { open: '<canvas ref={ref} />', close: null, text: '' }
+  const classes = [...el.classList].filter((c) => /^[a-z]/.test(c) && !c.includes('[')).slice(0, 3).join(' ')
+  const open = classes ? `<${tag} className="${classes}">` : `<${tag}>`
+  if (repeated) return { open, close: `</${tag}>`, text: `{items.map((item) => <${pascal(repeated)} key={item.name}>{item.name}</${pascal(repeated)}>)}` }
+  return text ? { open, close: `</${tag}>`, text } : { open: `${open.slice(0, -1)} />`, close: null, text: '' }
+}
 
 /**
  * The pieces a section is built from: its visible blocks, in reading order, as fine-grained as fits in MAX_PIECES.
@@ -280,10 +316,10 @@ function piecesOf (section: HTMLElement): HTMLElement[] {
     const found: HTMLElement[] = []
     const open = (el: Element, depth: number) => {
       for (const child of el.children) {
-        // The section's own `+` corner marks and other decoration are not content.
-        if (child.getAttribute('aria-hidden') === 'true' || !onScreen(child)) continue
+        // The section's own `+` corner marks (bare icons right under it) and other decoration are not content.
+        if (child.getAttribute('aria-hidden') === 'true' || (depth === 0 && child.tagName.toLowerCase() === 'svg') || !onScreen(child)) continue
         const kids = [...child.children].filter(onScreen)
-        if (kids.length > 0 && depth < maxDepth && !WHOLE.has(child.tagName.toUpperCase())) open(child, depth + 1)
+        if (kids.length > 0 && depth < maxDepth && !WHOLE.has(child.tagName.toUpperCase()) && !child.hasAttribute('data-jsx') && !child.hasAttribute('data-slot')) open(child, depth + 1)
         else found.push(child as HTMLElement)
       }
     }
@@ -426,15 +462,14 @@ export function AgentScene () {
       const file = `${section.id}-section.tsx`
       // What each piece looks like as code, cut to what fits in its box.
       const code = pieces.map((el, i) => {
-        const tag = el.tagName.toLowerCase()
-        const text = (el.textContent ?? '').replace(/\s+/g, ' ').trim()
+        const { open, close, text } = jsxOf(el)
         const cols = Math.max(4, Math.floor((spots[i].w - 14) / 6.7) - 2)
         const rows = Math.max(1, Math.floor((spots[i].h - 4) / LINE))
         const cut = (value: string, max: number) => value.length > max ? `${value.slice(0, Math.max(0, max - 1))}…` : value
-        if (!text) return [cut(`<${tag} />`, cols)]
-        if (rows < 3) return [cut(`<${tag}>${text}`, cols)]
+        if (!close) return [cut(open, cols)]
+        if (rows < 3) return [cut(`${open}${text}${close}`, cols)]
         const body = Array.from({ length: Math.min(rows - 2, Math.ceil(text.length / (cols - 2))) }, (_, n) => `  ${text.slice(n * (cols - 2), (n + 1) * (cols - 2))}`)
-        return [`<${tag}>`, ...body, `</${tag}>`]
+        return [cut(open, cols), ...body, close]
       })
       const panes = frames().slice(0, count)
       gsap.set(panes, { x: (i) => spots[i].x, y: (i) => spots[i].y, width: (i) => spots[i].w, height: (i) => spots[i].h, autoAlpha: 0, clipPath: 'none' })

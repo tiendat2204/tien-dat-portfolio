@@ -38,6 +38,7 @@ export function AwardCard ({
 
   return (
     <motion.li
+      data-jsx={`<AwardCard title="${title}" />`}
       className='relative ml-12 py-4 cursor-pointer group'
       onClick={() => setIsExpanded(!isExpanded)}
       initial={{ opacity: 0 }}

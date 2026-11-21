@@ -13,7 +13,8 @@ type SectionHeadProps = {
 export function SectionHead ({ index, total, title, link }: SectionHeadProps) {
   const sheet = `${String(index).padStart(2, '0')} / ${total}`
   return (
-    <div className='flex items-baseline justify-between gap-4 px-4'>
+    // `data-jsx` is this element's own source line: the home page's agents quote it while they "build" a section.
+    <div data-jsx={`<SectionHead index={${index}} total={${total}} title="${title}" />`} className='flex items-baseline justify-between gap-4 px-4'>
       <h2 className='font-doto text-2xl font-extrabold'>{title}</h2>
       {link
         ? (

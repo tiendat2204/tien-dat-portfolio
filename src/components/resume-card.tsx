@@ -59,6 +59,7 @@ export const ResumeCard = ({
 
   return (
     <div
+      data-jsx={`<ResumeCard title="${title}" />`}
       className='block cursor-pointer'
       onClick={handleClick}
     >

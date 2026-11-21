@@ -59,7 +59,7 @@ export function ProjectCard ({
   }
 
   return (
-    <div className='block cursor-pointer border-b' onClick={handleClick}>
+    <div data-jsx={`<ProjectCard title="${title}" />`} className='block cursor-pointer border-b' onClick={handleClick}>
       <Card className='flex items-start justify-start ring-0 flex-row  gap-0'>
         <div className='flex items-center gap-1 justify-start p-4'>
           <Avatar
