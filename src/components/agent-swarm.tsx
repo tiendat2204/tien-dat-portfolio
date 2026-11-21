@@ -19,7 +19,8 @@ import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
     the page out of that section's own pieces: Ori plans it (the content goes and every block becomes an unticked
     todo line of code), Quill writes the pieces one by one as added diff lines, typed out, each then giving way to
     what it renders, Boo ticks them off and sends one back as removed lines, the gates are the repo's real
-    commands, and it ships. A status line on the section's own top rule says which tool call is running. Then the section is exactly as it was and the cast returns to the dock.
+    commands, and it ships. A status line on the section's own top rule says which tool call is running, with a
+    beam of light riding its border. Then the section is exactly as it was and the cast returns to the dock.
   - AgentCast: the same cast as real controls in "How I build", with the build as text.
 
   Nothing runs per frame or per scroll event, and the canvases stop drawing off screen and in a hidden tab.
@@ -662,7 +663,7 @@ export function AgentScene () {
       })
       await wait(2.8)
       if (me.dead) return
-      gsap.to(stamp, { autoAlpha: 0, duration: 0.3 })
+      gsap.to(stamp, { autoAlpha: 0, duration: 0.4 })
       // Home time: each one jumps back to its place in the dock, which then takes over from the scene.
       await Promise.all(AGENTS.map(async ({ id }, i) => {
         await wait(i * 0.12)
@@ -709,19 +710,18 @@ export function AgentScene () {
   return (
     <div ref={rootRef} aria-hidden='true' className='pointer-events-none absolute inset-0 z-30 font-ibm'>
       {Array.from({ length: MAX_PIECES }, (_, i) => <span key={i} data-frame='' className='invisible absolute left-0 top-0 overflow-hidden whitespace-pre px-1.5 py-0.5 font-mono text-[11px] leading-[15px]' />)}
-      {/* The build's status line, in the section itself: an orb for what the agents are doing, the call, its result. */}
-      <span data-part='stamp' className='invisible absolute left-0 top-0 flex w-max items-center gap-1.5 border bg-background py-0.5 pl-1 pr-2 font-mono text-[11px] leading-4'>
-        {live && <ThinkingOrb state={ORBS[term.step] ?? 'working'} size={20} paused={hidden} />}
-        <span>{term.call}</span>
-        {term.result && <span className='text-muted-foreground'>⎿ {term.result}</span>}
-        <span className='tabular-nums text-muted-foreground'>{term.step}/{BUILD_STEPS.length}</span>
+      {/* The build's status line, in the section itself: an orb for what the agents are doing, the call, its result.
+          One bright beam in the foreground colour rides its border (`.agent-beam` in globals.css). */}
+      <span data-part='stamp' className='invisible absolute left-0 top-0 block w-max font-mono text-[11px] leading-4'>
+        {live && (
+          <span className='agent-beam flex items-center gap-1.5 border bg-background py-0.5 pl-1 pr-2'>
+            <ThinkingOrb state={ORBS[term.step] ?? 'working'} size={20} paused={hidden} />
+            <span>{term.call}</span>
+            {term.result && <span className='text-muted-foreground'>⎿ {term.result}</span>}
+            <span className='tabular-nums text-muted-foreground'>{term.step}/{BUILD_STEPS.length}</span>
+          </span>
+        )}
       </span>
-      {([['ticket', 'ticket: build', 'currentColor'], ['write', 'task: write', BY_ID.claude.color], ['review', 'task: review', BY_ID.codex.color]] as const).map(([kind, text, color]) => (
-        <span key={kind} data-card={kind} className='invisible absolute left-0 top-0 flex w-max items-center gap-1.5 border bg-background px-1.5 py-1 text-[11px] leading-none shadow-sm' style={{ borderColor: color }}>
-          <span className='size-1.5' style={{ backgroundColor: color }} />
-          {text}
-        </span>
-      ))}
       {AGENTS.map(({ id, avatar, color }, i) => (
         <span key={id} data-actor={id} className='invisible absolute left-0 top-0'>
           <span data-bot='' className='absolute -left-[26px] -top-[26px] block origin-bottom'>
