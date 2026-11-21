@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { AgentSwarm } from '@/components/agent-swarm'
 import { AwardCard } from '@/components/AwardCard'
 import BlurFadeText from '@/components/magicui/blur-fade-text'
 import { ShellPrompt } from '@/components/shell-prompt'
@@ -48,7 +49,7 @@ export default function Page () {
   })
 
   return (
-    <main className='flex flex-col min-h-dvh mx-auto w-full max-w-3xl'>
+    <main className='relative flex flex-col min-h-dvh mx-auto w-full max-w-3xl'>
       <script
         type='application/ld+json'
         dangerouslySetInnerHTML={{
@@ -312,6 +313,7 @@ export default function Page () {
 
       <BlogSection />
 
+      <AgentSwarm />
     </main>
   )
 }
