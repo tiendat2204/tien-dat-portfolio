@@ -666,11 +666,12 @@ export function AgentScene () {
       */}
       <span data-part='stamp' className='invisible absolute left-0 top-0 block w-max font-mono text-[11px] leading-4'>
         {live && (
-          <span className='flex items-center gap-1.5 border bg-background py-0.5 pl-1 pr-2'>
-            <ThinkingOrb state={ORBS[term.step] ?? 'working'} size={20} paused={hidden} />
-            <span>{term.call}</span>
-            {term.result && <span className='text-muted-foreground'>⎿ {term.result}</span>}
-            <span className='tabular-nums text-muted-foreground'>{term.step}/{BUILD_STEPS.length}</span>
+          // Never wider than the window: on a phone the call is cut short and its result is left to the step count.
+          <span className='flex max-w-[calc(100vw-3.5rem)] items-center gap-1.5 border bg-background py-0.5 pl-1 pr-2'>
+            <span className='shrink-0'><ThinkingOrb state={ORBS[term.step] ?? 'working'} size={20} paused={hidden} /></span>
+            <span className='min-w-0 truncate'>{term.call}</span>
+            {term.result && <span className='hidden shrink-0 text-muted-foreground sm:inline'>⎿ {term.result}</span>}
+            <span className='shrink-0 tabular-nums text-muted-foreground'>{term.step}/{BUILD_STEPS.length}</span>
           </span>
         )}
       </span>

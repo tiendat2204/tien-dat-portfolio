@@ -266,7 +266,7 @@ export default function Page () {
                 title={project.title}
                 logoUrl={project.logoUrl}
                 positions={project.positions}
-                image={project.image}
+                image={'image' in project ? project.image : undefined}
                 invertInLight={'invertInLight' in project ? project.invertInLight : undefined}
                 links={project.links}
               />

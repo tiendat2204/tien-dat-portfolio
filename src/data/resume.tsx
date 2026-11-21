@@ -532,7 +532,6 @@ export const DATA = {
           icon: <Icons.Github className='size-3' />,
         },
       ],
-      image: '/projects/memory-game.png',
     },
     {
       title: 'Sticker Animation',
@@ -574,7 +573,7 @@ export const DATA = {
           icon: <Icons.Github className='size-3' />,
         },
       ],
-      image: '/projects/sticker-animation.png',
+      image: '/blog/sticker-animation.png',
     },
   ],
   awards: [
