@@ -198,7 +198,12 @@ export function AgentSwarm () {
       while (!me.dead) {
         const sections = [...document.querySelectorAll<HTMLElement>('main > section[id]')]
         const index = nextVisible(sections.map((s) => s.getBoundingClientRect()), window.innerHeight, -1)
-        if (index >= 0) return { name: sections[index].id, body: local(sections[index].getBoundingClientRect()) }
+        if (index >= 0) {
+          const rect = sections[index].getBoundingClientRect()
+          const origin = edge()
+          // `body` is the part on screen, where the cast works; `full` is the section's real box.
+          return { name: sections[index].id, body: local(rect), full: { x: rect.left - origin.left, y: rect.top - origin.top, w: rect.width, h: rect.height } }
+        }
         await wait(0.6)
       }
       return null
@@ -358,9 +363,9 @@ export function AgentSwarm () {
       if (me.dead) return
 
       // 6. Shipped: the bricks sink into the section's own top rule, its frame lights up once, and a small stamp
-      // sits on the rule. Nothing is drawn over the section's content.
+      // sits on the rule. Both follow the section's real box, so nothing is drawn over its content.
       narrate(6, 'me: ship it → deployed tiendat.work', boo.color)
-      const { body: shipped } = on
+      const { full: shipped } = on
       const frame = root.querySelector<HTMLElement>('[data-part="frame"]')!
       const stamp = root.querySelector<HTMLElement>('[data-part="stamp"]')!
       gsap.to(bricks(), { scaleY: 0, y: (i) => slots[i].y, opacity: 0, duration: 0.3, ease: 'power2.in', stagger: 0.02 })
@@ -396,7 +401,7 @@ export function AgentSwarm () {
   if (!enabled) return null
 
   return (
-    <div ref={rootRef} aria-hidden='true' className='pointer-events-none absolute inset-0 z-40 font-ibm'>
+    <div ref={rootRef} aria-hidden='true' className='pointer-events-none absolute inset-0 z-30 font-ibm'>
       {Array.from({ length: BRICKS }, (_, i) => (
         <span key={i} data-brick='' className='absolute left-0 top-0 opacity-0 will-change-transform'>
           <Brick />
