@@ -1,12 +1,12 @@
 import Link from 'next/link'
 
-import { AgentStage } from '@/components/agent-swarm'
+import { AgentCast } from '@/components/agent-swarm'
 import { Icon } from '@/components/Icon'
 import { BlurFade } from '@/components/magicui/blur-fade'
 import { BLUR_FADE_DELAY } from '@/data/config'
 import { SectionHead } from '@/components/section-head'
 
-// Teaser for /uses: the agents' stage and the build walkthrough, plus one link per workflow diagram.
+// Teaser for /uses: the agent cast and the build walkthrough, plus one link per workflow diagram.
 const FLOWS = [
   { id: 'review', title: 'review loop', note: 'Codex reviews every change Claude makes, through hooks.', text: 'text-emerald-600 dark:text-emerald-400', hover: 'hover:bg-emerald-500/5' },
   { id: 'superpowers', title: 'superpowers', note: 'Brainstorm, plan, TDD and verify before anything is done.', text: 'text-violet-600 dark:text-violet-400', hover: 'hover:bg-violet-500/5' },
@@ -29,7 +29,7 @@ export function HowIBuildSection () {
 
       <BlurFade delay={BLUR_FADE_DELAY * 4} offset={0}>
         <div className='flex flex-col gap-3 p-4'>
-          <AgentStage />
+          <AgentCast />
           <p className='text-sm text-muted-foreground'>
             Claude Code writes, Codex reviews every change, and I decide what ships.
           </p>

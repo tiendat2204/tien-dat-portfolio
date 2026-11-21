@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { AgentDock } from '@/components/agent-swarm'
+import { AgentSwarm } from '@/components/agent-swarm'
 import { AwardCard } from '@/components/AwardCard'
 import BlurFadeText from '@/components/magicui/blur-fade-text'
 import { ShellPrompt } from '@/components/shell-prompt'
@@ -313,7 +313,7 @@ export default function Page () {
 
       <BlogSection />
 
-      <AgentDock />
+      <AgentSwarm />
     </main>
   )
 }

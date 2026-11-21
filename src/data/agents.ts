@@ -4,7 +4,7 @@
 export const AGENTS = [
   {
     id: 'orca',
-    lines: ['I split the job into tasks.', 'One worktree per worker.', 'Press ▶ to watch us build.'],
+    lines: ['I split the job into tasks.', 'One worktree per worker.', 'Drag me onto a section.'],
     name: 'Ori',
     avatar: 'droid',
     verb: 'plan',
@@ -16,7 +16,7 @@ export const AGENTS = [
   },
   {
     id: 'claude',
-    lines: ['I write the change.', 'CLAUDE.md says: square corners.', 'Press ▶ to watch us build.'],
+    lines: ['I write the change.', 'CLAUDE.md says: square corners.', 'Drag me onto a section.'],
     name: 'Quill',
     avatar: 'star',
     verb: 'write',
@@ -28,7 +28,7 @@ export const AGENTS = [
   },
   {
     id: 'codex',
-    lines: ['I read every diff.', 'Found an issue? I say how to fix it.', 'Press ▶ to watch us build.'],
+    lines: ['I read every diff.', 'Found an issue? I say how to fix it.', 'Drag me onto a section.'],
     name: 'Boo',
     avatar: 'ghost',
     verb: 'review',
