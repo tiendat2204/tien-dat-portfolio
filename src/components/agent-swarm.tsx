@@ -37,6 +37,8 @@ const RUN_EVENT = 'agent-swarm:run'
 const DROP_EVENT = 'agent-swarm:drop'
 const BUSY_EVENT = 'agent-swarm:busy'
 const STATUS_EVENT = 'agent-swarm:status'
+/** detail: a line for the dock to say, when a build was asked for but could not start. */
+const HINT_EVENT = 'agent-swarm:hint'
 
 const BRICK = { w: 18, h: 20 }
 // Size of a character while it is out on the page.
@@ -141,6 +143,22 @@ export function AgentDock () {
   const away = useBusy()
   const [said, setSaid] = useState<{ id: AgentId; line: number } | null>(null)
   const [held, setHeld] = useState<AgentId | null>(null)
+  const [hint, setHint] = useState<string | null>(null)
+
+  // A build that could not start says why, in the dock's bubble.
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const onHint = (e: Event) => {
+      setHint((e as CustomEvent<string>).detail)
+      clearTimeout(timer)
+      timer = setTimeout(() => setHint(null), 2600)
+    }
+    window.addEventListener(HINT_EVENT, onHint)
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener(HINT_EVENT, onHint)
+    }
+  }, [])
 
   // A little hop, one after another, when scrolling stops in a new section.
   useEffect(() => {
@@ -214,7 +232,7 @@ export function AgentDock () {
       {/* A column no wider than the three characters, so the bubble and the controls stay in the gutter too. */}
       <div ref={rootRef} className={`group/dock pointer-events-none fixed bottom-3 right-3 z-30 flex w-32 flex-col items-end gap-1 font-ibm transition-[opacity,scale] duration-300 ${away ? 'scale-75 opacity-0' : '*:pointer-events-auto'}`}>
         <span role='status' className='w-full text-[11px] leading-4'>
-          {said && <span className='block border bg-background px-2 py-1 shadow-sm'>{BY_ID[said.id].name}: {BY_ID[said.id].lines[said.line]}</span>}
+          {(said || hint) && <span className='block border bg-background px-2 py-1 shadow-sm'>{said ? `${BY_ID[said.id].name}: ${BY_ID[said.id].lines[said.line]}` : hint}</span>}
         </span>
         {/* Hidden until the dock is hovered or focused, and takes no clicks while hidden. */}
         <span className='invisible flex w-full flex-col gap-1 text-[11px] text-muted-foreground opacity-0 transition-opacity focus-within:visible focus-within:opacity-100 group-hover/dock:visible group-hover/dock:opacity-100 group-focus-within/dock:visible group-focus-within/dock:opacity-100'>
@@ -560,6 +578,7 @@ export function AgentScene () {
       const id = (e as CustomEvent<{ section?: string } | undefined>).detail?.section
       const section = (id ? document.getElementById(id) : null) ?? pick()
       if (section) story(section)
+      else window.dispatchEvent(new CustomEvent(HINT_EVENT, { detail: 'No section in view. Scroll to one first.' }))
     }
     // Whichever character is dropped, the whole crew comes to build the section it landed on.
     const onDrop = (e: Event) => {
