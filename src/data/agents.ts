@@ -3,6 +3,7 @@
 export const AGENTS = [
   {
     id: 'orca',
+    avatar: 'droid',
     verb: 'plan',
     color: '#4c8dff',
     href: '/uses#workflow-orca',
@@ -12,6 +13,7 @@ export const AGENTS = [
   },
   {
     id: 'claude',
+    avatar: 'star',
     verb: 'write',
     color: '#f58742',
     href: '/uses#workflow-superpowers',
@@ -21,6 +23,7 @@ export const AGENTS = [
   },
   {
     id: 'codex',
+    avatar: 'ghost',
     verb: 'review',
     color: '#4cc47c',
     href: '/uses#workflow-review',

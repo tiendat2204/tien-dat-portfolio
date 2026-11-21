@@ -1,14 +1,16 @@
 'use client'
 
+import type { BotAvatarProps } from 'bot-avatars'
 import { gsap } from 'gsap'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { AGENTS, BUILD_STEPS, type AgentId } from '@/data/agents'
 import { nextVisible, perimeterPoints, rowPoints, toLocalBox, type Box, type Point } from '@/lib/agent-cursors-plan'
 
 /*
-  The home page's agents at work. Each agent is a little flat-colour character with two pill eyes. It hops over to
+  The home page's agents at work. Each agent is a plush little character (bot-avatars, drawn on a canvas). It hops over to
   the block it works on, throws out a swarm of small dots that settle on the block, then gathers them back in.
   Together they act out one build of this site (BUILD_STEPS): ticket, plan, write, review, gates, ship. It plays
   once, on whatever section is on screen, and can be replayed. AgentCast is the same cast as real controls, and is
@@ -24,27 +26,27 @@ const RUN_EVENT = 'agent-swarm:run'
 const OPEN_EVENT = 'agent-swarm:open'
 const STATUS_EVENT = 'agent-swarm:status'
 
-// One body per agent, drawn on a 36 × 36 grid.
-const BODIES: Record<AgentId, ReactNode> = {
-  orca: <rect x='3' y='3' width='30' height='30' rx='11' transform='rotate(-6 18 18)' />,
-  claude: <path d='M5 27C3 14 9 4 18 4s15 10 13 23c-8 4-18 4-26 0Z' />,
-  codex: <rect x='1' y='7' width='34' height='22' rx='11' />,
+// The avatars draw on a canvas, so they only exist in the browser.
+const BotAvatar = dynamic(() => import('bot-avatars').then((m) => m.BotAvatar), { ssr: false })
+
+// What a character is feeling. `focused` and `surprised` hold the head still: down at the work, or thrown back.
+type Mood = 'idle' | 'working' | 'happy' | 'focused' | 'surprised' | 'asleep'
+
+const MOODS: Record<Mood, Pick<BotAvatarProps, 'state' | 'pose'>> = {
+  idle: { state: 'default' },
+  working: { state: 'working' },
+  happy: { state: 'working' },
+  focused: { state: 'default', pose: { pitch: -0.45, yaw: -0.25 } },
+  surprised: { state: 'default', pose: { pitch: 0.5, roll: 0.12 } },
+  asleep: { state: 'sleeping' },
 }
 
-function Bot ({ id, size = 36, delay = 0 }: { id: AgentId; size?: number; delay?: number }) {
-  const { color } = AGENTS.find((a) => a.id === id)!
+function Bot ({ id, size, mood = 'idle', still = false }: { id: AgentId; size: number; mood?: Mood; still?: boolean }) {
+  const agent = AGENTS.find((a) => a.id === id)!
   return (
-    <svg aria-hidden='true' width={size} height={size} viewBox='0 0 36 36' className='agent-bot block shrink-0 overflow-visible' style={{ animationDelay: `${-delay}s` }}>
-      <g fill={color}>{BODIES[id]}</g>
-      <g data-part='eyes'>
-        <g className='agent-look' style={{ animationDelay: `${-delay * 1.7}s` }}>
-          <g className='agent-eyes' fill='#0c0c0c' style={{ animationDelay: `${-delay * 1.3}s` }}>
-            <rect x='11.6' y='13' width='3.8' height='8.6' rx='1.9' transform='rotate(5 13.5 17.3)' />
-            <rect x='20.6' y='13' width='3.8' height='8.6' rx='1.9' transform='rotate(5 22.5 17.3)' />
-          </g>
-        </g>
-      </g>
-    </svg>
+    <span aria-hidden='true' className='block shrink-0' style={{ width: size, height: size }}>
+      <BotAvatar type={agent.avatar} color={agent.color} face='mouth' size={size} seed={AGENTS.indexOf(agent) / AGENTS.length} paused={still} interactive={!still} {...MOODS[mood]} />
+    </span>
   )
 }
 
@@ -67,12 +69,12 @@ function storeOn (on: boolean) {
 
 // The swarm needs room and motion: off on phones, under reduced motion, or when the visitor sent it home.
 function useSwarm () {
-  const [state, setState] = useState({ on: true, able: false })
+  const [state, setState] = useState({ on: true, able: false, still: false })
 
   useEffect(() => {
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const wide = window.matchMedia('(min-width: 640px)')
-    const sync = () => setState({ on: storedOn(), able: !motion.matches && wide.matches })
+    const sync = () => setState({ on: storedOn(), able: !motion.matches && wide.matches, still: motion.matches })
     sync()
     motion.addEventListener('change', sync)
     wide.addEventListener('change', sync)
@@ -92,6 +94,7 @@ export function AgentSwarm () {
   const hudRef = useRef<HTMLDivElement>(null)
   const { on, able } = useSwarm()
   const enabled = on && able
+  const [moods, setMoods] = useState<Partial<Record<AgentId, Mood>>>({})
 
   useEffect(() => {
     const root = rootRef.current
@@ -101,8 +104,8 @@ export function AgentSwarm () {
     const dots = (id: AgentId) => gsap.utils.toArray<HTMLElement>(`[data-dot='${id}']`, root)
     const anchor = (id: AgentId) => root.querySelector<HTMLElement>(`[data-anchor='${id}']`)!
     const bot = (id: AgentId) => anchor(id).querySelector<HTMLElement>('[data-part="bot"]')!
-    const eyes = (id: AgentId) => anchor(id).querySelector<SVGGElement>('[data-part="eyes"]')!
-    const everything = () => [...root.querySelectorAll('[data-dot], [data-anchor], [data-part="bot"], [data-part="eyes"]'), hud]
+    const feel = (id: AgentId, mood: Mood) => setMoods((prev) => ({ ...prev, [id]: mood }))
+    const everything = () => [...root.querySelectorAll('[data-dot], [data-anchor], [data-part="bot"]'), hud]
     const at = {} as Record<AgentId, Point>
     let run = { dead: false }
     let timers: gsap.core.Tween[] = []
@@ -123,11 +126,10 @@ export function AgentSwarm () {
       window.dispatchEvent(new CustomEvent(STATUS_EVENT, { detail: `Step ${step} of ${BUILD_STEPS.length}: ${text}` }))
     }
 
-    // A character does not glide: it hops, leans into the jump, looks where it is going and squashes on landing.
+    // A character does not glide: it hops, leans into the jump, and squashes on landing.
     const go = (id: AgentId, to: Point, duration = 0.75) => {
       const lean = Math.sign(to.x - (at[id]?.x ?? to.x))
       at[id] = to
-      gsap.to(eyes(id), { x: lean * 1.6, y: 0.4, duration: 0.2 })
       gsap.timeline()
         .to(bot(id), { y: -16, rotation: lean * 10, scaleY: 1.08, duration: duration / 2, ease: 'power2.out' })
         .to(bot(id), { y: 0, rotation: 0, scaleY: 1, duration: duration / 2, ease: 'power2.in' })
@@ -155,7 +157,6 @@ export function AgentSwarm () {
     const emit = (id: AgentId, points: Point[], duration = 1) => {
       gsap.killTweensOf(dots(id))
       gsap.set(dots(id), { x: at[id].x - DOT / 2, y: at[id].y - DOT / 2, opacity: 1 })
-      gsap.to(eyes(id), { x: 1.4, y: 1.4, duration: 0.2 })
       return send(id, points, duration)
     }
 
@@ -163,7 +164,6 @@ export function AgentSwarm () {
     const collect = async (id: AgentId) => {
       await gsap.to(dots(id), { x: at[id].x - DOT / 2, y: at[id].y - DOT / 2, duration: 0.6, ease: 'power2.in', stagger: { amount: 0.25, from: 'random' } }).then()
       gsap.set(dots(id), { opacity: 0 })
-      gsap.to(eyes(id), { x: 0, y: 0, duration: 0.2 })
       gsap.fromTo(bot(id), { scale: 1.18 }, { scale: 1, duration: 0.3, ease: 'back.out(3)' })
     }
 
@@ -174,10 +174,10 @@ export function AgentSwarm () {
     const seat = (i: number): Point => {
       const rect = edge()
       const gutter = window.innerWidth - rect.right
-      return { x: gutter > 190 ? rect.width + 40 : rect.width - 30, y: -rect.top + window.innerHeight * 0.26 + i * 66 }
+      return { x: gutter > 190 ? rect.width + 52 : rect.width - 40, y: -rect.top + window.innerHeight * 0.24 + i * 84 }
     }
     // A character works perched on the top edge of its block.
-    const perch = (box: Box, along = 0): Point => ({ x: box.x + 26 + box.w * along, y: box.y - 20 })
+    const perch = (box: Box, along = 0): Point => ({ x: box.x + 36 + box.w * along, y: box.y - 26 })
 
     // The section to work on: whichever is on screen now. Waits (the story pauses) while none is.
     const stage = async (me: { dead: boolean }) => {
@@ -201,8 +201,8 @@ export function AgentSwarm () {
         gsap.set(dots(id), { opacity: 0 })
         gsap.set(anchor(id), { autoAlpha: 0 })
         gsap.set(bot(id), { x: 0, y: 0, rotation: 0, scale: 1 })
-        gsap.set(eyes(id), { x: 0, y: 0 })
         say(id, verb)
+        feel(id, 'idle')
       })
       gsap.to(hud, { autoAlpha: 1, y: 0, duration: 0.3 })
 
@@ -223,10 +223,12 @@ export function AgentSwarm () {
       const heading = local((on.section.querySelector('h2') ?? on.section).getBoundingClientRect())
       say('orca', `plan ${on.name}`, true)
       await go('orca', perch(heading))
+      feel('orca', 'working')
       await emit('orca', perimeterPoints(heading, SWARM))
       await twinkle('orca', 2)
       if (me.dead) return
       await collect('orca')
+      feel('orca', 'idle')
       say('orca', 'tasks out')
       await go('orca', seat(0))
       if (me.dead) return
@@ -235,8 +237,9 @@ export function AgentSwarm () {
       narrate(2, 'orca → claude: write · orca → codex: review', AGENTS[0].color)
       await emit('orca', [seat(1), seat(2)], 0.7)
       gsap.to(dots('orca'), { opacity: 0, duration: 0.2 })
-      gsap.to(eyes('orca'), { x: 0, y: 0, duration: 0.2 })
       await Promise.all([appear('claude', seat(1)), appear('codex', seat(2))])
+      // Its part is done for now: orca dozes off until the gates.
+      feel('orca', 'asleep')
       await wait(0.4)
 
       // The visitor may have scrolled on: each phase works on the section that is on screen now.
@@ -245,6 +248,7 @@ export function AgentSwarm () {
       narrate(3, `claude writes ${on.name}`, AGENTS[1].color)
       say('claude', `write ${on.name}`, true)
       await go('claude', perch(on.body))
+      feel('claude', 'working')
       await emit('claude', perimeterPoints(on.body, SWARM))
       await twinkle('claude', 4)
 
@@ -254,17 +258,28 @@ export function AgentSwarm () {
       const { name, body } = on
       narrate(4, 'codex reviews the diff', AGENTS[2].color)
       say('claude', 'diff → codex')
+      feel('claude', 'idle')
       say('codex', `review ${name}`, true)
       if (at.claude.y !== perch(body).y) {
         await go('claude', perch(body))
         await send('claude', perimeterPoints(body, SWARM), 0.6)
       }
       await go('codex', perch(body, 0.72))
+      // Head down, eyes on the diff.
+      feel('codex', 'focused')
       await emit('codex', rowPoints(body, body.y, SWARM))
       await gsap.to(dots('codex'), { y: body.y + body.h - DOT / 2, duration: 1.1, ease: 'none' }).then()
       if (me.dead) return
       narrate(4, 'codex: 1 issue → claude fixes it', AGENTS[1].color)
       say('codex', '1 issue')
+      // The writer jumps at the news, then gets back to it.
+      feel('claude', 'surprised')
+      anchor('claude').toggleAttribute('data-alert', true)
+      gsap.fromTo(bot('claude'), { y: 0 }, { y: -14, duration: 0.16, ease: 'power2.out', yoyo: true, repeat: 1 })
+      say('claude', '!')
+      await wait(0.9)
+      anchor('claude').toggleAttribute('data-alert', false)
+      feel('claude', 'working')
       say('claude', 'fix', true)
       await twinkle('claude', 2)
       await gsap.to(dots('codex'), { y: body.y - DOT / 2, duration: 0.8, ease: 'none' }).then()
@@ -272,6 +287,8 @@ export function AgentSwarm () {
       narrate(4, 'codex: review ✓', AGENTS[2].color)
       say('codex', `${name} ✓`)
       say('claude', 'done')
+      feel('codex', 'happy')
+      feel('claude', 'idle')
       await wait(0.6)
 
       // Each gate fills a third of the block's bottom edge.
@@ -283,7 +300,8 @@ export function AgentSwarm () {
         if (me.dead) return
         narrate(5, `gates: ${gates.slice(0, i + 1).map((g) => `${g} ✓`).join('  ')}`, color)
         say(id, `${gates[i]} ✓`)
-        await go(id, { x: on.body.x + on.body.w * (i / 3 + 1 / 6), y: floor + 26 })
+        feel(id, 'idle')
+        await go(id, { x: on.body.x + on.body.w * (i / 3 + 1 / 6), y: floor + 40 })
         const row = rowPoints(on.body, floor, SWARM, i / 3 + 0.01, (i + 1) / 3 - 0.01)
         await (id === 'orca' ? emit(id, row, 0.7) : send(id, row, 0.7))
       }
@@ -295,10 +313,12 @@ export function AgentSwarm () {
         await collect(id)
         say(id, verb)
         await go(id, seat(i))
-        await go(id, seat(i), 0.45)
+        // Shipped: everyone celebrates for a moment.
+        feel(id, 'happy')
       }))
       await wait(3.5)
       if (me.dead) return
+      AGENTS.forEach(({ id }) => feel(id, 'idle'))
       gsap.to(hud, { autoAlpha: 0, y: 8, duration: 0.4 })
     }
 
@@ -322,7 +342,7 @@ export function AgentSwarm () {
       {AGENTS.map(({ id, color }) => Array.from({ length: SWARM }, (_, i) => (
         <span key={`${id}-${i}`} data-dot={id} className='absolute left-0 top-0 rounded-full opacity-0 will-change-transform' style={{ width: DOT, height: DOT, backgroundColor: color }} />
       )))}
-      {AGENTS.map(({ id, verb, color }, i) => (
+      {AGENTS.map(({ id, verb, color }) => (
         <button
           key={id}
           type='button'
@@ -331,10 +351,11 @@ export function AgentSwarm () {
           onClick={() => window.dispatchEvent(new CustomEvent(OPEN_EVENT, { detail: id }))}
           className='group/agent pointer-events-auto invisible absolute left-0 top-0 cursor-pointer'
         >
-          <span data-part='bot' className='absolute -left-[22px] -top-[22px] block origin-bottom'>
-            <Bot id={id} size={44} delay={i * 0.9} />
+          <span data-part='bot' className='absolute -left-8 -top-8 block origin-bottom'>
+            <Bot id={id} size={64} mood={moods[id]} />
+            <span className='absolute -right-1 -top-2 hidden size-5 place-items-center rounded-full bg-foreground text-xs font-bold text-background group-data-[alert]/agent:grid'>!</span>
           </span>
-          <span className='ml-7 mt-5 flex w-max items-center gap-1 px-1.5 py-0.5 text-[11px] font-medium leading-4 text-black' style={{ backgroundColor: color }}>
+          <span className='ml-9 mt-7 flex w-max items-center gap-1 px-1.5 py-0.5 text-[11px] font-medium leading-4 text-black' style={{ backgroundColor: color }}>
             <span>{id}</span>
             <span className='opacity-50'>·</span>
             <span data-part='task'>{verb}</span>
@@ -355,7 +376,7 @@ export function AgentSwarm () {
 
 // The same cast as real controls: who each agent is, how the build goes, and the swarm's replay and off switch.
 export function AgentCast () {
-  const { on, able } = useSwarm()
+  const { on, able, still } = useSwarm()
   const [open, setOpen] = useState<AgentId | null>(null)
   const [status, setStatus] = useState('')
   const ref = useRef<HTMLDivElement>(null)
@@ -380,7 +401,7 @@ export function AgentCast () {
     <div ref={ref} className='flex flex-col gap-3'>
       <p aria-live='polite' className='sr-only'>{status}</p>
       <div className='flex flex-wrap items-center gap-2'>
-        {AGENTS.map(({ id, verb }, i) => (
+        {AGENTS.map(({ id, verb }) => (
           <button
             key={id}
             type='button'
@@ -389,7 +410,7 @@ export function AgentCast () {
             onClick={() => setOpen(open === id ? null : id)}
             className={`flex items-center gap-2.5 border px-2.5 py-1.5 text-xs transition-colors hover:bg-muted/50 ${open === id ? 'border-foreground/60 bg-muted/50' : ''}`}
           >
-            <Bot id={id} size={28} delay={i * 0.9} />
+            <Bot id={id} size={44} still={still} mood={open === id ? 'happy' : 'idle'} />
             <span className='text-left'>
               <span className='block font-medium'>{id}</span>
               <span className='block text-muted-foreground'>{verb}</span>
