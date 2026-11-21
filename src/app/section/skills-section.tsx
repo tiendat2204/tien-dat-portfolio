@@ -120,6 +120,11 @@ export default function SkillsSection () {
           delay={BLUR_FADE_DELAY * 14}
         />
         <CategorySection
+          title='MOBILE'
+          skills={DATA.skills.mobile}
+          delay={BLUR_FADE_DELAY * 16}
+        />
+        <CategorySection
           title='BACKEND'
           skills={DATA.skills.backend}
           delay={BLUR_FADE_DELAY * 18}

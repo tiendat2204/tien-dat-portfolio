@@ -26,6 +26,7 @@ export const DATA = {
       { name: 'TypeScript', icon: 'skills/typescript.svg' },
       { name: 'JavaScript', icon: 'skills/javascript.svg' },
       { name: 'Python', icon: 'skills/python.svg' },
+      { name: 'Dart', icon: 'skills/dart.svg' },
       { name: 'HTML', icon: 'skills/html.svg' },
       { name: 'CSS', icon: 'skills/css.svg' },
     ],
@@ -42,6 +43,11 @@ export const DATA = {
       { name: 'Vite', icon: 'skills/vite.svg' },
       { name: 'Motion', icon: 'skills/motion.svg', iconDark: 'skills/motion-dark.svg' },
       { name: 'Leaflet / MapLibre', icon: 'leaflet-icon.svg' },
+    ],
+    mobile: [
+      { name: 'Flutter', icon: 'skills/flutter.svg' },
+      { name: 'React Native', icon: 'skills/react.svg', iconDark: 'skills/react-dark.svg' },
+      { name: 'Riverpod', icon: 'skills/riverpod.svg' },
     ],
     backend: [
       { name: 'Node.js', icon: 'skills/nodejs.svg' },
@@ -149,6 +155,7 @@ export const DATA = {
             'Built a shared design system (semantic tokens, data tables, permission-aware screens, loading, empty and error states) reused across all three apps',
             'Delivered map-based plot management for cooperatives, drawing and editing field boundaries with Leaflet/MapLibre',
             'Built the marketplace buyer journey: storefronts, product pages, cart, checkout and QR origin tracing',
+            'Built AgriTA Mobile, the Flutter client for field workers: cultivation journal with camera photos, harvests, tasks and an offline outbox',
             'Added Playwright E2E and axe-core accessibility tests',
             'E-Office Workflow (separate client): built business workflow features and secure APIs, reducing approval workflow time by 70% with an automated system',
             'Digital Library for a Pagoda: developed and maintained a full-stack system with book catalog management, borrowing records and role-based access control, managing 40,000+ books for 1,000+ active users',

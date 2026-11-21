@@ -38,6 +38,7 @@ export function GET () {
     '## Skills',
     `- Languages: ${skills.languages.map((s) => s.name).join(', ')}`,
     `- Frontend: ${skills.frontend.map((s) => s.name).join(', ')}`,
+    `- Mobile: ${skills.mobile.map((s) => s.name).join(', ')}`,
     `- Backend: ${skills.backend.map((s) => s.name).join(', ')}`,
     `- Database: ${skills.database.map((s) => s.name).join(', ')}`,
     `- Testing & DevOps: ${skills.testingDevOps.map((s) => s.name).join(', ')}`,
