@@ -29,9 +29,10 @@ import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
 */
 
 const REJECTED = '#ef4444'
-// Appended to the border beam's own stylesheet (`{id}` is filled in per instance): full-strength layers and a
-// thicker stroke, so the colourless beam shows on something as large as a section.
-const BEAM_CSS = '[data-beam="{id}"]::before,[data-beam="{id}"]::after,[data-beam="{id}"] [data-beam-bloom]{opacity:1!important}[data-beam="{id}"]::after{padding:2px!important}'
+// Appended to the border beam's own stylesheet (`{id}` is filled in per instance): full-strength stroke and glow and
+// a thicker stroke, so the colourless beam shows on something as large as a section. The bloom layer is left out:
+// it is the costliest of the three to animate over a box this size and adds least to the look.
+const BEAM_CSS = '[data-beam="{id}"]::before,[data-beam="{id}"]::after{opacity:1!important}[data-beam="{id}"]::after{padding:2px!important}[data-beam="{id}"] [data-beam-bloom]{display:none!important}'
 // Diff colours for the code the cast writes, and the colour of a line not written yet.
 const ADDED = '#4cc47c'
 const MUTED = 'hsl(var(--muted-foreground))'
