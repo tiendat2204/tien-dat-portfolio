@@ -1,6 +1,8 @@
 'use client'
 
+import { BorderBeam } from 'border-beam'
 import { gsap } from 'gsap'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { ThinkingOrb, type ThinkingOrbProps } from 'thinking-orbs'
@@ -27,6 +29,9 @@ import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
 */
 
 const REJECTED = '#ef4444'
+// Appended to the border beam's own stylesheet (`{id}` is filled in per instance): full-strength layers and a
+// thicker stroke, so the colourless beam shows on something as large as a section.
+const BEAM_CSS = '[data-beam="{id}"]::before,[data-beam="{id}"]::after,[data-beam="{id}"] [data-beam-bloom]{opacity:1!important}[data-beam="{id}"]::after{padding:2px!important}'
 // Diff colours for the code the cast writes, and the colour of a line not written yet.
 const ADDED = '#4cc47c'
 const MUTED = 'hsl(var(--muted-foreground))'
@@ -350,6 +355,7 @@ export function AgentScene () {
   const { still } = usePrefs()
   const hidden = useTabHidden()
   const [cast, setCast] = useState<Cast>(resting)
+  const { resolvedTheme } = useTheme()
   // The build's status line: which step, the tool call being made, and its result once it has one.
   const [term, setTerm] = useState({ step: 0, call: '', result: '' })
   const [live, setLive] = useState(false)
@@ -714,8 +720,15 @@ export function AgentScene () {
   return (
     <div ref={rootRef} aria-hidden='true' className='pointer-events-none absolute inset-0 z-30 font-ibm'>
       {Array.from({ length: MAX_PIECES }, (_, i) => <span key={i} data-frame='' className='invisible absolute left-0 top-0 overflow-hidden whitespace-pre px-1.5 py-0.5 font-mono text-[11px] leading-[15px]' />)}
-      {/* One bright beam in the foreground colour rides the border of the section being built (`.agent-beam`). */}
-      <span data-part='beam' className='agent-beam invisible absolute left-0 top-0 block' />
+      {/* The Border beam from libraries.dev, in its colourless variant, round the section being built. Its mono
+          layers are tuned for small cards and are too faint on a whole section, so BEAM_CSS turns them up. */}
+      <span data-part='beam' className='invisible absolute left-0 top-0 block'>
+        {live && (
+          <BorderBeam size='md' colorVariant='mono' staticColors theme={resolvedTheme === 'light' ? 'light' : 'dark'} borderRadius={0} duration={3.2} css={BEAM_CSS} className='block size-full'>
+            <span className='block size-full' />
+          </BorderBeam>
+        )}
+      </span>
       {/* The build's status line, in the section itself: an orb for what the agents are doing, the call, its result.
       */}
       <span data-part='stamp' className='invisible absolute left-0 top-0 block w-max font-mono text-[11px] leading-4'>
