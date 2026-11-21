@@ -693,3 +693,14 @@ section[data-reveal][data-revealed] h2.font-doto {
 
 .agent-dots i:nth-child(2) { animation-delay: 0.2s; }
 .agent-dots i:nth-child(3) { animation-delay: 0.4s; }
+
+/* An agent at rest is one dot that breathes, like an assistant waiting for its turn. */
+@keyframes agent-breathe {
+  50% { transform: scale(1.2); }
+}
+
+.agent-orb { animation: agent-breathe 2.4s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-orb { animation: none; }
+}

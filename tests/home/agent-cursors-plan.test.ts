@@ -23,11 +23,6 @@ test('toLocalBox clips to the viewport and converts to overlay coordinates', () 
   assert.deepEqual(toLocalBox(rect(200, 100), root, 800), { x: 20, y: 700, w: 600, h: 100 })
 })
 
-test('facePoints centres the dots of a face on its middle', async () => {
-  const { facePoints } = await import('../../src/lib/agent-cursors-plan')
-  assert.deepEqual(facePoints(['#.#', '.#.', '...'], 4), [{ x: -4, y: -4 }, { x: 4, y: -4 }, { x: 0, y: 0 }])
-})
-
 test('perimeterPoints walks the edge clockwise from the top-left corner', async () => {
   const { perimeterPoints } = await import('../../src/lib/agent-cursors-plan')
   const box = { x: 10, y: 20, w: 100, h: 50 }

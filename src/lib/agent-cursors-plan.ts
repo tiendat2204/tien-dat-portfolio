@@ -32,12 +32,6 @@ export function toLocalBox (rect: RectLike, root: RectLike, viewportHeight: numb
   return { x: rect.left - root.left, y: top - root.top, w: rect.width, h: bottom - top }
 }
 
-/** Where each dot of a face sits, relative to the face's centre. */
-export function facePoints (face: readonly string[], pitch: number): Point[] {
-  const mid = (face[0].length - 1) / 2
-  return face.flatMap((row, y) => [...row].flatMap((cell, x) => cell === '#' ? [{ x: (x - mid) * pitch, y: (y - (face.length - 1) / 2) * pitch }] : []))
-}
-
 /** `count` points spread evenly around a box's edge, clockwise from the top-left corner. */
 export function perimeterPoints (box: Box, count: number): Point[] {
   const total = 2 * (box.w + box.h)
