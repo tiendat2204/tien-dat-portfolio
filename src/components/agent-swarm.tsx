@@ -7,20 +7,22 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 
 import { AGENTS, BUILD_STEPS, type AgentId } from '@/data/agents'
-import { checkPoints, nextVisible, rowPoints, toLocalBox, type Box, type Point } from '@/lib/agent-cursors-plan'
+import { nextVisible, rowPoints, toLocalBox, type Box, type Point } from '@/lib/agent-cursors-plan'
 
 /*
   The home page's agents at work: Ori, Quill and Boo, three plush characters (bot-avatars, drawn on a canvas), act
   out one build of this site (BUILD_STEPS). Tasks are cards they throw to each other, and the work is a course of
   voxel bricks, the same cubes as the hero figure, laid along the top of the section on screen: Ori marks out the
   slots, Quill lays a brick in each, Boo checks them one by one and kicks out a bad one, the gates ripple down the
-  row, and at the end the bricks fly together into a tick. It plays once and can be replayed. AgentCast is the same
+  row, and at the end the bricks sink into the section's top rule and its frame lights up. It plays once and can be replayed. AgentCast is the same
   cast as real controls, and is what phones and reduced-motion visitors get.
 */
 
 const BRICKS = 30
 const BRICK = { w: 18, h: 20 }
 const REJECTED = '#ef4444'
+// Bricks pop up into place from inside the block, so nothing ever crosses the site header above it.
+const RISE = 24
 const STORAGE_KEY = 'agent-cursors'
 const TOGGLE_EVENT = 'agent-swarm:toggle'
 const RUN_EVENT = 'agent-swarm:run'
@@ -128,7 +130,7 @@ export function AgentSwarm () {
     const anchor = (id: AgentId) => root.querySelector<HTMLElement>(`[data-anchor='${id}']`)!
     const bot = (id: AgentId) => anchor(id).querySelector<HTMLElement>('[data-part="bot"]')!
     const feel = (id: AgentId, mood: Mood) => setMoods((prev) => ({ ...prev, [id]: mood }))
-    const everything = () => [...root.querySelectorAll('[data-brick], [data-card], [data-anchor], [data-part="bot"]'), hud]
+    const everything = () => [...root.querySelectorAll('[data-brick], [data-card], [data-anchor], [data-part="bot"], [data-part="frame"], [data-part="stamp"]'), hud]
     const at = {} as Record<AgentId, Point>
     let run = { dead: false }
     let timers: gsap.core.Tween[] = []
@@ -220,7 +222,7 @@ export function AgentSwarm () {
         feel(id, 'idle')
       })
       gsap.set(bricks(), { opacity: 0, scale: 1, rotation: 0 })
-      gsap.set(root.querySelectorAll('[data-card]'), { autoAlpha: 0 })
+      gsap.set(root.querySelectorAll('[data-card], [data-part="frame"], [data-part="stamp"]'), { autoAlpha: 0 })
       gsap.to(hud, { autoAlpha: 1, y: 0, duration: 0.3 })
 
       // 1. The ticket flies in from the page's left edge, and Ori catches it.
@@ -264,14 +266,16 @@ export function AgentSwarm () {
         const now = await stage(me)
         if (!now) return null
         const next = course(now.body)
-        if (Math.abs(next[0].x - slots[0].x) > 2 || Math.abs(next[0].y - slots[0].y) > 2) {
+        const moved = (i: number) => Math.abs(next[i].x - slots[i].x) > 2 || Math.abs(next[i].y - slots[i].y) > 2
+        // Both ends: a resize can leave the first slot almost where it was and move the last one a long way.
+        if (moved(0) || moved(BRICKS - 1)) {
           slots = next
           await gsap.to(bricks(), { x: (i) => slot(slots[i]).x, y: (i) => slot(slots[i]).y, duration: 0.5, ease: 'power2.inOut' }).then()
         }
         return now
       }
 
-      // 3. Quill hops along the course, and a brick drops into each slot behind it.
+      // 3. Quill hops along the course, and a brick pops up into each slot behind it.
       on = await follow()
       if (!on) return
       narrate(3, `${quill.name} writes ${on.name}`, quill.color)
@@ -279,8 +283,8 @@ export function AgentSwarm () {
       await go('claude', perch(on.body))
       feel('claude', 'working')
       const lay = gsap.fromTo(bricks(),
-        { y: (i) => slot(slots[i]).y - 48, opacity: 0 },
-        { y: (i) => slot(slots[i]).y, opacity: 1, duration: 0.45, ease: 'bounce.out', immediateRender: false, stagger: { each: 0.07, onStart: tint(quill.color) } })
+        { y: (i) => slot(slots[i]).y + RISE, opacity: 0 },
+        { y: (i) => slot(slots[i]).y, opacity: 1, duration: 0.4, ease: 'back.out(3)', immediateRender: false, stagger: { each: 0.07, onStart: tint(quill.color) } })
       for (const along of [0.33, 0.66, 0.96]) await go('claude', perch(on.body, along), 0.7)
       await lay.then()
       if (me.dead) return
@@ -291,7 +295,7 @@ export function AgentSwarm () {
       const { name, body } = on
       const bad = Math.floor(BRICKS * 0.62)
       const approve = (start: number, end: number) => gsap.to(bricks().slice(start, end), {
-        keyframes: [{ scale: 1.4, duration: 0.08 }, { scale: 1, duration: 0.17 }],
+        keyframes: [{ scale: 1.25, y: '+=3', duration: 0.08 }, { scale: 1, y: '-=3', duration: 0.17 }],
         stagger: { each: 0.06, onStart: tint(boo.color) },
       }).then()
       narrate(4, `${boo.name} reviews the diff`, boo.color)
@@ -321,12 +325,12 @@ export function AgentSwarm () {
       if (me.dead) return
       anchor('claude').toggleAttribute('data-alert', false)
       // Boo kicks the bad brick out, and Quill comes back to lay a new one.
-      gsap.to(wrong, { x: '+=110', y: '-=90', rotation: 260, opacity: 0, duration: 0.6, ease: 'power2.out' })
+      gsap.to(wrong, { x: '+=110', y: '+=90', rotation: 260, opacity: 0, duration: 0.6, ease: 'power2.out' })
       feel('claude', 'working')
       say('claude', 'fix', true)
       await go('claude', { x: slots[bad].x - 30, y: perch(body).y })
       wrong.style.color = quill.color
-      await gsap.fromTo(wrong, { x: slot(slots[bad]).x, y: slot(slots[bad]).y - 48, rotation: 0, opacity: 0 }, { y: slot(slots[bad]).y, opacity: 1, duration: 0.45, ease: 'bounce.out' }).then()
+      await gsap.fromTo(wrong, { x: slot(slots[bad]).x, y: slot(slots[bad]).y + RISE, rotation: 0, opacity: 0 }, { y: slot(slots[bad]).y, opacity: 1, duration: 0.4, ease: 'back.out(3)' }).then()
       say('claude', 'fixed')
       feel('claude', 'idle')
       const secondPass = approve(bad, BRICKS)
@@ -348,15 +352,22 @@ export function AgentSwarm () {
         if (me.dead) return
         narrate(5, `gates: ${gates.slice(0, i + 1).map((g) => `${g} ✓`).join('  ')}`, color)
         say(id, `${gates[i]} ✓`)
-        await gsap.to(bricks(), { keyframes: [{ y: '-=10', duration: 0.12, ease: 'power2.out' }, { y: '+=10', duration: 0.18, ease: 'power2.in' }], stagger: 0.016 }).then()
+        await gsap.to(bricks(), { keyframes: [{ y: '+=9', duration: 0.12, ease: 'power2.out' }, { y: '-=9', duration: 0.18, ease: 'power2.in' }], stagger: 0.016 }).then()
       }
       await wait(0.4)
       if (me.dead) return
 
-      // 6. Shipped: the bricks fly together into a tick, and everyone goes home to celebrate.
-      narrate(6, 'me: ship it → deployed tiendat.work')
-      const tick = checkPoints({ x: on.body.x + on.body.w / 2, y: on.body.y + on.body.h / 2 }, Math.min(150, on.body.h * 0.7), BRICKS)
-      gsap.to(bricks(), { x: (i) => slot(tick[i]).x, y: (i) => slot(tick[i]).y, duration: 0.9, ease: 'back.out(1.4)', stagger: { amount: 0.4, from: 'random' } })
+      // 6. Shipped: the bricks sink into the section's own top rule, its frame lights up once, and a small stamp
+      // sits on the rule. Nothing is drawn over the section's content.
+      narrate(6, 'me: ship it → deployed tiendat.work', boo.color)
+      const { body: shipped } = on
+      const frame = root.querySelector<HTMLElement>('[data-part="frame"]')!
+      const stamp = root.querySelector<HTMLElement>('[data-part="stamp"]')!
+      gsap.to(bricks(), { scaleY: 0, y: (i) => slots[i].y, opacity: 0, duration: 0.3, ease: 'power2.in', stagger: 0.02 })
+      gsap.set(frame, { x: shipped.x, y: shipped.y, width: shipped.w, height: shipped.h, autoAlpha: 1, clipPath: 'inset(0 100% 0 0)' })
+      gsap.to(frame, { clipPath: 'inset(0 0% 0 0)', duration: 0.8, ease: 'power2.inOut' })
+      gsap.set(stamp, { x: shipped.x + shipped.w - 14, y: shipped.y, xPercent: -100, yPercent: -50 })
+      gsap.fromTo(stamp, { autoAlpha: 0, scale: 1.6 }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: 'back.out(2)', delay: 0.8 })
       await Promise.all(AGENTS.map(async ({ id, verb }, i) => {
         say(id, verb)
         await go(id, seat(i))
@@ -365,7 +376,7 @@ export function AgentSwarm () {
       await wait(3.5)
       if (me.dead) return
       AGENTS.forEach(({ id }) => feel(id, 'idle'))
-      gsap.to(bricks(), { opacity: 0, scale: 0.3, duration: 0.4, stagger: { amount: 0.3, from: 'center' } })
+      gsap.to([frame, stamp], { autoAlpha: 0, duration: 0.6 })
       gsap.to(hud, { autoAlpha: 0, y: 8, duration: 0.4 })
     }
 
@@ -397,6 +408,10 @@ export function AgentSwarm () {
           {text}
         </span>
       ))}
+      <span data-part='frame' className='invisible absolute left-0 top-0 border' style={{ borderColor: BY_ID.codex.color, backgroundColor: `${BY_ID.codex.color}0d` }} />
+      <span data-part='stamp' className='invisible absolute left-0 top-0 w-max border bg-background px-1.5 py-0.5 text-[11px] leading-4' style={{ borderColor: BY_ID.codex.color, color: BY_ID.codex.color }}>
+        ✓ shipped
+      </span>
       {AGENTS.map(({ id, name, verb, color }) => (
         <button
           key={id}

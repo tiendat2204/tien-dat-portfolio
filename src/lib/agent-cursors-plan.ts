@@ -38,18 +38,3 @@ export function rowPoints (box: Box, y: number, count: number, from = 0, to = 1)
   const span = box.w * (to - from)
   return Array.from({ length: count }, (_, i) => ({ x: start + (count === 1 ? span / 2 : (i / (count - 1)) * span), y }))
 }
-
-/**
- * `count` points drawn as a tick (✓) `size` wide, centred on `center`: about a third of them on the short
- * down-stroke, the rest on the long up-stroke.
- */
-export function checkPoints (center: Point, size: number, count: number): Point[] {
-  const short = Math.max(1, Math.round(count / 3))
-  const corners = [{ x: 0, y: 0.5 }, { x: 0.36, y: 0.86 }, { x: 1, y: 0.14 }]
-  return Array.from({ length: count }, (_, i) => {
-    const [from, to, t] = i < short
-      ? [corners[0], corners[1], i / short]
-      : [corners[1], corners[2], (i - short) / Math.max(1, count - short - 1)]
-    return { x: center.x + (from.x + (to.x - from.x) * t - 0.5) * size, y: center.y + (from.y + (to.y - from.y) * t - 0.5) * size }
-  })
-}
