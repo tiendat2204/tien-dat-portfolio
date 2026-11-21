@@ -1,6 +1,8 @@
 'use client'
 
+import { BorderBeam } from 'border-beam'
 import { gsap } from 'gsap'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 
@@ -44,8 +46,11 @@ const STATUS_EVENT = 'agent-swarm:status'
 const HINT_EVENT = 'agent-swarm:hint'
 const NOTHING_TO_BUILD = 'No section in view. Scroll to one first.'
 
-// Size of a character while it is out on the page.
+// Size of a character while it is out on the page, and in the dock.
 const ACTOR = 52
+const DOCKED = 40
+// How many lines of output the build's terminal keeps on screen.
+const TERM_LINES = 6
 // A section is built from at most this many pieces; a busier one is taken in bigger blocks.
 const MAX_PIECES = 26
 // The site header's height, and the highest line (in the viewport) the characters may stand on below it.
@@ -221,7 +226,7 @@ export function AgentDock () {
   return (
     <>
       {/* A column no wider than the three characters, so the bubble and the controls stay in the gutter too. */}
-      <div ref={rootRef} className={`group/dock pointer-events-none fixed bottom-3 right-3 z-30 flex w-32 flex-col items-end gap-1 font-ibm transition-[opacity,scale] duration-300 ${away ? 'scale-75 opacity-0' : '*:pointer-events-auto'}`}>
+      <div ref={rootRef} className={`group/dock pointer-events-none fixed bottom-3 right-3 z-30 flex w-32 flex-col items-end gap-1 font-ibm transition-opacity duration-200 ${away ? 'opacity-0' : '*:pointer-events-auto'}`}>
         <span role='status' className='w-full text-[11px] leading-4'>
           {(said || hint) && <span className='block border bg-background px-2 py-1 shadow-sm'>{said ? `${BY_ID[said.id].name}: ${BY_ID[said.id].lines[said.line]}` : hint}</span>}
         </span>
@@ -236,13 +241,14 @@ export function AgentDock () {
               key={id}
               type='button'
               aria-label={`${name}, ${verb}. Press to hear a line, or drag onto a section.`}
+              data-agent-home={id}
               onPointerDown={grab(id, lines)}
               // The pointer handlers do the poking; this is for the keyboard.
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setSaid((prev) => ({ id, line: prev?.id === id ? (prev.line + 1) % lines.length : 0 })) }}
               className={`cursor-grab touch-none select-none active:cursor-grabbing ${held === id ? 'opacity-30' : ''}`}
             >
               <span data-bot='' className='block origin-bottom'>
-                <AgentDot type={avatar} color={color} size={40} seed={i / AGENTS.length} paused={hidden || away} mood={said?.id === id ? 'happy' : 'idle'} />
+                <AgentDot type={avatar} color={color} size={DOCKED} seed={i / AGENTS.length} paused={hidden || away} mood={said?.id === id ? 'happy' : 'idle'} />
               </span>
             </button>
           ))}
@@ -265,7 +271,8 @@ type Cast = Record<AgentId, Actor>
 const resting = (): Cast => Object.fromEntries(AGENTS.map((a) => [a.id, { mood: 'idle', busy: false, alert: false }])) as Cast
 
 // Tags that are one piece of a section however much they hold; anything else is opened up to find its pieces
-// (unless it is a component that names itself, with `data-jsx` or shadcn's `data-slot`).
+// (unless it is a component that names itself, with `data-jsx` or shadcn's `data-slot`, or a block marked
+// `data-piece` to be kept whole).
 const WHOLE = new Set(['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'A', 'BUTTON', 'IMG', 'SVG', 'CANVAS', 'SPAN', 'TIME', 'CODE', 'PRE', 'FIGURE', 'BLOCKQUOTE', 'LI', 'LABEL', 'INPUT', 'VIDEO'])
 
 const pascal = (name: string) => name.split(/[-_\s]+/).filter(Boolean).map((w) => w[0].toUpperCase() + w.slice(1)).join('')
@@ -319,7 +326,7 @@ function piecesOf (section: HTMLElement): HTMLElement[] {
         // The section's own `+` corner marks (bare icons right under it) and other decoration are not content.
         if (child.getAttribute('aria-hidden') === 'true' || (depth === 0 && child.tagName.toLowerCase() === 'svg') || !onScreen(child)) continue
         const kids = [...child.children].filter(onScreen)
-        if (kids.length > 0 && depth < maxDepth && !WHOLE.has(child.tagName.toUpperCase()) && !child.hasAttribute('data-jsx') && !child.hasAttribute('data-slot')) open(child, depth + 1)
+        if (kids.length > 0 && depth < maxDepth && !WHOLE.has(child.tagName.toUpperCase()) && !child.hasAttribute('data-jsx') && !child.hasAttribute('data-slot') && !child.hasAttribute('data-piece')) open(child, depth + 1)
         else found.push(child as HTMLElement)
       }
     }
@@ -343,7 +350,9 @@ export function AgentScene () {
   const { still } = usePrefs()
   const hidden = useTabHidden()
   const [cast, setCast] = useState<Cast>(resting)
-  const [line, setLine] = useState('')
+  const { resolvedTheme } = useTheme()
+  // The terminal that narrates a build: which section, which step, and the last few lines of output.
+  const [term, setTerm] = useState<{ target: string; step: number; lines: string[] }>({ target: '', step: 0, lines: [] })
   const [live, setLive] = useState(false)
 
   useEffect(() => {
@@ -353,11 +362,10 @@ export function AgentScene () {
     const frames = () => gsap.utils.toArray<HTMLElement>('[data-frame]', root)
     const card = (kind: 'ticket' | 'write' | 'review') => root.querySelector<HTMLElement>(`[data-card='${kind}']`)!
     const stamp = root.querySelector<HTMLElement>('[data-part="stamp"]')!
-    const chip = root.querySelector<HTMLElement>('[data-part="chip"]')!
     const actor = (id: AgentId) => root.querySelector<HTMLElement>(`[data-actor='${id}']`)!
     const bot = (id: AgentId) => actor(id).querySelector<HTMLElement>('[data-bot]')!
     const act = (id: AgentId, patch: Partial<Actor>) => setCast((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }))
-    const props = () => [...root.querySelectorAll('[data-frame], [data-card], [data-actor]'), stamp, chip]
+    const props = () => [...root.querySelectorAll('[data-frame], [data-card], [data-actor]'), stamp]
     const at = {} as Record<AgentId, Point>
     // The section's pieces while they are being built, with the inline styles to put back afterwards.
     let held: { el: HTMLElement; opacity: string; clipPath: string }[] = []
@@ -370,17 +378,45 @@ export function AgentScene () {
     const leaver = new IntersectionObserver(([entry]) => { if (!entry.isIntersecting && !run.dead) strike() })
 
     const wait = (seconds: number) => new Promise<void>((resolve) => { timers.push(gsap.delayedCall(seconds, resolve)) })
+    // One tool call per line, with its result (after `⎿`) on a line of its own, as a coding agent prints them.
     const narrate = (text: string, step: number) => {
-      const full = `${step}/${BUILD_STEPS.length}  ${text}`.replace('⎿', '\n  ⎿')
-      setLine(full)
+      const [call, result] = text.split('⎿').map((part) => part.trim())
+      const lines = result ? [call, `  ⎿  ${result}`] : [call]
+      setTerm((prev) => ({ ...prev, step, lines: [...prev.lines.filter((l) => l !== call), ...lines].slice(-TERM_LINES) }))
       // The scene is hidden from assistive tech; AgentCast announces the same line.
-      window.dispatchEvent(new CustomEvent(STATUS_EVENT, { detail: full }))
+      window.dispatchEvent(new CustomEvent(STATUS_EVENT, { detail: `${step}/${BUILD_STEPS.length}  ${text}` }))
     }
 
-    const appear = (id: AgentId, to: Point) => {
+    // Where a character lives in the dock, in the scene's coordinates; null when there is no dock.
+    const home = (id: AgentId): Point | null => {
+      const el = document.querySelector<HTMLElement>(`[data-agent-home='${id}']`)
+      if (!el) return null
+      const r = el.getBoundingClientRect()
+      const origin = root.getBoundingClientRect()
+      return { x: r.left + r.width / 2 - origin.left, y: r.top + r.height / 2 - origin.top }
+    }
+
+    // A long jump between the dock and the page: a high arc, growing or shrinking to the size at the other end.
+    const fly = (id: AgentId, to: Point, scale: number, duration = 0.7) => {
       at[id] = to
-      gsap.set(actor(id), { x: to.x, y: to.y, autoAlpha: 1 })
-      return gsap.fromTo(bot(id), { scale: 0 }, { scale: 1, duration: 0.4, ease: 'back.out(2.6)' }).then()
+      gsap.to(bot(id), { scale, duration, ease: 'power1.inOut' })
+      gsap.timeline()
+        .to(bot(id), { y: -60, duration: duration / 2, ease: 'power2.out' })
+        .to(bot(id), { y: 0, duration: duration / 2, ease: 'power2.in' })
+      return gsap.to(actor(id), { x: to.x, y: to.y, duration, ease: 'power1.inOut' }).then()
+    }
+
+    // A character comes in from its place in the dock, or just pops up when there is no dock.
+    const appear = (id: AgentId, to: Point) => {
+      const from = home(id)
+      if (!from) {
+        at[id] = to
+        gsap.set(actor(id), { x: to.x, y: to.y, autoAlpha: 1 })
+        return gsap.fromTo(bot(id), { scale: 0 }, { scale: 1, duration: 0.4, ease: 'back.out(2.6)' }).then()
+      }
+      gsap.set(actor(id), { x: from.x, y: from.y, autoAlpha: 1 })
+      gsap.set(bot(id), { scale: DOCKED / ACTOR })
+      return fly(id, to, 1)
     }
 
     // A character does not glide: it hops, leans into the jump and squashes on landing.
@@ -465,7 +501,8 @@ export function AgentScene () {
         const { open, close, text } = jsxOf(el)
         const cols = Math.max(4, Math.floor((spots[i].w - 14) / 6.7) - 2)
         const rows = Math.max(1, Math.floor((spots[i].h - 4) / LINE))
-        const cut = (value: string, max: number) => value.length > max ? `${value.slice(0, Math.max(0, max - 1))}…` : value
+        // A box too narrow for even a short tag shows no code at all, only its diff mark.
+        const cut = (value: string, max: number) => max < 8 ? '' : value.length > max ? `${value.slice(0, Math.max(0, max - 1))}…` : value
         if (!close) return [cut(open, cols)]
         if (rows < 3) return [cut(`${open}${text}${close}`, cols)]
         const body = Array.from({ length: Math.min(rows - 2, Math.ceil(text.length / (cols - 2))) }, (_, n) => `  ${text.slice(n * (cols - 2), (n + 1) * (cols - 2))}`)
@@ -482,7 +519,7 @@ export function AgentScene () {
         pane.textContent = `☐ ${code[i][0]}`
         paint(pane, MUTED)
       })
-      gsap.set(chip, { x: left + 8, y: Math.max(rule - 110, HEADER + 8 - origin.top), autoAlpha: 1 })
+      setTerm({ target: section.id, step: 0, lines: [] })
       gsap.set(stamp, { x: left + rect.width - 14, y: rule, xPercent: -100, yPercent: -50, scale: 1 })
       AGENTS.forEach(({ id }) => gsap.set(bot(id), { y: 0, rotation: 0, scale: 1 }))
       setLive(true)
@@ -629,8 +666,14 @@ export function AgentScene () {
       })
       await wait(2.8)
       if (me.dead) return
-      gsap.to([stamp, chip], { autoAlpha: 0, duration: 0.3 })
-      await gsap.to(AGENTS.map(({ id }) => bot(id)), { scale: 0, duration: 0.3, ease: 'back.in(2)', stagger: 0.06 }).then()
+      gsap.to(stamp, { autoAlpha: 0, duration: 0.3 })
+      // Home time: each one jumps back to its place in the dock, which then takes over from the scene.
+      await Promise.all(AGENTS.map(async ({ id }, i) => {
+        await wait(i * 0.12)
+        const to = home(id)
+        if (to) await fly(id, to, DOCKED / ACTOR)
+        else await gsap.to(bot(id), { scale: 0, duration: 0.3, ease: 'back.in(2)' }).then()
+      }))
       if (me.dead) return
       strike()
     }
@@ -670,7 +713,6 @@ export function AgentScene () {
   return (
     <div ref={rootRef} aria-hidden='true' className='pointer-events-none absolute inset-0 z-30 font-ibm'>
       {Array.from({ length: MAX_PIECES }, (_, i) => <span key={i} data-frame='' className='invisible absolute left-0 top-0 overflow-hidden whitespace-pre px-1.5 py-0.5 font-mono text-[11px] leading-[15px]' />)}
-      <span data-part='chip' className='invisible absolute left-0 top-0 w-max whitespace-pre border bg-background px-2 py-1 font-mono text-[11px] leading-4 text-muted-foreground shadow-sm'>{line}</span>
       <span data-part='stamp' className='invisible absolute left-0 top-0 w-max border bg-background px-1.5 py-0.5 text-[11px] leading-4' style={{ borderColor: BY_ID.codex.color, color: BY_ID.codex.color }}>✓ shipped</span>
       {([['ticket', 'ticket: build', 'currentColor'], ['write', 'task: write', BY_ID.claude.color], ['review', 'task: review', BY_ID.codex.color]] as const).map(([kind, text, color]) => (
         <span key={kind} data-card={kind} className='invisible absolute left-0 top-0 flex w-max items-center gap-1.5 border bg-background px-1.5 py-1 text-[11px] leading-none shadow-sm' style={{ borderColor: color }}>
@@ -678,6 +720,30 @@ export function AgentScene () {
           {text}
         </span>
       ))}
+      {live && (
+        // The build's terminal: a small window in the corner opposite the dock, with a beam riding its border.
+        <div className='fixed bottom-3 left-3 z-40 w-[min(23rem,calc(100vw-1.5rem))]'>
+          <BorderBeam size='md' colorVariant='colorful' theme={resolvedTheme === 'light' ? 'light' : 'dark'} borderRadius={0} strength={0.85}>
+            <div className='border bg-background font-mono text-[11px] leading-[17px] shadow-lg'>
+              <div className='flex items-center gap-1.5 border-b px-2 py-1 text-muted-foreground'>
+                <span className='size-2 bg-red-400' />
+                <span className='size-2 bg-amber-400' />
+                <span className='size-2 bg-emerald-400' />
+                <span className='ml-1 truncate'>agents — build {term.target}</span>
+                <span className='ml-auto tabular-nums'>{term.step}/{BUILD_STEPS.length}</span>
+              </div>
+              <div className='flex flex-col justify-end overflow-hidden px-2 py-1.5' style={{ height: TERM_LINES * 17 + 12 }}>
+                {term.lines.map((text, i) => (
+                  <p key={`${i}-${text}`} className={`truncate whitespace-pre ${text.startsWith('  ⎿') ? 'text-muted-foreground' : ''}`}>
+                    {text.startsWith('●') ? <><span className='text-emerald-500'>●</span>{text.slice(1)}</> : text}
+                    {i === term.lines.length - 1 && <span className='ml-0.5 motion-safe:animate-pulse'>▌</span>}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </BorderBeam>
+        </div>
+      )}
       {AGENTS.map(({ id, avatar, color }, i) => (
         <span key={id} data-actor={id} className='invisible absolute left-0 top-0'>
           <span data-bot='' className='absolute -left-[26px] -top-[26px] block origin-bottom'>

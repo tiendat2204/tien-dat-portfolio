@@ -50,7 +50,7 @@ export function ShellPrompt ({ command, dir = '~', children, speed = 90, classNa
 
   return (
     <div className={`font-ibm ${className ?? ''}`}>
-      <p className='whitespace-nowrap text-xs sm:text-sm'>
+      <p data-jsx={`<ShellPrompt command="${command}">`} className='whitespace-nowrap text-xs sm:text-sm'>
         {prompt}
         <span aria-hidden='true' className='ml-2'>{command.slice(0, typed)}</span>
         <span className='sr-only'>{done ? '' : command}</span>
@@ -58,7 +58,7 @@ export function ShellPrompt ({ command, dir = '~', children, speed = 90, classNa
       </p>
       <div className='shell-output' data-shown={done ? '' : undefined}>
         {children}
-        <p className='whitespace-nowrap text-xs sm:text-sm'>
+        <p data-jsx='</ShellPrompt>' className='whitespace-nowrap text-xs sm:text-sm'>
           {prompt}
           {done && cursor}
         </p>

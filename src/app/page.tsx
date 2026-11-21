@@ -160,7 +160,7 @@ export default function Page () {
 
         <div className='p-4'>
           <ShellPrompt command='cat about.md'>
-            <div className='my-3'>
+            <div className='my-3' data-jsx='<Markdown>{DATA.summary}</Markdown>'>
               <Markdown className='prose max-w-full text-pretty font-ibm text-sm text-muted-foreground -tracking-tighter dark:prose-invert'>
                 {DATA.summary}
               </Markdown>

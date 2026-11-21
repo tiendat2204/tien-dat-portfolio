@@ -73,7 +73,7 @@ interface CategorySectionProps {
 function CategorySection ({ title, skills, delay = 0 }: CategorySectionProps) {
   return (
     <BlurFade delay={delay}>
-      <div className='mb-4'>
+      <div className='mb-4' data-jsx={`<CategorySection title="${title}" skills={skills} />`}>
         <div className='flex items-center gap-2 mb-3'>
           <span className='text-muted-foreground/70 text-sm'>{'<'}</span>
           <h3 className='text-muted-foreground text-sm font-medium uppercase tracking-wider'>

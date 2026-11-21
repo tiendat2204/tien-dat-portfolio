@@ -14,7 +14,7 @@ const WorkSection = () => {
             delay={BLUR_FADE_DELAY * 6 + companyIndex * 0.1}
             key={`header-${company.company}`}
           >
-            <div className='company-header py-4 border-b border-muted '>
+            <div data-piece='' className='company-header py-4 border-b border-muted '>
               <div className='absolute left-1.5 top-1/2 -translate-y-1/2 sm:left-0 sm:-translate-x-1/2'>
                 <div className='relative'>
                   <div className='w-3 h-3 bg-primary rounded-full relative z-10' />
