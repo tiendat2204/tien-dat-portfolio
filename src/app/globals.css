@@ -677,8 +677,8 @@ section[data-reveal][data-revealed] h2.font-doto {
   }
 }
 
-/* The agents' status line (agent-swarm.tsx): one bright beam in the foreground colour travels its border, with a
-   soft glow behind it. A ring cut from a rotating conic gradient; no colours of its own. */
+/* The section the agents are building (agent-swarm.tsx): one bright beam in the foreground colour travels its
+   border, with a soft glow behind it. A ring cut from a rotating conic gradient; no colours of its own. */
 @property --agent-beam {
   syntax: '<angle>';
   inherits: false;
@@ -689,25 +689,23 @@ section[data-reveal][data-revealed] h2.font-doto {
   to { --agent-beam: 360deg; }
 }
 
-.agent-beam { position: relative; }
-
 .agent-beam::before,
 .agent-beam::after {
   content: '';
   position: absolute;
   inset: -1px;
-  padding: 1.5px;
-  pointer-events: none;
-  background: conic-gradient(from var(--agent-beam), transparent 0 60%, hsl(var(--foreground) / 0.2) 74%, hsl(var(--foreground)) 97%, transparent 100%);
+  padding: 2px;
+  background: conic-gradient(from var(--agent-beam), transparent 0 72%, hsl(var(--foreground) / 0.25) 84%, hsl(var(--foreground)) 98%, transparent 100%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: agent-beam 2.6s linear infinite;
+  animation: agent-beam 3.2s linear infinite;
 }
 
+/* The glow: the same ring, wider and blurred. */
 .agent-beam::after {
-  padding: 3px;
-  inset: -2px;
-  filter: blur(5px);
-  opacity: 0.75;
+  inset: -4px;
+  padding: 7px;
+  filter: blur(8px);
+  opacity: 0.8;
 }

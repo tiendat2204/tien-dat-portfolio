@@ -19,8 +19,8 @@ import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
     the page out of that section's own pieces: Ori plans it (the content goes and every block becomes an unticked
     todo line of code), Quill writes the pieces one by one as added diff lines, typed out, each then giving way to
     what it renders, Boo ticks them off and sends one back as removed lines, the gates are the repo's real
-    commands, and it ships. A status line on the section's own top rule says which tool call is running, with a
-    beam of light riding its border. Then the section is exactly as it was and the cast returns to the dock.
+    commands, and it ships. A status line on the section's own top rule says which tool call is running, and one
+    bright beam rides the section's border meanwhile. Then the section is exactly as it was and the cast returns to the dock.
   - AgentCast: the same cast as real controls in "How I build", with the build as text.
 
   Nothing runs per frame or per scroll event, and the canvases stop drawing off screen and in a hidden tab.
@@ -361,10 +361,11 @@ export function AgentScene () {
     const frames = () => gsap.utils.toArray<HTMLElement>('[data-frame]', root)
     const card = (kind: 'ticket' | 'write' | 'review') => root.querySelector<HTMLElement>(`[data-card='${kind}']`)!
     const stamp = root.querySelector<HTMLElement>('[data-part="stamp"]')!
+    const beam = root.querySelector<HTMLElement>('[data-part="beam"]')!
     const actor = (id: AgentId) => root.querySelector<HTMLElement>(`[data-actor='${id}']`)!
     const bot = (id: AgentId) => actor(id).querySelector<HTMLElement>('[data-bot]')!
     const act = (id: AgentId, patch: Partial<Actor>) => setCast((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }))
-    const props = () => [...root.querySelectorAll('[data-frame], [data-card], [data-actor]'), stamp]
+    const props = () => [...root.querySelectorAll('[data-frame], [data-card], [data-actor]'), stamp, beam]
     const at = {} as Record<AgentId, Point>
     // The section's pieces while they are being built, with the inline styles to put back afterwards.
     let held: { el: HTMLElement; opacity: string; clipPath: string }[] = []
@@ -518,6 +519,9 @@ export function AgentScene () {
         paint(pane, MUTED)
       })
       setTerm({ step: 0, call: '', result: '' })
+      // A beam of light rides the border of the section for as long as it is being built.
+      gsap.set(beam, { x: left, y: rect.top - origin.top, width: rect.width, height: rect.height })
+      gsap.fromTo(beam, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5 })
       // The status line sits on the section's own top rule, at its right end.
       gsap.set(stamp, { x: left + rect.width - 14, y: rule, xPercent: -100, yPercent: -50, scale: 1, autoAlpha: 1 })
       AGENTS.forEach(({ id }) => gsap.set(bot(id), { y: 0, rotation: 0, scale: 1 }))
@@ -663,7 +667,7 @@ export function AgentScene () {
       })
       await wait(2.8)
       if (me.dead) return
-      gsap.to(stamp, { autoAlpha: 0, duration: 0.4 })
+      gsap.to([stamp, beam], { autoAlpha: 0, duration: 0.5 })
       // Home time: each one jumps back to its place in the dock, which then takes over from the scene.
       await Promise.all(AGENTS.map(async ({ id }, i) => {
         await wait(i * 0.12)
@@ -710,11 +714,13 @@ export function AgentScene () {
   return (
     <div ref={rootRef} aria-hidden='true' className='pointer-events-none absolute inset-0 z-30 font-ibm'>
       {Array.from({ length: MAX_PIECES }, (_, i) => <span key={i} data-frame='' className='invisible absolute left-0 top-0 overflow-hidden whitespace-pre px-1.5 py-0.5 font-mono text-[11px] leading-[15px]' />)}
+      {/* One bright beam in the foreground colour rides the border of the section being built (`.agent-beam`). */}
+      <span data-part='beam' className='agent-beam invisible absolute left-0 top-0 block' />
       {/* The build's status line, in the section itself: an orb for what the agents are doing, the call, its result.
-          One bright beam in the foreground colour rides its border (`.agent-beam` in globals.css). */}
+      */}
       <span data-part='stamp' className='invisible absolute left-0 top-0 block w-max font-mono text-[11px] leading-4'>
         {live && (
-          <span className='agent-beam flex items-center gap-1.5 border bg-background py-0.5 pl-1 pr-2'>
+          <span className='flex items-center gap-1.5 border bg-background py-0.5 pl-1 pr-2'>
             <ThinkingOrb state={ORBS[term.step] ?? 'working'} size={20} paused={hidden} />
             <span>{term.call}</span>
             {term.result && <span className='text-muted-foreground'>⎿ {term.result}</span>}
