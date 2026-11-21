@@ -694,13 +694,30 @@ section[data-reveal][data-revealed] h2.font-doto {
 .agent-dots i:nth-child(2) { animation-delay: 0.2s; }
 .agent-dots i:nth-child(3) { animation-delay: 0.4s; }
 
-/* An agent at rest is one dot that breathes, like an assistant waiting for its turn. */
-@keyframes agent-breathe {
-  50% { transform: scale(1.2); }
+/* An agent character (agent-swarm.tsx) sways while it waits, glances around and blinks. */
+@keyframes agent-sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg) translateY(-1.5px); }
 }
 
-.agent-orb { animation: agent-breathe 2.4s ease-in-out infinite; }
+@keyframes agent-look {
+  0%, 28%, 96%, 100% { transform: translate(0, 0); }
+  36%, 58% { transform: translate(1.8px, 0.6px); }
+  66%, 88% { transform: translate(-1.6px, -0.4px); }
+}
+
+@keyframes agent-blink {
+  0%, 93%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.12); }
+}
+
+.agent-bot { transform-origin: 50% 85%; animation: agent-sway 3.4s ease-in-out infinite; }
+.agent-look { animation: agent-look 6s ease-in-out infinite; }
+.agent-eyes { transform-box: fill-box; transform-origin: center; animation: agent-blink 4.4s infinite; }
+
+/* Busy: a quick little wiggle. */
+[data-busy] .agent-bot { animation-duration: 0.7s; }
 
 @media (prefers-reduced-motion: reduce) {
-  .agent-orb { animation: none; }
+  .agent-bot, .agent-look, .agent-eyes { animation: none; }
 }

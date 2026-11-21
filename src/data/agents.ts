@@ -4,7 +4,7 @@ export const AGENTS = [
   {
     id: 'orca',
     verb: 'plan',
-    color: '#60a5fa',
+    color: '#4c8dff',
     href: '/uses#workflow-orca',
     role: 'Coordinator. Splits a job into tasks with dependencies and hands each one to a worker.',
     runsOn: 'Orca',
@@ -13,7 +13,7 @@ export const AGENTS = [
   {
     id: 'claude',
     verb: 'write',
-    color: '#f0a060',
+    color: '#f58742',
     href: '/uses#workflow-superpowers',
     role: 'Writer. Explores the code, plans the change, writes it and verifies it before calling it done.',
     runsOn: 'Claude Code',
@@ -22,7 +22,7 @@ export const AGENTS = [
   {
     id: 'codex',
     verb: 'review',
-    color: '#34d399',
+    color: '#4cc47c',
     href: '/uses#workflow-review',
     role: 'Reviewer. Reads every change the writer makes and sends back concrete issues.',
     runsOn: 'Codex',
