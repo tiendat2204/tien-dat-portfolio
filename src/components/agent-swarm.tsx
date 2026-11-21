@@ -364,6 +364,9 @@ export function AgentSwarm () {
 
       // 6. Shipped: the bricks sink into the section's own top rule, its frame lights up once, and a small stamp
       // sits on the rule. Both follow the section's real box, so nothing is drawn over its content.
+      // Read the section again: it may have grown or moved while the gates ran.
+      on = await follow()
+      if (!on) return
       narrate(6, 'me: ship it → deployed tiendat.work', boo.color)
       const { full: shipped } = on
       const frame = root.querySelector<HTMLElement>('[data-part="frame"]')!
