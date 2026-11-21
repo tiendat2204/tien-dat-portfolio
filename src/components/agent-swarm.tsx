@@ -1,10 +1,9 @@
 'use client'
 
-import { BorderBeam } from 'border-beam'
 import { gsap } from 'gsap'
-import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { ThinkingOrb, type ThinkingOrbProps } from 'thinking-orbs'
 
 import { AGENTS, BUILD_STEPS, type AgentId } from '@/data/agents'
 import { mostVisible, sectionAt, type Point } from '@/lib/agent-cursors-plan'
@@ -20,7 +19,7 @@ import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
     the page out of that section's own pieces: Ori plans it (the content goes and every block becomes an unticked
     todo line of code), Quill writes the pieces one by one as added diff lines, typed out, each then giving way to
     what it renders, Boo ticks them off and sends one back as removed lines, the gates are the repo's real
-    commands, and it ships. Then the section is exactly as it was and the cast returns to the dock.
+    commands, and it ships. A status line on the section's own top rule says which tool call is running. Then the section is exactly as it was and the cast returns to the dock.
   - AgentCast: the same cast as real controls in "How I build", with the build as text.
 
   Nothing runs per frame or per scroll event, and the canvases stop drawing off screen and in a hidden tab.
@@ -49,8 +48,8 @@ const NOTHING_TO_BUILD = 'No section in view. Scroll to one first.'
 // Size of a character while it is out on the page, and in the dock.
 const ACTOR = 52
 const DOCKED = 40
-// How many lines of output the build's terminal keeps on screen.
-const TERM_LINES = 6
+// The orb in the build's status line, by step: it takes the ticket, plans, writes, reviews, runs the gates, rests.
+const ORBS: NonNullable<ThinkingOrbProps['state']>[] = ['listening', 'listening', 'solving', 'composing', 'searching', 'working', 'breathing']
 // A section is built from at most this many pieces; a busier one is taken in bigger blocks.
 const MAX_PIECES = 26
 // The site header's height, and the highest line (in the viewport) the characters may stand on below it.
@@ -350,9 +349,8 @@ export function AgentScene () {
   const { still } = usePrefs()
   const hidden = useTabHidden()
   const [cast, setCast] = useState<Cast>(resting)
-  const { resolvedTheme } = useTheme()
-  // The terminal that narrates a build: which section, which step, and the last few lines of output.
-  const [term, setTerm] = useState<{ target: string; step: number; lines: string[] }>({ target: '', step: 0, lines: [] })
+  // The build's status line: which step, the tool call being made, and its result once it has one.
+  const [term, setTerm] = useState({ step: 0, call: '', result: '' })
   const [live, setLive] = useState(false)
 
   useEffect(() => {
@@ -378,11 +376,10 @@ export function AgentScene () {
     const leaver = new IntersectionObserver(([entry]) => { if (!entry.isIntersecting && !run.dead) strike() })
 
     const wait = (seconds: number) => new Promise<void>((resolve) => { timers.push(gsap.delayedCall(seconds, resolve)) })
-    // One tool call per line, with its result (after `⎿`) on a line of its own, as a coding agent prints them.
+    // A tool call, and its result after `⎿`, as a coding agent prints them.
     const narrate = (text: string, step: number) => {
-      const [call, result] = text.split('⎿').map((part) => part.trim())
-      const lines = result ? [call, `  ⎿  ${result}`] : [call]
-      setTerm((prev) => ({ ...prev, step, lines: [...prev.lines.filter((l) => l !== call), ...lines].slice(-TERM_LINES) }))
+      const [call, result = ''] = text.split('⎿').map((part) => part.trim())
+      setTerm({ step, call, result })
       // The scene is hidden from assistive tech; AgentCast announces the same line.
       window.dispatchEvent(new CustomEvent(STATUS_EVENT, { detail: `${step}/${BUILD_STEPS.length}  ${text}` }))
     }
@@ -519,8 +516,9 @@ export function AgentScene () {
         pane.textContent = `☐ ${code[i][0]}`
         paint(pane, MUTED)
       })
-      setTerm({ target: section.id, step: 0, lines: [] })
-      gsap.set(stamp, { x: left + rect.width - 14, y: rule, xPercent: -100, yPercent: -50, scale: 1 })
+      setTerm({ step: 0, call: '', result: '' })
+      // The status line sits on the section's own top rule, at its right end.
+      gsap.set(stamp, { x: left + rect.width - 14, y: rule, xPercent: -100, yPercent: -50, scale: 1, autoAlpha: 1 })
       AGENTS.forEach(({ id }) => gsap.set(bot(id), { y: 0, rotation: 0, scale: 1 }))
       setLive(true)
       window.dispatchEvent(new CustomEvent(BUSY_EVENT, { detail: true }))
@@ -650,16 +648,14 @@ export function AgentScene () {
         await wait(0.45)
         if (me.dead) return
         narrate(`● Bash(${gates[i][1]})  ⎿  ${gates[i][2]}`, 5)
-        stamp.textContent = gates.slice(0, i + 1).map((g) => `${g[0]} ✓`).join('  ')
-        gsap.fromTo(stamp, { autoAlpha: 1, scale: 1.25 }, { scale: 1, duration: 0.25, ease: 'back.out(2)' })
+        gsap.fromTo(stamp, { scale: 1.12 }, { scale: 1, duration: 0.25, ease: 'back.out(2)' })
         await wait(0.45)
         if (me.dead) return
       }
 
       // 6. Shipped: pushed to main, and the section is itself again.
       narrate('● Bash(git push origin main)  ⎿  deployed tiendat.work', 6)
-      stamp.textContent = '✓ shipped'
-      gsap.fromTo(stamp, { scale: 1.6 }, { scale: 1, duration: 0.3, ease: 'back.out(2)' })
+      gsap.fromTo(stamp, { scale: 1.2 }, { scale: 1, duration: 0.3, ease: 'back.out(2)' })
       AGENTS.forEach(({ id }, i) => {
         act(id, { mood: 'happy' })
         go(id, onRule(0.2 + i * 0.3), 0.5)
@@ -713,37 +709,19 @@ export function AgentScene () {
   return (
     <div ref={rootRef} aria-hidden='true' className='pointer-events-none absolute inset-0 z-30 font-ibm'>
       {Array.from({ length: MAX_PIECES }, (_, i) => <span key={i} data-frame='' className='invisible absolute left-0 top-0 overflow-hidden whitespace-pre px-1.5 py-0.5 font-mono text-[11px] leading-[15px]' />)}
-      <span data-part='stamp' className='invisible absolute left-0 top-0 w-max border bg-background px-1.5 py-0.5 text-[11px] leading-4' style={{ borderColor: BY_ID.codex.color, color: BY_ID.codex.color }}>✓ shipped</span>
+      {/* The build's status line, in the section itself: an orb for what the agents are doing, the call, its result. */}
+      <span data-part='stamp' className='invisible absolute left-0 top-0 flex w-max items-center gap-1.5 border bg-background py-0.5 pl-1 pr-2 font-mono text-[11px] leading-4'>
+        {live && <ThinkingOrb state={ORBS[term.step] ?? 'working'} size={20} paused={hidden} />}
+        <span>{term.call}</span>
+        {term.result && <span className='text-muted-foreground'>⎿ {term.result}</span>}
+        <span className='tabular-nums text-muted-foreground'>{term.step}/{BUILD_STEPS.length}</span>
+      </span>
       {([['ticket', 'ticket: build', 'currentColor'], ['write', 'task: write', BY_ID.claude.color], ['review', 'task: review', BY_ID.codex.color]] as const).map(([kind, text, color]) => (
         <span key={kind} data-card={kind} className='invisible absolute left-0 top-0 flex w-max items-center gap-1.5 border bg-background px-1.5 py-1 text-[11px] leading-none shadow-sm' style={{ borderColor: color }}>
           <span className='size-1.5' style={{ backgroundColor: color }} />
           {text}
         </span>
       ))}
-      {live && (
-        // The build's terminal: a small window in the corner opposite the dock, with a beam riding its border.
-        <div className='fixed bottom-3 left-3 z-40 w-[min(23rem,calc(100vw-1.5rem))]'>
-          <BorderBeam size='md' colorVariant='colorful' theme={resolvedTheme === 'light' ? 'light' : 'dark'} borderRadius={0} strength={0.85}>
-            <div className='border bg-background font-mono text-[11px] leading-[17px] shadow-lg'>
-              <div className='flex items-center gap-1.5 border-b px-2 py-1 text-muted-foreground'>
-                <span className='size-2 bg-red-400' />
-                <span className='size-2 bg-amber-400' />
-                <span className='size-2 bg-emerald-400' />
-                <span className='ml-1 truncate'>agents — build {term.target}</span>
-                <span className='ml-auto tabular-nums'>{term.step}/{BUILD_STEPS.length}</span>
-              </div>
-              <div className='flex flex-col justify-end overflow-hidden px-2 py-1.5' style={{ height: TERM_LINES * 17 + 12 }}>
-                {term.lines.map((text, i) => (
-                  <p key={`${i}-${text}`} className={`truncate whitespace-pre ${text.startsWith('  ⎿') ? 'text-muted-foreground' : ''}`}>
-                    {text.startsWith('●') ? <><span className='text-emerald-500'>●</span>{text.slice(1)}</> : text}
-                    {i === term.lines.length - 1 && <span className='ml-0.5 motion-safe:animate-pulse'>▌</span>}
-                  </p>
-                ))}
-              </div>
-            </div>
-          </BorderBeam>
-        </div>
-      )}
       {AGENTS.map(({ id, avatar, color }, i) => (
         <span key={id} data-actor={id} className='invisible absolute left-0 top-0'>
           <span data-bot='' className='absolute -left-[26px] -top-[26px] block origin-bottom'>

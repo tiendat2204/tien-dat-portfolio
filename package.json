@@ -37,7 +37,6 @@
     "@stylistic/eslint-plugin": "^5.5.0",
     "@tailwindcss/postcss": "^4.1.8",
     "@types/mdx": "^2.0.13",
-    "border-beam": "1.4.1",
     "bot-avatars": "0.2.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -75,6 +74,7 @@
     "strip-indent": "^4.0.0",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
+    "thinking-orbs": "^0.3.2",
     "unified": "^11.0.5",
     "unist-builder": "3.0.0",
     "unist-util-visit": "^5.0.0"
