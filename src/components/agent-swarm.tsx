@@ -42,6 +42,7 @@ const BUSY_EVENT = 'agent-swarm:busy'
 const STATUS_EVENT = 'agent-swarm:status'
 /** detail: a line for the dock to say, when a build was asked for but could not start. */
 const HINT_EVENT = 'agent-swarm:hint'
+const NOTHING_TO_BUILD = 'No section in view. Scroll to one first.'
 
 // Size of a character while it is out on the page.
 const ACTOR = 52
@@ -411,6 +412,7 @@ export function AgentScene () {
       const pieces = piecesOf(section)
       if (pieces.length === 0) {
         run.dead = true
+        window.dispatchEvent(new CustomEvent(HINT_EVENT, { detail: NOTHING_TO_BUILD }))
         return
       }
       held = pieces.map((el) => ({ el, opacity: el.style.opacity, clipPath: el.style.clipPath }))
@@ -607,7 +609,7 @@ export function AgentScene () {
       const id = (e as CustomEvent<{ section?: string } | undefined>).detail?.section
       const section = (id ? document.getElementById(id) : null) ?? pick()
       if (section) story(section)
-      else window.dispatchEvent(new CustomEvent(HINT_EVENT, { detail: 'No section in view. Scroll to one first.' }))
+      else window.dispatchEvent(new CustomEvent(HINT_EVENT, { detail: NOTHING_TO_BUILD }))
     }
     // Whichever character is dropped, the whole crew comes to build the section it landed on.
     const onDrop = (e: Event) => {
