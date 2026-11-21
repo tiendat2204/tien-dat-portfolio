@@ -4,9 +4,7 @@ import { cn } from '@/lib/utils'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { ReactLenis } from 'lenis/react'
-import NextTopLoader from 'nextjs-toploader'
 import { Footer } from '@/components/footer'
-import { LenisScrollStage } from '@/components/lenis-scroll-stage'
 import { Providers } from '@/components/Providers'
 import { Header } from '@/components/Header'
 import { buildWebSiteJsonLd } from '@/lib/seo/jsonld'
@@ -134,8 +132,6 @@ export default async function RootLayout ({
         )}
         suppressHydrationWarning
       >
-        {/* Square, hairline bar in the foreground colour: no glow and no spinner, like the rest of the site. */}
-        <NextTopLoader color='hsl(var(--foreground))' height={2} showSpinner={false} shadow={false} crawlSpeed={150} zIndex={100} />
         <Section
           className='overflow-x-clip w-full'
           crossesOffset='lg:translate-y-[3.15rem]'
@@ -147,18 +143,16 @@ export default async function RootLayout ({
           <TooltipProvider delayDuration={0}>
 
             <Providers>
-              <LenisScrollStage>
-                <Header stars={stars} />
+              <Header stars={stars} />
 
-                {children}
-                <Footer />
-                <CommandMenu
-                  posts={getAllPosts().map((p) => ({ slug: p.slug, title: p.metadata.title }))}
-                  components={getAllComponents().map((c) => ({ slug: c.slug, title: c.metadata.title }))}
-                />
-                <UiEffects />
-                <KeyboardShortcuts />
-              </LenisScrollStage>
+              {children}
+              <Footer />
+              <CommandMenu
+                posts={getAllPosts().map((p) => ({ slug: p.slug, title: p.metadata.title }))}
+                components={getAllComponents().map((c) => ({ slug: c.slug, title: c.metadata.title }))}
+              />
+              <UiEffects />
+              <KeyboardShortcuts />
             </Providers>
           </TooltipProvider>
 
