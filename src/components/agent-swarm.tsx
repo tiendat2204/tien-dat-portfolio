@@ -7,24 +7,34 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 
 import { AGENTS, BUILD_STEPS, type AgentId } from '@/data/agents'
-import { nextVisible, perimeterPoints, rowPoints, toLocalBox, type Box, type Point } from '@/lib/agent-cursors-plan'
+import { checkPoints, nextVisible, rowPoints, toLocalBox, type Box, type Point } from '@/lib/agent-cursors-plan'
 
 /*
-  The home page's agents at work. Each agent is a plush little character (bot-avatars, drawn on a canvas). It hops over to
-  the block it works on, throws out a swarm of small dots that settle on the block, then gathers them back in.
-  Together they act out one build of this site (BUILD_STEPS): ticket, plan, write, review, gates, ship. It plays
-  once, on whatever section is on screen, and can be replayed. AgentCast is the same cast as real controls, and is
-  what phones and reduced-motion visitors get.
+  The home page's agents at work: Ori, Quill and Boo, three plush characters (bot-avatars, drawn on a canvas), act
+  out one build of this site (BUILD_STEPS). Tasks are cards they throw to each other, and the work is a course of
+  voxel bricks, the same cubes as the hero figure, laid along the top of the section on screen: Ori marks out the
+  slots, Quill lays a brick in each, Boo checks them one by one and kicks out a bad one, the gates ripple down the
+  row, and at the end the bricks fly together into a tick. It plays once and can be replayed. AgentCast is the same
+  cast as real controls, and is what phones and reduced-motion visitors get.
 */
 
-const DOT = 4
-// How many small dots one agent throws out.
-const SWARM = 36
+const BRICKS = 30
+const BRICK = { w: 18, h: 20 }
+const REJECTED = '#ef4444'
 const STORAGE_KEY = 'agent-cursors'
 const TOGGLE_EVENT = 'agent-swarm:toggle'
 const RUN_EVENT = 'agent-swarm:run'
 const OPEN_EVENT = 'agent-swarm:open'
 const STATUS_EVENT = 'agent-swarm:status'
+
+const BY_ID = Object.fromEntries(AGENTS.map((a) => [a.id, a])) as { [K in AgentId]: Extract<typeof AGENTS[number], { id: K }> }
+
+// A per-brick callback for a staggered tween: recolours the brick as its own tween starts.
+const tint = (color: string) => function (this: gsap.core.Tween) {
+  const el = this.targets()[0] as HTMLElement
+  el.style.color = color
+  el.removeAttribute('data-ghost')
+}
 
 // The avatars draw on a canvas, so they only exist in the browser.
 const BotAvatar = dynamic(() => import('bot-avatars').then((m) => m.BotAvatar), { ssr: false })
@@ -42,11 +52,23 @@ const MOODS: Record<Mood, Pick<BotAvatarProps, 'state' | 'pose'>> = {
 }
 
 function Bot ({ id, size, mood = 'idle', still = false }: { id: AgentId; size: number; mood?: Mood; still?: boolean }) {
-  const agent = AGENTS.find((a) => a.id === id)!
+  const agent = BY_ID[id]
   return (
     <span aria-hidden='true' className='block shrink-0' style={{ width: size, height: size }}>
       <BotAvatar type={agent.avatar} color={agent.color} face='mouth' size={size} seed={AGENTS.indexOf(agent) / AGENTS.length} paused={still} interactive={!still} {...MOODS[mood]} />
     </span>
+  )
+}
+
+// One voxel brick: an isometric cube in the current colour, lit from the top.
+function Brick () {
+  return (
+    <svg width={BRICK.w} height={BRICK.h} viewBox='0 0 16 18' className='block overflow-visible'>
+      <path className='agent-brick-face' d='M8 0l8 4.5-8 4.5-8-4.5z' fill='currentColor' fillOpacity='0.95' />
+      <path className='agent-brick-face' d='M0 4.5l8 4.5v9l-8-4.5z' fill='currentColor' fillOpacity='0.6' />
+      <path className='agent-brick-face' d='M16 4.5l-8 4.5v9l8-4.5z' fill='currentColor' fillOpacity='0.32' />
+      <path className='agent-brick-edge' d='M8 0l8 4.5v9l-8 4.5-8-4.5v-9zM0 4.5l8 4.5 8-4.5M8 9v9' fill='none' stroke='currentColor' strokeWidth='0.8' strokeLinejoin='round' />
+    </svg>
   )
 }
 
@@ -67,7 +89,7 @@ function storeOn (on: boolean) {
   window.dispatchEvent(new CustomEvent(TOGGLE_EVENT))
 }
 
-// The swarm needs room and motion: off on phones, under reduced motion, or when the visitor sent it home.
+// The scene needs room and motion: off on phones, under reduced motion, or when the visitor sent it home.
 function useSwarm () {
   const [state, setState] = useState({ on: true, able: false, still: false })
 
@@ -101,11 +123,12 @@ export function AgentSwarm () {
     const hud = hudRef.current
     if (!enabled || !root || !hud) return
 
-    const dots = (id: AgentId) => gsap.utils.toArray<HTMLElement>(`[data-dot='${id}']`, root)
+    const bricks = () => gsap.utils.toArray<HTMLElement>('[data-brick]', root)
+    const card = (kind: 'ticket' | 'write' | 'review') => root.querySelector<HTMLElement>(`[data-card='${kind}']`)!
     const anchor = (id: AgentId) => root.querySelector<HTMLElement>(`[data-anchor='${id}']`)!
     const bot = (id: AgentId) => anchor(id).querySelector<HTMLElement>('[data-part="bot"]')!
     const feel = (id: AgentId, mood: Mood) => setMoods((prev) => ({ ...prev, [id]: mood }))
-    const everything = () => [...root.querySelectorAll('[data-dot], [data-anchor], [data-part="bot"]'), hud]
+    const everything = () => [...root.querySelectorAll('[data-brick], [data-card], [data-anchor], [data-part="bot"]'), hud]
     const at = {} as Record<AgentId, Point>
     let run = { dead: false }
     let timers: gsap.core.Tween[] = []
@@ -126,7 +149,7 @@ export function AgentSwarm () {
       window.dispatchEvent(new CustomEvent(STATUS_EVENT, { detail: `Step ${step} of ${BUILD_STEPS.length}: ${text}` }))
     }
 
-    // A character does not glide: it hops, leans into the jump, and squashes on landing.
+    // A character does not glide: it hops, leans into the jump and squashes on landing.
     const go = (id: AgentId, to: Point, duration = 0.75) => {
       const lean = Math.sign(to.x - (at[id]?.x ?? to.x))
       at[id] = to
@@ -144,31 +167,18 @@ export function AgentSwarm () {
       return gsap.fromTo(bot(id), { scale: 0 }, { scale: 1, duration: 0.45, ease: 'back.out(2.6)' }).then()
     }
 
-    // Move dots that are already out to new points.
-    const send = (id: AgentId, points: Point[], duration = 1) => gsap.to(dots(id), {
-      x: (i) => points[i % points.length].x - DOT / 2,
-      y: (i) => points[i % points.length].y - DOT / 2,
-      duration,
-      ease: 'power2.out',
-      stagger: { amount: 0.4, from: 'random' },
-    }).then()
-
-    // Throw the dots out from where the character stands; each one flies to its own point.
-    const emit = (id: AgentId, points: Point[], duration = 1) => {
-      gsap.killTweensOf(dots(id))
-      gsap.set(dots(id), { x: at[id].x - DOT / 2, y: at[id].y - DOT / 2, opacity: 1 })
-      return send(id, points, duration)
+    // A task card is thrown in an arc, and whoever it reaches catches it with a little swell.
+    const pass = async (kind: 'ticket' | 'write' | 'review', from: Point, to: Point, catcher: AgentId | null, duration = 0.8) => {
+      const el = card(kind)
+      gsap.set(el, { x: from.x, y: from.y, xPercent: -50, yPercent: -50, autoAlpha: 1, scale: 1, rotation: -10 })
+      gsap.to(el, { x: to.x, rotation: 8, duration, ease: 'power1.inOut' })
+      await gsap.timeline()
+        .to(el, { y: Math.min(from.y, to.y) - 54, duration: duration / 2, ease: 'power2.out' })
+        .to(el, { y: to.y, duration: duration / 2, ease: 'power2.in' })
+        .then()
+      gsap.to(el, { scale: 0, autoAlpha: 0, duration: 0.2 })
+      if (catcher) gsap.fromTo(bot(catcher), { scale: 1.2 }, { scale: 1, duration: 0.3, ease: 'back.out(3)' })
     }
-
-    // Gather the dots back into the character, which swells for a moment as they land.
-    const collect = async (id: AgentId) => {
-      await gsap.to(dots(id), { x: at[id].x - DOT / 2, y: at[id].y - DOT / 2, duration: 0.6, ease: 'power2.in', stagger: { amount: 0.25, from: 'random' } }).then()
-      gsap.set(dots(id), { opacity: 0 })
-      gsap.fromTo(bot(id), { scale: 1.18 }, { scale: 1, duration: 0.3, ease: 'back.out(3)' })
-    }
-
-    const twinkle = (id: AgentId, times = 3) =>
-      gsap.to(dots(id), { opacity: 0.2, duration: 0.2, repeat: times * 2 - 1, yoyo: true, stagger: { amount: 0.35, from: 'random' } }).then()
 
     // Where the characters wait: down the right-hand gutter, or just inside the edge when there is no gutter.
     const seat = (i: number): Point => {
@@ -176,15 +186,17 @@ export function AgentSwarm () {
       const gutter = window.innerWidth - rect.right
       return { x: gutter > 190 ? rect.width + 52 : rect.width - 40, y: -rect.top + window.innerHeight * 0.24 + i * 84 }
     }
-    // A character works perched on the top edge of its block.
-    const perch = (box: Box, along = 0): Point => ({ x: box.x + 36 + box.w * along, y: box.y - 26 })
-
+    // A character works standing just under the course of bricks, inside the block (clear of the site header).
+    const perch = (box: Box, along = 0): Point => ({ x: box.x + 44 + (box.w - 88) * along, y: box.y + 50 })
+    // One slot per brick, along the block's top edge.
+    const course = (box: Box) => rowPoints(box, box.y, BRICKS, 0.02, 0.98)
+    const slot = (p: Point) => ({ x: p.x - BRICK.w / 2, y: p.y - BRICK.h / 2 })
     // The section to work on: whichever is on screen now. Waits (the story pauses) while none is.
     const stage = async (me: { dead: boolean }) => {
       while (!me.dead) {
         const sections = [...document.querySelectorAll<HTMLElement>('main > section[id]')]
         const index = nextVisible(sections.map((s) => s.getBoundingClientRect()), window.innerHeight, -1)
-        if (index >= 0) return { section: sections[index], name: sections[index].id, body: local(sections[index].getBoundingClientRect()) }
+        if (index >= 0) return { name: sections[index].id, body: local(sections[index].getBoundingClientRect()) }
         await wait(0.6)
       }
       return null
@@ -196,130 +208,164 @@ export function AgentSwarm () {
       timers = []
       gsap.killTweensOf(everything())
       const me = run = { dead: false }
+      const ori = BY_ID.orca
+      const quill = BY_ID.claude
+      const boo = BY_ID.codex
 
       AGENTS.forEach(({ id, verb }) => {
-        gsap.set(dots(id), { opacity: 0 })
         gsap.set(anchor(id), { autoAlpha: 0 })
         anchor(id).removeAttribute('data-alert')
         gsap.set(bot(id), { x: 0, y: 0, rotation: 0, scale: 1 })
         say(id, verb)
         feel(id, 'idle')
       })
+      gsap.set(bricks(), { opacity: 0, scale: 1, rotation: 0 })
+      gsap.set(root.querySelectorAll('[data-card]'), { autoAlpha: 0 })
       gsap.to(hud, { autoAlpha: 1, y: 0, duration: 0.3 })
 
-      // The ticket arrives: orca hops in from the left edge and takes its seat.
-      narrate(1, 'me → orca: build tien-dat-profile')
+      // 1. The ticket flies in from the page's left edge, and Ori catches it.
+      narrate(1, `me → ${ori.name}: build tien-dat-profile`)
       const home = seat(0)
-      at.orca = { x: -50, y: home.y }
-      gsap.set(anchor('orca'), { x: at.orca.x, y: at.orca.y, autoAlpha: 1 })
-      say('orca', 'ticket')
-      await wait(0.4)
-      await go('orca', { x: home.x * 0.35, y: home.y }, 0.6)
-      await go('orca', { x: home.x * 0.7, y: home.y }, 0.6)
-      await go('orca', home, 0.6)
+      await appear('orca', home)
+      await pass('ticket', { x: -120, y: home.y - 20 }, { x: home.x, y: home.y - 8 }, 'orca', 1.2)
+      say('orca', 'got the ticket')
+      await wait(0.5)
       let on = await stage(me)
       if (!on) return
 
-      narrate(2, `orca splits the job: plan ${on.name}`, AGENTS[0].color)
-      const heading = local((on.section.querySelector('h2') ?? on.section).getBoundingClientRect())
+      // 2. The plan: Ori marks out one empty slot per brick along the top of the section.
+      narrate(2, `${ori.name} plans ${on.name}`, ori.color)
       say('orca', `plan ${on.name}`, true)
-      await go('orca', perch(heading))
-      feel('orca', 'working')
-      await emit('orca', perimeterPoints(heading, SWARM))
-      await twinkle('orca', 2)
+      await go('orca', perch(on.body))
+      feel('orca', 'focused')
+      let slots = course(on.body)
+      gsap.set(bricks(), { x: (i) => slot(slots[i]).x, y: (i) => slot(slots[i]).y, color: ori.color })
+      bricks().forEach((b) => b.toggleAttribute('data-ghost', true))
+      await gsap.fromTo(bricks(), { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.25, stagger: 0.035 }).then()
+      await wait(0.4)
       if (me.dead) return
-      await collect('orca')
       feel('orca', 'idle')
       say('orca', 'tasks out')
       await go('orca', seat(0))
       if (me.dead) return
 
-      // The hand-off: orca throws one stream of dots at each empty seat, and a worker pops up where it lands.
-      narrate(2, 'orca → claude: write · orca → codex: review', AGENTS[0].color)
-      await emit('orca', [seat(1), seat(2)], 0.7)
-      gsap.to(dots('orca'), { opacity: 0, duration: 0.2 })
-      await Promise.all([appear('claude', seat(1)), appear('codex', seat(2))])
-      // Its part is done for now: orca dozes off until the gates.
+      // The hand-off: the ticket becomes two task cards, thrown to the seats where the workers pop up.
+      narrate(2, `${ori.name} → ${quill.name}: write · ${ori.name} → ${boo.name}: review`, ori.color)
+      const from = { x: at.orca.x, y: at.orca.y - 10 }
+      appear('claude', seat(1))
+      appear('codex', seat(2))
+      await Promise.all([pass('write', from, seat(1), 'claude', 0.7), pass('review', from, seat(2), 'codex', 0.9)])
+      // Its part is done for now: Ori dozes off until the gates.
       feel('orca', 'asleep')
-      await wait(0.4)
+      await wait(0.5)
 
-      // The visitor may have scrolled on: each phase works on the section that is on screen now.
-      on = await stage(me)
+      // The visitor may have scrolled on: each phase re-reads the section on screen and moves the course to it.
+      const follow = async () => {
+        const now = await stage(me)
+        if (!now) return null
+        const next = course(now.body)
+        if (Math.abs(next[0].x - slots[0].x) > 2 || Math.abs(next[0].y - slots[0].y) > 2) {
+          slots = next
+          await gsap.to(bricks(), { x: (i) => slot(slots[i]).x, y: (i) => slot(slots[i]).y, duration: 0.5, ease: 'power2.inOut' }).then()
+        }
+        return now
+      }
+
+      // 3. Quill hops along the course, and a brick drops into each slot behind it.
+      on = await follow()
       if (!on) return
-      narrate(3, `claude writes ${on.name}`, AGENTS[1].color)
+      narrate(3, `${quill.name} writes ${on.name}`, quill.color)
       say('claude', `write ${on.name}`, true)
       await go('claude', perch(on.body))
       feel('claude', 'working')
-      await emit('claude', perimeterPoints(on.body, SWARM))
-      await twinkle('claude', 4)
+      const lay = gsap.fromTo(bricks(),
+        { y: (i) => slot(slots[i]).y - 48, opacity: 0 },
+        { y: (i) => slot(slots[i]).y, opacity: 1, duration: 0.45, ease: 'bounce.out', immediateRender: false, stagger: { each: 0.07, onStart: tint(quill.color) } })
+      for (const along of [0.33, 0.66, 0.96]) await go('claude', perch(on.body, along), 0.7)
+      await lay.then()
+      if (me.dead) return
 
-      // The reviewer's dots line up into one row and sweep the block from top to bottom.
-      on = await stage(me)
+      // 4. Boo walks the course and turns each brick it approves green; one is wrong.
+      on = await follow()
       if (!on) return
       const { name, body } = on
-      narrate(4, 'codex reviews the diff', AGENTS[2].color)
-      say('claude', 'diff → codex')
+      const bad = Math.floor(BRICKS * 0.62)
+      const approve = (start: number, end: number) => gsap.to(bricks().slice(start, end), {
+        keyframes: [{ scale: 1.4, duration: 0.08 }, { scale: 1, duration: 0.17 }],
+        stagger: { each: 0.06, onStart: tint(boo.color) },
+      }).then()
+      narrate(4, `${boo.name} reviews the diff`, boo.color)
+      say('claude', `diff → ${boo.name}`)
       feel('claude', 'idle')
       say('codex', `review ${name}`, true)
-      if (at.claude.y !== perch(body).y) {
-        await go('claude', perch(body))
-        await send('claude', perimeterPoints(body, SWARM), 0.6)
-      }
-      await go('codex', perch(body, 0.72))
-      // Head down, eyes on the diff.
+      await go('codex', perch(body, 0.04))
+      // Head down, eyes on the bricks.
       feel('codex', 'focused')
-      await emit('codex', rowPoints(body, body.y, SWARM))
-      await gsap.to(dots('codex'), { y: body.y + body.h - DOT / 2, duration: 1.1, ease: 'none' }).then()
+      const firstPass = approve(0, bad)
+      await go('codex', perch(body, 0.3), 0.6)
+      await go('codex', perch(body, bad / BRICKS - 0.04), 0.6)
+      await firstPass
       if (me.dead) return
-      narrate(4, 'codex: 1 issue → claude fixes it', AGENTS[1].color)
+
+      const wrong = bricks()[bad]
+      wrong.style.color = REJECTED
+      gsap.fromTo(wrong, { rotation: -14 }, { rotation: 14, duration: 0.07, repeat: 7, yoyo: true })
+      narrate(4, `${boo.name}: 1 issue → ${quill.name} fixes it`, REJECTED)
       say('codex', '1 issue')
-      // The writer jumps at the news, then gets back to it.
+      // The writer jumps at the news.
       feel('claude', 'surprised')
       anchor('claude').toggleAttribute('data-alert', true)
       gsap.fromTo(bot('claude'), { y: 0 }, { y: -14, duration: 0.16, ease: 'power2.out', yoyo: true, repeat: 1 })
       say('claude', '!')
       await wait(0.9)
+      if (me.dead) return
       anchor('claude').toggleAttribute('data-alert', false)
+      // Boo kicks the bad brick out, and Quill comes back to lay a new one.
+      gsap.to(wrong, { x: '+=110', y: '-=90', rotation: 260, opacity: 0, duration: 0.6, ease: 'power2.out' })
       feel('claude', 'working')
       say('claude', 'fix', true)
-      await twinkle('claude', 2)
-      await gsap.to(dots('codex'), { y: body.y - DOT / 2, duration: 0.8, ease: 'none' }).then()
-      if (me.dead) return
-      narrate(4, 'codex: review ✓', AGENTS[2].color)
-      say('codex', `${name} ✓`)
-      say('claude', 'done')
-      feel('codex', 'happy')
+      await go('claude', { x: slots[bad].x - 30, y: perch(body).y })
+      wrong.style.color = quill.color
+      await gsap.fromTo(wrong, { x: slot(slots[bad]).x, y: slot(slots[bad]).y - 48, rotation: 0, opacity: 0 }, { y: slot(slots[bad]).y, opacity: 1, duration: 0.45, ease: 'bounce.out' }).then()
+      say('claude', 'fixed')
       feel('claude', 'idle')
+      const secondPass = approve(bad, BRICKS)
+      await go('codex', perch(body, 0.97), 0.7)
+      await secondPass
+      if (me.dead) return
+      narrate(4, `${boo.name}: review ✓`, boo.color)
+      say('codex', `${name} ✓`)
+      feel('codex', 'happy')
       await wait(0.6)
 
-      // Each gate fills a third of the block's bottom edge.
-      on = await stage(me)
+      // 5. Each gate sends a ripple down the course.
+      on = await follow()
       if (!on) return
-      const floor = on.body.y + on.body.h
+      feel('orca', 'idle')
+      feel('codex', 'idle')
       const gates = ['tsc', 'test', 'build']
       for (const [i, { id, color }] of AGENTS.entries()) {
         if (me.dead) return
         narrate(5, `gates: ${gates.slice(0, i + 1).map((g) => `${g} ✓`).join('  ')}`, color)
         say(id, `${gates[i]} ✓`)
-        feel(id, 'idle')
-        await go(id, { x: on.body.x + on.body.w * (i / 3 + 1 / 6), y: floor + 40 })
-        const row = rowPoints(on.body, floor, SWARM, i / 3 + 0.01, (i + 1) / 3 - 0.01)
-        await (id === 'orca' ? emit(id, row, 0.7) : send(id, row, 0.7))
+        await gsap.to(bricks(), { keyframes: [{ y: '-=10', duration: 0.12, ease: 'power2.out' }, { y: '+=10', duration: 0.18, ease: 'power2.in' }], stagger: 0.016 }).then()
       }
-      await wait(0.7)
+      await wait(0.4)
       if (me.dead) return
 
+      // 6. Shipped: the bricks fly together into a tick, and everyone goes home to celebrate.
       narrate(6, 'me: ship it → deployed tiendat.work')
+      const tick = checkPoints({ x: on.body.x + on.body.w / 2, y: on.body.y + on.body.h / 2 }, Math.min(150, on.body.h * 0.7), BRICKS)
+      gsap.to(bricks(), { x: (i) => slot(tick[i]).x, y: (i) => slot(tick[i]).y, duration: 0.9, ease: 'back.out(1.4)', stagger: { amount: 0.4, from: 'random' } })
       await Promise.all(AGENTS.map(async ({ id, verb }, i) => {
-        await collect(id)
         say(id, verb)
         await go(id, seat(i))
-        // Shipped: everyone celebrates for a moment.
         feel(id, 'happy')
       }))
       await wait(3.5)
       if (me.dead) return
       AGENTS.forEach(({ id }) => feel(id, 'idle'))
+      gsap.to(bricks(), { opacity: 0, scale: 0.3, duration: 0.4, stagger: { amount: 0.3, from: 'center' } })
       gsap.to(hud, { autoAlpha: 0, y: 8, duration: 0.4 })
     }
 
@@ -340,10 +386,18 @@ export function AgentSwarm () {
 
   return (
     <div ref={rootRef} aria-hidden='true' className='pointer-events-none absolute inset-0 z-40 font-ibm'>
-      {AGENTS.map(({ id, color }) => Array.from({ length: SWARM }, (_, i) => (
-        <span key={`${id}-${i}`} data-dot={id} className='absolute left-0 top-0 rounded-full opacity-0 will-change-transform' style={{ width: DOT, height: DOT, backgroundColor: color }} />
-      )))}
-      {AGENTS.map(({ id, verb, color }) => (
+      {Array.from({ length: BRICKS }, (_, i) => (
+        <span key={i} data-brick='' className='absolute left-0 top-0 opacity-0 will-change-transform'>
+          <Brick />
+        </span>
+      ))}
+      {([['ticket', 'ticket: build', 'currentColor'], ['write', 'task: write', BY_ID.claude.color], ['review', 'task: review', BY_ID.codex.color]] as const).map(([kind, text, color]) => (
+        <span key={kind} data-card={kind} className='invisible absolute left-0 top-0 flex w-max items-center gap-1.5 border bg-background px-1.5 py-1 text-[11px] leading-none shadow-sm' style={{ borderColor: color }}>
+          <span className='size-1.5' style={{ backgroundColor: color }} />
+          {text}
+        </span>
+      ))}
+      {AGENTS.map(({ id, name, verb, color }) => (
         <button
           key={id}
           type='button'
@@ -357,7 +411,7 @@ export function AgentSwarm () {
             <span className='absolute -right-1 -top-2 hidden size-5 place-items-center rounded-full bg-foreground text-xs font-bold text-background group-data-[alert]/agent:grid'>!</span>
           </span>
           <span className='ml-9 mt-7 flex w-max items-center gap-1 px-1.5 py-0.5 text-[11px] font-medium leading-4 text-black' style={{ backgroundColor: color }}>
-            <span>{id}</span>
+            <span>{name}</span>
             <span className='opacity-50'>·</span>
             <span data-part='task'>{verb}</span>
             <span className='agent-dots hidden gap-0.5 pl-0.5 group-data-[busy]/agent:flex'>
@@ -375,7 +429,7 @@ export function AgentSwarm () {
   )
 }
 
-// The same cast as real controls: who each agent is, how the build goes, and the swarm's replay and off switch.
+// The same cast as real controls: who each agent is, how the build goes, and the scene's replay and off switch.
 export function AgentCast () {
   const { on, able, still } = useSwarm()
   const [open, setOpen] = useState<AgentId | null>(null)
@@ -402,7 +456,7 @@ export function AgentCast () {
     <div ref={ref} className='flex flex-col gap-3'>
       <p aria-live='polite' className='sr-only'>{status}</p>
       <div className='flex flex-wrap items-center gap-2'>
-        {AGENTS.map(({ id, verb }) => (
+        {AGENTS.map(({ id, name, verb }) => (
           <button
             key={id}
             type='button'
@@ -413,7 +467,7 @@ export function AgentCast () {
           >
             <Bot id={id} size={44} still={still} mood={open === id ? 'happy' : 'idle'} />
             <span className='text-left'>
-              <span className='block font-medium'>{id}</span>
+              <span className='block font-medium'>{name}</span>
               <span className='block text-muted-foreground'>{verb}</span>
             </span>
           </button>
@@ -435,13 +489,13 @@ export function AgentCast () {
       <div id='agent-details'>
         {current && (
           <div className='border-l-2 py-1 pl-3 text-xs' style={{ borderColor: current.color }}>
-            <p>{current.role}</p>
+            <p><span className='font-medium'>{current.name}.</span> {current.role}</p>
             <p className='mt-1 text-muted-foreground'>Runs on {current.runsOn}.</p>
             <ul className='mt-1 list-inside list-["–_"] text-muted-foreground'>
               {current.setup.map((item) => <li key={item}>{item}</li>)}
             </ul>
             <Link href={current.href} className='mt-1 inline-block underline underline-offset-2 hover:text-foreground'>
-              see the {current.id} workflow →
+              see the {current.runsOn} workflow →
             </Link>
           </div>
         )}

@@ -23,18 +23,19 @@ test('toLocalBox clips to the viewport and converts to overlay coordinates', () 
   assert.deepEqual(toLocalBox(rect(200, 100), root, 800), { x: 20, y: 700, w: 600, h: 100 })
 })
 
-test('perimeterPoints walks the edge clockwise from the top-left corner', async () => {
-  const { perimeterPoints } = await import('../../src/lib/agent-cursors-plan')
-  const box = { x: 10, y: 20, w: 100, h: 50 }
-  assert.deepEqual(perimeterPoints(box, 6), [
-    { x: 10, y: 20 }, { x: 60, y: 20 }, { x: 110, y: 20 },
-    { x: 110, y: 70 }, { x: 60, y: 70 }, { x: 10, y: 70 },
-  ])
-})
-
 test('rowPoints spreads a row across a slice of the box width', async () => {
   const { rowPoints } = await import('../../src/lib/agent-cursors-plan')
   const box = { x: 0, y: 0, w: 300, h: 40 }
   assert.deepEqual(rowPoints(box, 40, 3, 1 / 3, 2 / 3).map((p) => Math.round(p.x)), [100, 150, 200])
   assert.deepEqual(rowPoints(box, 40, 1), [{ x: 150, y: 40 }])
+})
+
+test('checkPoints draws a tick: down to the corner, then up to the top right', async () => {
+  const { checkPoints } = await import('../../src/lib/agent-cursors-plan')
+  const points = checkPoints({ x: 100, y: 100 }, 100, 9)
+  assert.equal(points.length, 9)
+  assert.deepEqual(points[0], { x: 50, y: 100 })
+  assert.deepEqual(points[3], { x: 86, y: 136 })
+  assert.deepEqual(points[8], { x: 150, y: 64 })
+  assert.ok(points[1].y > points[0].y && points[5].y < points[4].y)
 })

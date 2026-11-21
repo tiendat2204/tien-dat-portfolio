@@ -1,8 +1,10 @@
-// The cast of the home page's agent swarm (agent-swarm.tsx). Roles and setup mirror /uses.
+// The cast of the home page's agent scene (agent-swarm.tsx). Each character has its own name; `runsOn` is the
+// tool behind it. Roles and setup mirror /uses.
 
 export const AGENTS = [
   {
     id: 'orca',
+    name: 'Ori',
     avatar: 'droid',
     verb: 'plan',
     color: '#4c8dff',
@@ -13,6 +15,7 @@ export const AGENTS = [
   },
   {
     id: 'claude',
+    name: 'Quill',
     avatar: 'star',
     verb: 'write',
     color: '#f58742',
@@ -23,6 +26,7 @@ export const AGENTS = [
   },
   {
     id: 'codex',
+    name: 'Boo',
     avatar: 'ghost',
     verb: 'review',
     color: '#4cc47c',
@@ -35,12 +39,12 @@ export const AGENTS = [
 
 export type AgentId = typeof AGENTS[number]['id']
 
-// The build story the swarm acts out, and the text walkthrough shown where it cannot move.
+// The build story the cast acts out, and the text walkthrough shown where it cannot move.
 export const BUILD_STEPS = [
   'I write the ticket: build tien-dat-profile.',
-  'orca splits it into tasks, one worktree each.',
-  'claude writes the change.',
-  'codex reviews it; issues go back to claude.',
+  'Ori splits it into tasks, one worktree each.',
+  'Quill writes the change.',
+  'Boo reviews it; issues go back to Quill.',
   'The gates run: tsc, unit tests, build.',
   'I decide what ships; pushing main deploys.',
 ] as const
