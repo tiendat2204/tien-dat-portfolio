@@ -606,6 +606,51 @@ export const DATA = {
       ],
     },
     {
+      title: 'Claude Code 101 Certificate',
+      dates: 'November 21, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the Claude Code 101 course and passed its quiz: the agentic loop, context management, the Explore, Plan, Code, Commit workflow, CLAUDE.md, subagents, skills, MCP and hooks.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/1792694c11ad213162fb37c4981aeba0',
+        },
+      ],
+    },
+    {
+      title: 'Introduction to Evals Certificate',
+      dates: 'November 21, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the Introduction to evals course with a perfect quiz score (12 of 12): choosing a model by measurement, building a minimum viable eval, iterating the prompt before upgrading the model, and running evals in CI and against production drift.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/be8f17ba0fb937329ed935797204842b',
+        },
+      ],
+    },
+    {
+      title: 'Building Effective Human-Agent Teams Certificate',
+      dates: 'November 21, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the Building effective human-agent teams (beta) course on moving from single-player to multiplayer AI and preparing a team for the shift.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/e1b156bb58ce7918bcd4ac665cdb70cc',
+        },
+      ],
+    },
+    {
       title: 'Gemini Certified Educator',
       dates: 'January 30, 2026',
       location: 'Google for Education',
