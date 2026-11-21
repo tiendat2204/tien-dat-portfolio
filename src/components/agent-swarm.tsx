@@ -1,7 +1,6 @@
 'use client'
 
 import { gsap } from 'gsap'
-import { useLenis } from 'lenis/react'
 import Link from 'next/link'
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 
@@ -16,8 +15,9 @@ import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
     wide screens). They hop when a new section is reached and say a line when poked. Its ▶ starts a build of the section in view,
     and a character picked up and dropped on a section starts one there.
   - AgentScene: where the work shows. The crew builds a section of the page out of that section's own pieces: Ori
-    plans it (the content goes and a dashed outline stands in for every block), Quill builds the pieces one by one
-    with a thrown voxel brick, Boo approves them and sends one back, the gates pulse through, and it ships. Then
+    plans it (the content goes and a patch of dots stands in for every block), Quill builds the pieces one by one
+    with a thrown voxel brick, each arriving in chunky columns, Boo approves them with a flash and sends one
+    back, the gates pulse through, and it ships. Then
     the section is exactly as it was and the cast returns to the dock.
   - AgentCast: the same cast as real controls in "How I build", with the build as text.
 
@@ -25,6 +25,10 @@ import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
 */
 
 const REJECTED = '#ef4444'
+// A piece that is not built yet shows as a patch of dots, like the dot grid behind the hero figure.
+const DOTS = 'radial-gradient(currentColor 1.1px, transparent 1.6px)'
+// Pieces appear in chunky columns, block by block, not in a smooth wipe.
+const BLOCKY = 'steps(9)'
 const STORAGE_KEY = 'agent-cursors'
 const TOGGLE_EVENT = 'agent-swarm:toggle'
 /** detail: `{ section?: string }` — the section id to build on; the one in view when left out. */
@@ -39,9 +43,9 @@ const BRICK = { w: 18, h: 20 }
 const ACTOR = 52
 // A section is built from at most this many pieces; a busier one is taken in bigger blocks.
 const MAX_PIECES = 26
-// A section's top rule must be this far below the header, and this far above the bottom, to build on it.
-const HEADROOM = 230
-const FOOTROOM = 140
+// The site header's height, and the highest line (in the viewport) the characters may stand on below it.
+const HEADER = 57
+const STAND_MIN = HEADER + ACTOR + 20
 
 const BY_ID = Object.fromEntries(AGENTS.map((a) => [a.id, a])) as { [K in AgentId]: Extract<typeof AGENTS[number], { id: K }> }
 
@@ -293,15 +297,9 @@ export function AgentScene () {
   const rootRef = useRef<HTMLDivElement>(null)
   const { still } = usePrefs()
   const hidden = useTabHidden()
-  const lenis = useLenis()
-  const scrollRef = useRef<(top: number) => void>(undefined)
   const [cast, setCast] = useState<Cast>(resting)
   const [line, setLine] = useState('')
   const [live, setLive] = useState(false)
-
-  useEffect(() => {
-    scrollRef.current = (top) => { if (lenis) lenis.scrollTo(top); else window.scrollTo({ top, behavior: 'smooth' }) }
-  }, [lenis])
 
   useEffect(() => {
     const root = rootRef.current
@@ -392,17 +390,12 @@ export function AgentScene () {
       const quill = BY_ID.claude
       const boo = BY_ID.codex
 
-      // Bring the section's top rule to a clear part of the view first.
-      let rect = section.getBoundingClientRect()
-      if (rect.top < HEADROOM || rect.top > window.innerHeight - FOOTROOM) {
-        scrollRef.current?.(window.scrollY + rect.top - window.innerHeight * 0.38)
-        await wait(1.1)
-        if (me.dead) return
-        rect = section.getBoundingClientRect()
-      }
+      // The section is built where it is, with no scrolling. The three stand on its top rule, or, when that rule
+      // is above the view, on a line just under the site header.
+      const rect = section.getBoundingClientRect()
       const origin = root.getBoundingClientRect()
       const left = rect.left - origin.left
-      const rule = rect.top - origin.top
+      const rule = Math.max(rect.top, STAND_MIN) - origin.top
       const pieces = piecesOf(section)
       if (pieces.length === 0) {
         run.dead = true
@@ -415,8 +408,8 @@ export function AgentScene () {
       })
       const count = pieces.length
       const outline = frames().slice(0, count)
-      gsap.set(outline, { x: (i) => spots[i].x - 3, y: (i) => spots[i].y - 3, width: (i) => spots[i].w + 6, height: (i) => spots[i].h + 6, autoAlpha: 0, scale: 1, borderStyle: 'dashed', borderColor: ori.color, backgroundColor: 'transparent' })
-      gsap.set(chip, { x: left + 8, y: rule - 150, autoAlpha: 1 })
+      gsap.set(outline, { x: (i) => spots[i].x, y: (i) => spots[i].y, width: (i) => spots[i].w, height: (i) => spots[i].h, autoAlpha: 0, scale: 1, color: ori.color, backgroundImage: DOTS, backgroundSize: '7px 7px', backgroundColor: 'transparent', clipPath: 'inset(0 0 0 0%)' })
+      gsap.set(chip, { x: left + 8, y: Math.max(rule - 110, HEADER + 8 - origin.top), autoAlpha: 1 })
       gsap.set(stamp, { x: left + rect.width - 14, y: rule, xPercent: -100, yPercent: -50, scale: 1 })
       AGENTS.forEach(({ id }) => gsap.set(bot(id), { y: 0, rotation: 0, scale: 1 }))
       setLive(true)
@@ -438,7 +431,7 @@ export function AgentScene () {
       await pass('ticket', { x: left - 60, y: rule - ACTOR / 2 }, at.orca, 'orca', 0.9)
       if (me.dead) return
 
-      // 2. The plan: the section's content goes, and a dashed outline stands in for every piece.
+      // 2. The plan: the section's content goes, and a patch of dots stands in for every piece.
       narrate(`${ori.name} plans it: ${count} pieces`, 2)
       act('orca', { mood: 'focused', busy: true })
       gsap.to(pieces, { opacity: 0, duration: 0.2, stagger: 0.025 })
@@ -452,15 +445,16 @@ export function AgentScene () {
       // Its part is done for now: Ori dozes off until the gates.
       act('orca', { mood: 'asleep' })
 
-      // A piece is built by a voxel brick thrown at its slot: the outline goes solid and the content wipes in.
+      // A piece is built by a voxel brick thrown at it: its dots turn the writer's colour and give way, block by
+      // block, to the real content.
       const build = (i: number) => {
         const brick = bricks()[i % bricks().length]
         gsap.fromTo(brick, { x: at.claude.x, y: at.claude.y - 20, autoAlpha: 1, scale: 1, rotation: 0 }, { x: spots[i].x, y: spots[i].y, rotation: 180, duration: 0.2, ease: 'power1.in', onComplete: () => { gsap.set(brick, { autoAlpha: 0 }) } })
         // Started when the brick lands, through a tracked timer, so a strike in between cancels it cleanly.
         timers.push(gsap.delayedCall(0.2, () => {
-          gsap.set(outline[i], { borderStyle: 'solid', borderColor: quill.color, backgroundColor: `${quill.color}26` })
-          gsap.to(outline[i], { backgroundColor: `${quill.color}00`, duration: 0.5, delay: 0.1 })
-          gsap.fromTo(pieces[i], { opacity: 1, clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 0.35, ease: 'power2.out' })
+          gsap.set(outline[i], { autoAlpha: 1, color: quill.color, backgroundImage: DOTS, backgroundColor: 'transparent' })
+          gsap.fromTo(outline[i], { clipPath: 'inset(0 0 0 0%)' }, { clipPath: 'inset(0 0 0 100%)', duration: 0.42, ease: BLOCKY })
+          gsap.fromTo(pieces[i], { opacity: 1, clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 0.42, ease: BLOCKY })
         }))
       }
 
@@ -478,14 +472,14 @@ export function AgentScene () {
       if (me.dead) return
       act('claude', { mood: 'idle', busy: false })
 
-      // 4. Boo follows, approving each piece (its outline turns green). One is wrong.
+      // 4. Boo follows, approving each piece with a flash of green. One is wrong.
       const bad = Math.min(count - 1, Math.floor(count * 0.6))
       const approve = async (start: number, end: number) => {
         for (let i = start; i < end; i++) {
           if (i % stride === 0) await go('codex', beside(i, 1))
           if (me.dead) return
-          gsap.set(outline[i], { borderColor: boo.color })
-          gsap.fromTo(outline[i], { scale: 1.04 }, { scale: 1, duration: 0.2 })
+          gsap.set(outline[i], { backgroundImage: 'none', backgroundColor: `${boo.color}40`, clipPath: 'none' })
+          gsap.fromTo(outline[i], { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.45, ease: 'power1.in' })
           await wait(0.07)
           if (me.dead) return
         }
@@ -495,8 +489,9 @@ export function AgentScene () {
       await approve(0, bad)
       if (me.dead) return
       await go('codex', beside(bad, 1))
-      gsap.set(outline[bad], { borderColor: REJECTED, backgroundColor: `${REJECTED}26` })
-      gsap.fromTo(outline[bad], { x: spots[bad].x - 6 }, { x: spots[bad].x, duration: 0.06, repeat: 7, yoyo: true })
+      // The bad piece breaks back up into red dots.
+      gsap.set(outline[bad], { autoAlpha: 1, color: REJECTED, backgroundImage: DOTS, backgroundColor: 'transparent', clipPath: 'none' })
+      gsap.fromTo(outline[bad], { x: spots[bad].x - 4 }, { x: spots[bad].x + 4, duration: 0.06, repeat: 7, yoyo: true })
       gsap.to(pieces[bad], { opacity: 0.25, duration: 0.2 })
       narrate(`${boo.name}: 1 issue. Back to ${quill.name}.`, 4)
       act('codex', { busy: false })
@@ -509,7 +504,7 @@ export function AgentScene () {
       await go('claude', beside(bad, -1))
       if (me.dead) return
       gsap.killTweensOf(outline[bad])
-      gsap.set(outline[bad], { x: spots[bad].x - 3 })
+      gsap.set(outline[bad], { x: spots[bad].x })
       build(bad)
       await wait(0.7)
       if (me.dead) return
@@ -530,15 +525,15 @@ export function AgentScene () {
         narrate(`gates: ${done}`, 5)
         stamp.textContent = done
         gsap.fromTo(stamp, { autoAlpha: 1, scale: 1.25 }, { scale: 1, duration: 0.25, ease: 'back.out(2)' })
-        await gsap.fromTo(outline, { opacity: 0.35 }, { opacity: 1, duration: 0.2, stagger: 0.012 }).then()
+        gsap.set(outline, { backgroundImage: 'none', backgroundColor: `${boo.color}33`, clipPath: 'none', x: (n) => spots[n].x })
+        await gsap.fromTo(outline, { autoAlpha: 0.9 }, { autoAlpha: 0, duration: 0.3, stagger: 0.02 }).then()
         if (me.dead) return
       }
 
-      // 6. Shipped: the outlines let go and the section is itself again.
+      // 6. Shipped: the section is itself again.
       narrate('me: ship it. Deployed to tiendat.work.', 6)
       stamp.textContent = '✓ shipped'
       gsap.fromTo(stamp, { scale: 1.6 }, { scale: 1, duration: 0.3, ease: 'back.out(2)' })
-      gsap.to(outline, { autoAlpha: 0, scale: 1.04, duration: 0.4, stagger: 0.015 })
       AGENTS.forEach(({ id }, i) => {
         act(id, { mood: 'happy' })
         go(id, onRule(0.2 + i * 0.3), 0.5)
@@ -551,11 +546,10 @@ export function AgentScene () {
       strike()
     }
 
-    // The section to build when none is named: the first whose top rule is clear in the view, else "How I build".
+    // The section to build when none is named: the one in the middle of the view.
     const pick = () => {
       const list = sections()
-      return list.find((s) => { const top = s.getBoundingClientRect().top; return top >= HEADROOM && top <= window.innerHeight - FOOTROOM }) ??
-        document.getElementById('how-i-build') ?? list[0] ?? null
+      return list[sectionAt(list.map((s) => s.getBoundingClientRect()), window.innerHeight / 2)] ?? list[0] ?? null
     }
     const onRun = (e: Event) => {
       const id = (e as CustomEvent<{ section?: string } | undefined>).detail?.section
@@ -588,7 +582,7 @@ export function AgentScene () {
 
   return (
     <div ref={rootRef} aria-hidden='true' className='pointer-events-none absolute inset-0 z-30 font-ibm'>
-      {Array.from({ length: MAX_PIECES }, (_, i) => <span key={i} data-frame='' className='invisible absolute left-0 top-0 border' />)}
+      {Array.from({ length: MAX_PIECES }, (_, i) => <span key={i} data-frame='' className='invisible absolute left-0 top-0' />)}
       {Array.from({ length: 6 }, (_, i) => (
         <span key={i} data-brick='' className='invisible absolute left-0 top-0' style={{ color: BY_ID.claude.color }}>
           <Brick />
