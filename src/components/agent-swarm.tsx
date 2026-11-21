@@ -22,6 +22,7 @@ const STORAGE_KEY = 'agent-cursors'
 const TOGGLE_EVENT = 'agent-swarm:toggle'
 const RUN_EVENT = 'agent-swarm:run'
 const OPEN_EVENT = 'agent-swarm:open'
+const STATUS_EVENT = 'agent-swarm:status'
 
 function storedOn () {
   try {
@@ -91,6 +92,8 @@ export function AgentSwarm () {
       hud.querySelector('[data-part="step"]')!.textContent = `${step}/${BUILD_STEPS.length}`
       hud.querySelector('[data-part="text"]')!.textContent = text
       hud.querySelector<HTMLElement>('[data-part="lamp"]')!.style.backgroundColor = color
+      // The overlay is hidden from assistive tech; AgentCast announces the same line.
+      window.dispatchEvent(new CustomEvent(STATUS_EVENT, { detail: `Step ${step} of ${BUILD_STEPS.length}: ${text}` }))
     }
 
     const orb = (id: AgentId) => anchor(id).querySelector<HTMLElement>('[data-part="orb"]')!
@@ -303,18 +306,26 @@ export function AgentCast () {
   const ref = useRef<HTMLDivElement>(null)
   const current = AGENTS.find((a) => a.id === open)
 
-  // A click on a dot out on the page lands here.
+  const [status, setStatus] = useState('')
+
+  // A click on a dot out on the page lands here, and so does each line of the running build.
   useEffect(() => {
     const onOpen = (e: Event) => {
       setOpen((e as CustomEvent<AgentId>).detail)
       ref.current?.scrollIntoView({ block: 'center' })
     }
+    const onStatus = (e: Event) => setStatus((e as CustomEvent<string>).detail)
     window.addEventListener(OPEN_EVENT, onOpen)
-    return () => window.removeEventListener(OPEN_EVENT, onOpen)
+    window.addEventListener(STATUS_EVENT, onStatus)
+    return () => {
+      window.removeEventListener(OPEN_EVENT, onOpen)
+      window.removeEventListener(STATUS_EVENT, onStatus)
+    }
   }, [])
 
   return (
     <div ref={ref} className='flex flex-col gap-3'>
+      <p aria-live='polite' className='sr-only'>{status}</p>
       <div className='flex flex-wrap items-center gap-2'>
         {AGENTS.map(({ id, verb, color }) => (
           <button
