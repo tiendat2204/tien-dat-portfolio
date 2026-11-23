@@ -605,6 +605,51 @@ export const DATA = {
       ],
     },
     {
+      title: 'Claude Code in Action Certificate',
+      dates: 'November 23, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the Claude Code in action course with a perfect quiz score (8 of 8): steering long sessions, a CLAUDE.md that Claude follows, verification skills, permission modes, hooks, scheduled and headless runs, GitHub Actions and code review, verifying unattended runs, and plugins.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/913c5777434c0df9a2f581a64f2354cb',
+        },
+      ],
+    },
+    {
+      title: 'Tool Use with the Messages API Certificate',
+      dates: 'November 23, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the Tool use with the Messages API course with a perfect quiz score (12 of 12): writing tool descriptions Claude picks, strict tool use, parallel and streamed tool calls, code execution, web search, computer use, and cutting the cost of tool-heavy workflows.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/3bb4a138e99fa3abcd04147245d9a67f',
+        },
+      ],
+    },
+    {
+      title: 'Claude Platform 101 Certificate',
+      dates: 'November 23, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the Claude Platform 101 course with a perfect quiz score (5 of 5): the first API call, choosing a model, the agent loop, tool use, thinking, built-in tools, skills, MCP, context management and managed agents.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/92976e9e93c737259d5065c08a1664e0',
+        },
+      ],
+    },
+    {
       title: 'Claude Code 101 Certificate',
       dates: 'November 21, 2026',
       location: 'Claude Academy (Anthropic)',
