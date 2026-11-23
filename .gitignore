@@ -18,6 +18,9 @@
 
 # misc
 .DS_Store
+
+# IDE
+/.idea
 *.pem
 
 # debug
