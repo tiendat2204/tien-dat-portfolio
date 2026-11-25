@@ -605,6 +605,51 @@ export const DATA = {
       ],
     },
     {
+      title: 'Introduction to Claude Tag Certificate',
+      dates: 'November 25, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the Introduction to Claude Tag course with a perfect quiz score (10 of 10): proactive replies, channel memory versus instructions, giving Claude ownership of a task, steering a running task, and choosing the right channel or DM.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/22241453120a53fa1bdad957cf013a87',
+        },
+      ],
+    },
+    {
+      title: 'Introduction to Claude Cowork Certificate',
+      dates: 'November 25, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the Introduction to Claude Cowork course with a perfect quiz score (10 of 10): global and project instructions, working folders and permissions, writing good prompts, skills and plugins, Claude in Chrome, and scheduled tasks.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/13fbd30c8564dcac57580be90dbf69cd',
+        },
+      ],
+    },
+    {
+      title: 'Claude 101 Certificate',
+      dates: 'November 25, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the Claude 101 course with a perfect quiz score (10 of 10): prompting, projects, artifacts, skills, connectors, enterprise search, research, and which Claude product fits which job.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/0e7e8da56d83ca0423b32810ff1cf770',
+        },
+      ],
+    },
+    {
       title: 'Claude Code in Action Certificate',
       dates: 'November 23, 2026',
       location: 'Claude Academy (Anthropic)',
