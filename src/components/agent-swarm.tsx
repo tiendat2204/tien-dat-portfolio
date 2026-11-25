@@ -6,7 +6,7 @@ import { useTheme } from 'next-themes'
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { ThinkingOrb, type ThinkingOrbProps } from 'thinking-orbs'
 
-import { BUSY_EVENT, BY_ID, DROP_EVENT, HINT_EVENT, RUN_EVENT, STATUS_EVENT, storeOn, usePrefs, useTabHidden } from '@/components/agent-shared'
+import { BUSY_EVENT, BY_ID, DROP_EVENT, HINT_EVENT, RUN_EVENT, STATUS_EVENT, storeOn, takePendingRun, usePrefs, useTabHidden } from '@/components/agent-shared'
 import { AGENTS, BUILD_STEPS, type AgentId } from '@/data/agents'
 import { mostVisible, sectionAt, type Point } from '@/lib/agent-cursors-plan'
 import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
@@ -313,13 +313,12 @@ export function AgentScene () {
     if (still || !root) return
 
     const frames = () => gsap.utils.toArray<HTMLElement>('[data-frame]', root)
-    const card = (kind: 'ticket' | 'write' | 'review') => root.querySelector<HTMLElement>(`[data-card='${kind}']`)!
     const stamp = root.querySelector<HTMLElement>('[data-part="stamp"]')!
     const beam = root.querySelector<HTMLElement>('[data-part="beam"]')!
     const actor = (id: AgentId) => root.querySelector<HTMLElement>(`[data-actor='${id}']`)!
     const bot = (id: AgentId) => actor(id).querySelector<HTMLElement>('[data-bot]')!
     const act = (id: AgentId, patch: Partial<Actor>) => setCast((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }))
-    const props = () => [...root.querySelectorAll('[data-frame], [data-card], [data-actor]'), stamp, beam]
+    const props = () => [...root.querySelectorAll('[data-frame], [data-actor]'), stamp, beam]
     const at = {} as Record<AgentId, Point>
     // The section's pieces while they are being built, with the inline styles to put back afterwards.
     let held: { el: HTMLElement; opacity: string; clipPath: string }[] = []
@@ -384,16 +383,10 @@ export function AgentScene () {
       return gsap.to(actor(id), { x: to.x, y: to.y, duration, ease: 'power1.inOut' }).then()
     }
 
-    // A task card is thrown in an arc, and whoever it reaches catches it with a little swell.
-    const pass = async (kind: 'ticket' | 'write' | 'review', from: Point, to: Point, catcher: AgentId, duration = 0.8) => {
-      const el = card(kind)
-      gsap.set(el, { x: from.x, y: from.y - 34, xPercent: -50, yPercent: -50, autoAlpha: 1, scale: 1, rotation: -10 })
-      gsap.to(el, { x: to.x, rotation: 8, duration, ease: 'power1.inOut' })
-      await gsap.timeline()
-        .to(el, { y: Math.min(from.y, to.y) - 70, duration: duration / 2, ease: 'power2.out' })
-        .to(el, { y: to.y - 34, duration: duration / 2, ease: 'power2.in' })
-        .then()
-      gsap.to(el, { scale: 0, autoAlpha: 0, duration: 0.2 })
+    // A task is handed over without a card in the way of the content: the call takes its time, then the catcher swells.
+    const pass = async (_kind: 'ticket' | 'write' | 'review', _from: Point, _to: Point, catcher: AgentId, duration = 0.8) => {
+      await wait(duration)
+      if (run.dead) return
       gsap.fromTo(bot(catcher), { scale: 1.2 }, { scale: 1, duration: 0.3, ease: 'back.out(3)' })
     }
 
@@ -651,6 +644,8 @@ export function AgentScene () {
       if (section) story(section)
     }
     window.addEventListener(RUN_EVENT, onRun)
+    const asked = takePendingRun()
+    if (asked) window.dispatchEvent(new CustomEvent(RUN_EVENT, { detail: asked }))
     window.addEventListener(DROP_EVENT, onDrop)
     window.addEventListener('resize', strike)
 
@@ -685,7 +680,7 @@ export function AgentScene () {
           <span className='flex max-w-[calc(100vw-3.5rem)] items-center gap-1.5 border bg-background py-0.5 pl-1 pr-2'>
             <span className='shrink-0'><ThinkingOrb state={ORBS[term.step] ?? 'working'} size={20} paused={hidden} /></span>
             <span className='min-w-0 truncate'>{term.call}</span>
-            {term.result && <span className='hidden shrink-0 text-muted-foreground sm:inline'>⎿ {term.result}</span>}
+            {term.result && <span className={`shrink-0 text-muted-foreground ${term.step === BUILD_STEPS.length ? '' : 'hidden sm:inline'}`}>⎿ {term.result}</span>}
             <span className='shrink-0 tabular-nums text-muted-foreground'>{term.step}/{BUILD_STEPS.length}</span>
           </span>
         )}

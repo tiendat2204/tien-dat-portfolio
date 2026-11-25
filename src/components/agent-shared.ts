@@ -11,6 +11,16 @@ const STORAGE_KEY = 'agent-cursors'
 export const TOGGLE_EVENT = 'agent-swarm:toggle'
 /** detail: `{ section?: string }` — the section id to build on; the one in view when left out. */
 export const RUN_EVENT = 'agent-swarm:run'
+// A build asked for before the animation code has loaded: the scene picks it up when it mounts.
+let pendingRun: { section?: string } | null = null
+export function holdRun (detail: { section?: string } | undefined) {
+  pendingRun = detail ?? {}
+}
+export function takePendingRun () {
+  const asked = pendingRun
+  pendingRun = null
+  return asked
+}
 /** detail: `{ id, x, y }` — a character let go at a viewport point. */
 export const DROP_EVENT = 'agent-swarm:drop'
 export const BUSY_EVENT = 'agent-swarm:busy'
