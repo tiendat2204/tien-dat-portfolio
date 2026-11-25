@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 
-import { holdRun, RUN_EVENT } from '@/components/agent-shared'
+import { holdRun, RUN_EVENT, takePendingRun } from '@/components/agent-shared'
 
 const AgentSwarm = dynamic(() => import('@/components/agent-swarm').then((m) => m.AgentSwarm), { ssr: false })
 
@@ -40,6 +40,8 @@ export function AgentSwarmLazy () {
     return () => {
       query.removeEventListener('change', arm)
       stop()
+      // A Run asked for on this view of the home page does not outlive it.
+      takePendingRun()
     }
   }, [])
 
