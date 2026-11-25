@@ -6,7 +6,7 @@ import { useTheme } from 'next-themes'
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { ThinkingOrb, type ThinkingOrbProps } from 'thinking-orbs'
 
-import { BUSY_EVENT, BY_ID, DROP_EVENT, HINT_EVENT, RUN_EVENT, STATUS_EVENT, storeOn, takePendingRun, usePrefs, useTabHidden } from '@/components/agent-shared'
+import { BUSY_EVENT, BY_ID, DROP_EVENT, HINT_EVENT, RUN_EVENT, scene, STATUS_EVENT, storeOn, takePendingRun, usePrefs, useTabHidden } from '@/components/agent-shared'
 import { AGENTS, BUILD_STEPS, type AgentId } from '@/data/agents'
 import { mostVisible, sectionAt, type Point } from '@/lib/agent-cursors-plan'
 import { AgentDot, type AgentDotMood } from '@/registry/AgentDot/agent-dot'
@@ -644,6 +644,7 @@ export function AgentScene () {
       if (section) story(section)
     }
     window.addEventListener(RUN_EVENT, onRun)
+    scene.ready = true
     const asked = takePendingRun()
     if (asked) window.dispatchEvent(new CustomEvent(RUN_EVENT, { detail: asked }))
     window.addEventListener(DROP_EVENT, onDrop)
@@ -651,6 +652,7 @@ export function AgentScene () {
 
     return () => {
       leaver.disconnect()
+      scene.ready = false
       window.removeEventListener(RUN_EVENT, onRun)
       window.removeEventListener(DROP_EVENT, onDrop)
       window.removeEventListener('resize', strike)

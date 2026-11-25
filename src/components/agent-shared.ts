@@ -13,8 +13,10 @@ export const TOGGLE_EVENT = 'agent-swarm:toggle'
 export const RUN_EVENT = 'agent-swarm:run'
 // A build asked for before the animation code has loaded: the scene picks it up when it mounts.
 let pendingRun: { section?: string } | null = null
+/** True while the scene is mounted and listening, so a Run no longer needs to be held. */
+export const scene = { ready: false }
 export function holdRun (detail: { section?: string } | undefined) {
-  pendingRun = detail ?? {}
+  if (!scene.ready) pendingRun = detail ?? {}
 }
 export function takePendingRun () {
   const asked = pendingRun
