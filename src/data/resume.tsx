@@ -605,6 +605,36 @@ export const DATA = {
       ],
     },
     {
+      title: 'Model Context Protocol: Advanced Topics Certificate',
+      dates: 'November 26, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the Model Context Protocol advanced topics course with a perfect assessment score (10 of 10): roots, sampling, stdio and StreamableHTTP transports, server-sent events, JSON responses, and the connection initialization sequence.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/4283583c1e15b53a0a8090a4ee3a3fc9',
+        },
+      ],
+    },
+    {
+      title: 'Introduction to Model Context Protocol Certificate',
+      dates: 'November 26, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the Introduction to Model Context Protocol course with a perfect final assessment (7 of 7): why MCP, tools, resources and prompts, building servers and clients with the Python SDK, and testing with the MCP Inspector.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/10ad29b6b5363dc5273c679ad61e0cca',
+        },
+      ],
+    },
+    {
       title: 'Introduction to Claude Tag Certificate',
       dates: 'November 25, 2026',
       location: 'Claude Academy (Anthropic)',
