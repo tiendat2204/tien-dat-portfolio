@@ -605,6 +605,21 @@ export const DATA = {
       ],
     },
     {
+      title: 'AI Fluency for Builders Certificate',
+      dates: 'November 26, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the AI Fluency for builders course with a perfect quiz score (8 of 8): the 4D Framework (Delegation, Description, Discernment, Diligence), the builder\'s toolkit, acceptance tests as a shared definition of done, the Description Chain, and the five lenses for judging AI-built code.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/28cd7f9f0a0d3b7072df00b63d5120fb',
+        },
+      ],
+    },
+    {
       title: 'Model Context Protocol: Advanced Topics Certificate',
       dates: 'November 26, 2026',
       location: 'Claude Academy (Anthropic)',
