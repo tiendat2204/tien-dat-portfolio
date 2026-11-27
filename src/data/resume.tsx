@@ -605,6 +605,51 @@ export const DATA = {
       ],
     },
     {
+      title: 'AI Fluency for Creative Work Certificate',
+      dates: 'November 27, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the AI Fluency for creative work course with a perfect quiz score (9 of 9): the Creative Value and Production lenses, the 4D Framework as two nested loops, the five roles AI can take in a piece of work, and a personal AI use policy.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/0027dc77d2c22d26f7c9d4ed5f17edbc',
+        },
+      ],
+    },
+    {
+      title: 'AI Fluency: Framework and Foundations Certificate',
+      dates: 'November 27, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the AI Fluency: Framework and foundations course with a perfect quiz score (10 of 10): effective, efficient, ethical and safe collaboration with AI, and the 4D competencies (Delegation, Description, Discernment, Diligence) with their components.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/e9412a0f6ed266e156d318e0f9567fac',
+        },
+      ],
+    },
+    {
+      title: 'AI Capabilities and Limitations Certificate',
+      dates: 'November 27, 2026',
+      location: 'Claude Academy (Anthropic)',
+      logo: '/icons/skills/claude.svg',
+      description:
+        'Completed the AI capabilities and limitations course with a perfect quiz score (10 of 10): next-token prediction, knowledge cutoffs, working memory and context limits, steerability, and how these properties combine into the failures seen in practice.',
+      links: [
+        {
+          title: 'Certificate',
+          icon: <Icons.Globe className='h-4 w-4' />,
+          href: 'https://academy.claude.com/verify/7d46893068ac882e489b04e7a1f03f82',
+        },
+      ],
+    },
+    {
       title: 'AI Fluency for Builders Certificate',
       dates: 'November 26, 2026',
       location: 'Claude Academy (Anthropic)',
